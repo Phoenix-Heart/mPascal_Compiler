@@ -34,9 +34,11 @@ public class Selector {
         else {
             token = validMachines.get(0).getToken();
         }
+        return token;
+    }
+    public void reset() {
         // reset the machines after a token is extracted, preparing for the next token.
         validMachines = new ArrayList<Context>();
         validMachines.addAll(machines);
-        return token;
     }
 }
