@@ -88,6 +88,18 @@ public class Scanner {
                     select = special;
                     select.reset();
                 }
+                else if (isWhiteSpace(ch)) {
+                    // scan recursively for next non-whitespace character.
+                    return getToken();
+                }
+                else {
+                    return Token.MP_ERROR;
+                }
+                while(select.read((char)ch)) {
+                    token = select.getToken();
+                    ch = read();
+                }
+                return token;
             }
         } catch (IOException e) {
             System.out.println("File cannot be read");

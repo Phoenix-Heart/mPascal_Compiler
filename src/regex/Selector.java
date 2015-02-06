@@ -17,7 +17,8 @@ public class Selector {
         this.validMachines = new ArrayList<Context>();
         validMachines.addAll(machines);
     }
-    public void read(char ch) {
+    // return true if some valid token exists
+    public boolean read(char ch) {
         ArrayList<Context> invalids = new ArrayList<Context>();
         // run the next symbol in each FSM and remove any FSM from the list which reaches an invalid state.
         for(Context fsm : validMachines) {
@@ -25,6 +26,8 @@ public class Selector {
                 invalids.add(fsm);
         }
         validMachines.removeAll(invalids);
+        if(validMachines.isEmpty()) return false;
+        else return true;
     }
     public Token getToken() {
         Token token;
