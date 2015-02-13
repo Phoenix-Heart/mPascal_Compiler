@@ -13,7 +13,6 @@ public class Selector {
     private ArrayList<Context> validMachines;
 
     protected void populate(ArrayList<Context> machines) {
-        this.machines = machines;
         this.validMachines = new ArrayList<Context>();
         validMachines.addAll(machines);
     }
@@ -38,5 +37,9 @@ public class Selector {
             token = validMachines.get(0).getToken();
         }
         return token;
+    }
+
+    public boolean hasToken() {
+        return !validMachines.isEmpty();
     }
 }
