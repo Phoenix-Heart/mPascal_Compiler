@@ -81,12 +81,10 @@ public class Scanner {
             else {
                 ch =  read();
                 if(isAlphanumeric(ch)) {
-                    select = alpha;
-                    select.reset();
+                    select = new alphaSelector();
                 }
                 else if (isSpecial(ch)||isDigit(ch)) {
-                    select = special;
-                    select.reset();
+                    select = new specialSelector();
                 }
                 else if (isWhiteSpace(ch)) {
                     // scan recursively for next non-whitespace character.
@@ -107,21 +105,21 @@ public class Scanner {
 
         return token;
     }
-    private boolean isEOL(int ch) {
+    public static boolean isEOL(int ch) {
         if(((char)ch=='\n')||((char)ch=='\r'))
             return true;
         else return false;
     }
-    private boolean isAlphanumeric(int ch) {
+    public static boolean isAlphanumeric(int ch) {
         return (isLetter(ch)||isDigit(ch)||isUnderScore(ch));
     }
-    private boolean isLetter(int ch) {
+    public static boolean isLetter(int ch) {
         return Character.isLetter(ch);
     }
-    private boolean isDigit(int ch) {
+    public static boolean isDigit(int ch) {
         return Character.isDigit(ch);
     }
-    private boolean isUnderScore(int ch) {
+    public static boolean isUnderScore(int ch) {
         return ('_'==(char)ch);
     }
     // white space includes spaces, tabs, carriage returns, line feeds, form feeds and unicode separators.
