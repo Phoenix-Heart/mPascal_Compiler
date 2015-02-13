@@ -22,8 +22,8 @@ public class Selector {
         ArrayList<Context> invalids = new ArrayList<Context>();
         // run the next symbol in each FSM and remove any FSM from the list which reaches an invalid state.
         for(Context fsm : validMachines) {
-            if(!fsm.read(ch))
-                invalids.add(fsm);
+            fsm.read(ch);
+            if(fsm.invalid()) invalids.add(fsm);
         }
         validMachines.removeAll(invalids);
         if(validMachines.isEmpty()) return false;
@@ -38,10 +38,5 @@ public class Selector {
             token = validMachines.get(0).getToken();
         }
         return token;
-    }
-    public void reset() {
-        // reset the machines after a token is extracted, preparing for the next token.
-        validMachines = new ArrayList<Context>();
-        validMachines.addAll(machines);
     }
 }
