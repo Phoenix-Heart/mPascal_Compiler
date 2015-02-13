@@ -16,5 +16,4 @@ public abstract class State {
 
     public abstract void read(char c);
     public abstract boolean accepted();
-    public abstract State getState();
 }
