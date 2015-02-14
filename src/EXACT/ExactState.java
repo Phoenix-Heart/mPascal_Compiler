@@ -3,29 +3,31 @@ package EXACT;
 import regex.InvalidState;
 import regex.State;
 
+import java.util.LinkedList;
+
 /**
  * Created by night on 2/5/2015.
  * Discovers an exact match by tracking state internally.
  */
 public class ExactState extends State {
-    private final char[] name;
-    private int index;
+    LinkedList<Character> states;
     public ExactState(String name) {
-        this.name = name.toCharArray();
-        index = 0;
+        states = new LinkedList<Character>();
+        for(char c : name.toCharArray()) {
+            states.add(new Character(c));
+        }
     }
     public void read(char c) {
-        if(name.length>index-1) {
+        if(states.isEmpty()) {
             changeState(InvalidState.getState());
         }
-        if(name[index]!=c) {
+        else if(!states.remove().equals(c)) {
             changeState(InvalidState.getState());
         }
-        index++;
     }
 
     @Override
     public boolean accepted() {
-        return (index==name.length);
+        return (states.isEmpty());
     }
 }

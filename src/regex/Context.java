@@ -24,6 +24,7 @@ public class Context {
     }
 
     public void changeState(State state) {
+        state.setContext(this);
         current = state;
     }
     public boolean read(char c) {
@@ -35,5 +36,12 @@ public class Context {
     }
     public Token getToken() {
         return token;
+    }
+    public boolean invalid() {
+        if(current.equals(invalid)) {
+            return true;
+        }
+        else
+            return false;
     }
 }

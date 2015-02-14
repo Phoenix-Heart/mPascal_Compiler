@@ -18,7 +18,7 @@ public class mp {
             while(token!= Token.MP_EOF) {
                 token = s.getToken();
                 tokens.add(token);
-                System.out.println("Found token "+ token.name() +" at ( "+s.getLemexe()+" )");
+                System.out.println("Found token "+ token.name() +" at ( "+s.getLexeme()+" )");
             }
         }
         else {

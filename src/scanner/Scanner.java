@@ -37,7 +37,8 @@ public class Scanner {
         special = new specialSelector();
         alpha = new alphaSelector();
         numLine = 1;
-        column = 1;
+        column = 0;
+        lexeme = "";
         try {
             reader = new BufferedReader(new FileReader(filename));
         } catch (FileNotFoundException e) {
@@ -70,40 +71,48 @@ public class Scanner {
     }
     public Token getToken() {
         int ch;
-        String lexeme = "";
+        lexeme = "";
 
         try {
             if(!reader.ready()) {
-                token = Token.MP_EOF;
+                return Token.MP_EOF;
+            }
+            ch = read();
 
+            // skip whitespace
+            while(isWhiteSpace(ch)) {
+                ch = read();
             }
             // prepare to scan for a token. Scan first character and choose appropriate selector.
-            else {
-                ch =  read();
+                boolean valid = true;
                 if(isAlphanumeric(ch)) {
                     select = new alphaSelector();
                 }
                 else if (isSpecial(ch)||isDigit(ch)) {
                     select = new specialSelector();
                 }
-                else if (isWhiteSpace(ch)) {
-                    // scan recursively for next non-whitespace character.
-                    return getToken();
-                }
                 else {
                     return Token.MP_ERROR;
                 }
-                while(select.read((char)ch)) {
-                    token = select.getToken();
-                    ch = read();
+                while(valid) {
+                    select.read((char) ch);
+                    if(select.hasToken()) {
+                        token = select.getToken();
+                        lexeme += (char) ch;
+                        ch = read();
+                    }
+                    else {
+                        valid = false;
+                    }
                 }
                 return token;
-            }
         } catch (IOException e) {
             System.out.println("File cannot be read");
         }
-
         return token;
+    }
+    public String getLexeme() {
+       return lexeme;
     }
     public static boolean isEOL(int ch) {
         if(((char)ch=='\n')||((char)ch=='\r'))
