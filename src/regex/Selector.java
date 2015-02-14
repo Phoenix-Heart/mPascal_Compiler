@@ -9,7 +9,6 @@ import java.util.ArrayList;
  * Aggregates the FSMs and selects an appropriate token at end of input
  */
 public class Selector {
-    private ArrayList<Context> machines;
     private ArrayList<Context> validMachines;
 
     protected void populate(ArrayList<Context> machines) {

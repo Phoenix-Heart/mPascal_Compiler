@@ -18,6 +18,7 @@ public class Context {
     }
     // create the context for an FSM which matches the string exactly.
     public Context( String match, Token token) {
+        invalid = InvalidState.getState();
         current = new ExactState(match);
         current.setContext(this);
         this.token = token;

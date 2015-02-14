@@ -6,6 +6,7 @@ package regex;
 public class InvalidState extends State {
     private static InvalidState state;
     private InvalidState() {
+        state = this;
     }
     public static State getState() {
         if(state==null) {

@@ -1,6 +1,7 @@
 package MP_IDENTIFIER;
 
 import MP_IDENTIFIER.State_IDENTIFIER_TRAILING_UNDERSCORE;
+import regex.InvalidState;
 import regex.State;
 
 /**
@@ -23,6 +24,9 @@ public class State_IDENTIFIER extends State {
         if(!Character.isLetterOrDigit(c)) {
             if(c=='_') {
                 context.changeState(State_IDENTIFIER_TRAILING_UNDERSCORE.getState());
+            }
+            else {
+                context.changeState(InvalidState.getState());
             }
         }
     }
