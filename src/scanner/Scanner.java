@@ -44,11 +44,6 @@ public class Scanner {
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
-        try {
-            line = reader.readLine();
-        } catch (IOException e) {
-            System.out.println("File cannot be read");
-        }
     }
     public int getLine() {
         return numLine;
@@ -95,7 +90,8 @@ public class Scanner {
                     return Token.MP_ERROR;
                 }
                 while(valid) {
-                    select.read((char) ch);
+                    char c = Character.toLowerCase((char)ch);
+                    select.read(c);
                     if(select.hasToken()) {
                         token = select.getToken();
                         lexeme += (char) ch;
