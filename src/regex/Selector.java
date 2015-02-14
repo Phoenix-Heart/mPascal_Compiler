@@ -5,7 +5,7 @@ import MP_IDENTIFIER.State_ID_Empty;
 import java.util.ArrayList;
 
 /**
- * Created by night on 2/5/2015.
+ * Created by Christina on 2/5/2015.
  * Aggregates the FSMs and selects an appropriate token at end of input
  */
 public class Selector {
@@ -28,14 +28,14 @@ public class Selector {
         else return true;
     }
     public Token getToken() {
-        Token token;
-        if(validMachines.isEmpty()) {
-            token = null;
+        if(!validMachines.isEmpty()) {
+            for(Context fsm : validMachines) {
+                if(fsm.accepted()) {
+                    return fsm.getToken();
+                }
+            }
         }
-        else {
-            token = validMachines.get(0).getToken();
-        }
-        return token;
+        return null;
     }
 
     public boolean hasToken() {

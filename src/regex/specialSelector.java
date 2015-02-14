@@ -1,9 +1,14 @@
 package regex;
 
+import MP_FIXED_LIT.State_FIXED_LIT_START;
+import MP_FLOAT_LIT.State_FLOAT_LIT_START;
+import MP_INTEGER_LIT.State_INTEGER_LIT_START;
+import MP_STRING_LIT.State_STRING_LIT_START;
+
 import java.util.ArrayList;
 
 /**
- * Created by night on 2/6/2015.
+ * Created by Christina on 2/6/2015.
  */
 public class specialSelector extends Selector {
     public specialSelector() {
@@ -25,6 +30,11 @@ public class specialSelector extends Selector {
         machines.add( new Context(")", Token.MP_RPAREN));
         machines.add( new Context(";", Token.MP_SCOLON));
         machines.add( new Context("*", Token.MP_TIMES));
+        //machines.add(new Context(State_FIXED_LIT_START.getState(), Token.MP_FIXED_LIT));
+        //machines.add(new Context(State_FLOAT_LIT_START.getState(),Token.MP_FLOAT_LIT));
+        machines.add(new Context(State_INTEGER_LIT_START.getState(), Token.MP_INTEGER_LIT));
+        machines.add(new Context(State_STRING_LIT_START.getState(), Token.MP_STRING_LIT));
+
         super.populate(machines);
     }
 }

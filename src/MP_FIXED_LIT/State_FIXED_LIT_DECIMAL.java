@@ -5,6 +5,7 @@ import regex.State;
 public class State_FIXED_LIT_DECIMAL extends State {
     private static State state;
     private State_FIXED_LIT_DECIMAL() {
+        state = this;                   // added by Christina
     }
     // states are singletons
     public static State getState() {

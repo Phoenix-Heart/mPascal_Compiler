@@ -15,14 +15,15 @@ import java.util.*;
 public class Scanner {
     private int numLine;
     private int column;
+    private int nextline;
+    private int nextcol;
     String lexeme;
     Token token;
-    String line;
-    // most basic tokens can be resolved in a hash table instead of using more elaborate states
     private Selector select;
     private Selector special;
     private Selector alpha;
     private BufferedReader reader;
+    private int ch;
     /*
     Need to implement:
     read and scan file one char at a time
@@ -33,11 +34,14 @@ public class Scanner {
 
      */
     Scanner(String filename) {
+        ch = 0;
         select = null;
         special = new specialSelector();
         alpha = new alphaSelector();
         numLine = 1;
-        column = 0;
+        column = 1;
+        nextline = 1;
+        nextcol = 1;
         lexeme = "";
         try {
             reader = new BufferedReader(new FileReader(filename));
@@ -54,10 +58,12 @@ public class Scanner {
     private int read() {
         try {
             int c =  reader.read();
-            if(isEOL(c))
-                numLine++;
+            if(isEOL(c)) {
+                nextcol = 1;
+                nextline++;
+            }
             else
-                column++;
+                nextcol++;
             return c;
         } catch (IOException e) {
             e.printStackTrace();
@@ -65,28 +71,49 @@ public class Scanner {
         }
     }
     public Token getToken() {
-        int ch;
         lexeme = "";
+        // update current location prior to scanning
+        column = nextcol;
+        numLine = nextline;
 
         try {
             if(!reader.ready()) {
                 return Token.MP_EOF;
             }
-            ch = read();
+            // if no input has been read yet, read the first character.
+            // otherwise, this should be set to the first unrecognized character from the last scan.
+            if(ch==0)
+                ch = read();
 
             // skip whitespace
             while(isWhiteSpace(ch)) {
                 ch = read();
             }
+            // skip comments
+            if(ch=='{') {
+                while(ch!='}') {
+                    ch = read();
+                    if(isEOL(ch)) {
+                        ch = read();
+                        return Token.MP_RUN_COMMENT;
+                    }
+                }
+                ch = read();
+                return getToken();
+            }
+
             // prepare to scan for a token. Scan first character and choose appropriate selector.
                 boolean valid = true;
-                if(isAlphanumeric(ch)) {
+                if(isAlpha(ch)) {
                     select = new alphaSelector();
                 }
                 else if (isSpecial(ch)||isDigit(ch)) {
                     select = new specialSelector();
                 }
                 else {
+                    lexeme += (char)ch;
+                    // need to read a new character, because of forward-checking.
+                    ch = read();
                     return Token.MP_ERROR;
                 }
                 while(valid) {
@@ -118,6 +145,9 @@ public class Scanner {
     public static boolean isAlphanumeric(int ch) {
         return (isLetter(ch)||isDigit(ch)||isUnderScore(ch));
     }
+    public static boolean isAlpha(int ch) {
+        return (isLetter(ch)||isUnderScore(ch));
+    }
     public static boolean isLetter(int ch) {
         return Character.isLetter(ch);
     }
@@ -147,6 +177,7 @@ public class Scanner {
             case '(':
             case ')':
             case '*':
+            case '\'':
                 return true;
             default:
                 return false;

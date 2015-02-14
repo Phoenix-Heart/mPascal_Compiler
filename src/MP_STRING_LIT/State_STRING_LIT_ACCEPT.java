@@ -6,6 +6,7 @@ import regex.State;
 public class State_STRING_LIT_ACCEPT extends State {
     private static State state;
     private State_STRING_LIT_ACCEPT() {
+        state = this;                           // added by Christina
     }
     // states are singletons
     public static State getState() {

@@ -7,6 +7,7 @@ import MP_STRING_LIT.State_STRING_LIT_ACCEPT;
 public class State_STRING_LIT_MIDDLE extends State {
     private static State state;
     private State_STRING_LIT_MIDDLE() {
+        state = this;                           // added by Christina
     }
     // states are singletons
     public static State getState() {
@@ -18,16 +19,17 @@ public class State_STRING_LIT_MIDDLE extends State {
 
         @Override
         public void read(char c) {
-            if(c == '\'' || c == '\n' || c =='\r') {
+            if(c == '\n' || c =='\r') {
                 context.changeState(regex.InvalidState.getState());
             }
              else {
-            	 if (c == '\"')	{
+            	 if (c == '\'')	{
 	            context.changeState(State_STRING_LIT_ACCEPT.getState());
             	 }
-            	 else {
-            		 context.changeState(State_STRING_LIT_MIDDLE.getState());
-            	 }
+            	 //else {
+                     // do not need to change state
+            		 //context.changeState(State_STRING_LIT_MIDDLE.getState());
+            	 //}
 	        }
         }
 

@@ -23,6 +23,9 @@ public class Context {
         current.setContext(this);
         this.token = token;
     }
+    public void setInvalid() {
+        changeState(invalid);
+    }
 
     public void changeState(State state) {
         state.setContext(this);
@@ -44,5 +47,8 @@ public class Context {
         }
         else
             return false;
+    }
+    public boolean accepted() {
+        return current.accepted();
     }
 }

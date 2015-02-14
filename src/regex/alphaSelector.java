@@ -5,7 +5,7 @@ import MP_IDENTIFIER.State_ID_Empty;
 import java.util.ArrayList;
 
 /**
- * Created by night on 2/6/2015.
+ * Created by Christina on 2/6/2015.
  */
 public class alphaSelector extends Selector {
     public alphaSelector() {

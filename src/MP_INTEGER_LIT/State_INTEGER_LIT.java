@@ -1,3 +1,4 @@
+// Written by Hunter
 package MP_INTEGER_LIT;
 
 import regex.State;
@@ -5,7 +6,8 @@ import regex.State;
 public class State_INTEGER_LIT extends State {
 	    private static State state;
 	    private State_INTEGER_LIT() {
-	    }
+			state = this;
+		}
 	    // states are singletons
 	    public static State getState() {
 	        if(state==null) {
@@ -16,7 +18,8 @@ public class State_INTEGER_LIT extends State {
 	    @Override
 	    public void read(char c) {
 	        if(Character.isDigit(c)) {
-	                context.changeState(State_INTEGER_LIT.getState());
+				// do not need to change state
+	             //   context.changeState(State_INTEGER_LIT.getState());
 	            }
 	        else {
 	        	context.changeState(regex.InvalidState.getState());

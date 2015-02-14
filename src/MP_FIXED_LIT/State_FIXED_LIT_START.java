@@ -6,6 +6,7 @@ import MP_FIXED_LIT.State_FIXED_LIT_WHOLE;
 public class State_FIXED_LIT_START extends State {
     private static State state;
     private State_FIXED_LIT_START() {
+        state = this;                   // added by Christina
     }
     // states are singletons
     public static State getState() {

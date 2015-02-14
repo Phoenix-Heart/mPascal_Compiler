@@ -1,3 +1,4 @@
+// Written by Hunter
 package MP_INTEGER_LIT;
 
 import regex.State;
@@ -6,6 +7,7 @@ import MP_INTEGER_LIT.State_INTEGER_LIT;
 public class State_INTEGER_LIT_START extends State {
     private static State state;
     private State_INTEGER_LIT_START() {
+        state = this;                           // added by Christina
     }
     // states are singletons
     public static State getState() {
@@ -21,7 +23,7 @@ public class State_INTEGER_LIT_START extends State {
                 context.changeState(State_INTEGER_LIT.getState());
             }
              else {
-	            context.changeState(regex.InvalidState.getState());
+	            context.setInvalid();
 	        }
         }
 

@@ -6,7 +6,7 @@ import regex.State;
 import java.util.LinkedList;
 
 /**
- * Created by night on 2/5/2015.
+ * Created by Christina on 2/5/2015.
  * Discovers an exact match by tracking state internally.
  */
 public class ExactState extends State {

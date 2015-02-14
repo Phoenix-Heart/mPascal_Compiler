@@ -1,7 +1,7 @@
 package regex;
 
 /**
- * Created by night on 2/4/2015.
+ * Created by Christina on 2/4/2015.
  */
 public class InvalidState extends State {
     private static InvalidState state;

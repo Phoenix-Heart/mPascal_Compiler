@@ -6,7 +6,7 @@ import java.lang.reflect.Array;
 import java.util.ArrayList;
 
 /**
- * Created by night on 2/4/2015.
+ * Created by Christina on 2/4/2015.
  */
 public class mp {
     public static void main(String[] args) {
@@ -18,7 +18,11 @@ public class mp {
             while(token!= Token.MP_EOF) {
                 token = s.getToken();
                 tokens.add(token);
-                System.out.println("Found token "+ token.name() +" at ( "+s.getLexeme()+" )");
+                System.out.println();
+                System.out.print("Token "+ token.name());
+                System.out.print(", Lexeme  \""+s.getLexeme()+"\"");
+                System.out.print(", Line "+s.getLine());
+                System.out.print(", Column "+s.getColumn());
             }
         }
         else {

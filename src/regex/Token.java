@@ -1,6 +1,7 @@
 package regex;
 
 /**
+ * created by Christina
  * A complete list of all valid token types in microPascal
  */
 public enum Token
@@ -11,5 +12,5 @@ public enum Token
     MP_WHILE, MP_WRITE, MP_WRITELN, MP_IDENTIFIER, MP_INTEGER_LIT, MP_FIXED_LIT, MP_FLOAT_LIT, MP_STRING_LIT,
     MP_ASSIGN, MP_COLON, MP_COMMA, MP_EQUAL, MP_FLOAT_DIVIDE, MP_GEQUAL, MP_GTHAN, MP_LEQUAL, MP_LPAREN,
     MP_LTHAN, MP_MINUS, MP_NEQUAL, MP_PERIOD, MP_PLUS, MP_RPAREN, MP_SCOLON, MP_TIMES, MP_EOF, MP_RUN_COMMENT,
-    MP_RUN_STRING, MP_ERROR;
+    MP_RUN_STRING, MP_ERROR
 }

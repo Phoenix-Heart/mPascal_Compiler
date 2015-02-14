@@ -7,6 +7,7 @@ import MP_STRING_LIT.State_STRING_LIT_ACCEPT;
 public class State_STRING_LIT_START extends State {
     private static State state;
     private State_STRING_LIT_START() {
+        state = this;                           // added by Christina
     }
     // states are singletons
     public static State getState() {
@@ -18,11 +19,11 @@ public class State_STRING_LIT_START extends State {
 
         @Override
         public void read(char c) {
-            if(c == '\"') {
+            if(c == '\'') {
                 context.changeState(State_STRING_LIT_MIDDLE.getState());
             }
              else {
-	            context.changeState(State_STRING_LIT_ACCEPT.getState());
+	            context.setInvalid();
 	        }
         }
 

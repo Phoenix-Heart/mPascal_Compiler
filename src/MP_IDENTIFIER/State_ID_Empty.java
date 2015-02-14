@@ -8,6 +8,7 @@ import regex.State;
 public class State_ID_Empty extends State {
     private static State state;
     private State_ID_Empty() {
+        state = this;                   // added by Christina
     }
     // states are singletons
     public static State getState() {
@@ -17,7 +18,7 @@ public class State_ID_Empty extends State {
         else return state;
     }
     /**
-     * Created by night on 2/4/2015.
+     * Created by Christina on 2/4/2015.
      * Represents a valid identifier that is not and cannot be a reserved word.
      */
 

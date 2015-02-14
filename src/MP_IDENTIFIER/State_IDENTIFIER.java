@@ -5,12 +5,13 @@ import regex.InvalidState;
 import regex.State;
 
 /**
- * Created by night on 2/4/2015.
+ * Created by Christina on 2/4/2015.
  * Represents a valid identifier that is not and cannot be a reserved word.
  */
 public class State_IDENTIFIER extends State {
     private static State state;
     private State_IDENTIFIER() {
+        state = this;
     }
     // states are singletons
     public static State getState() {

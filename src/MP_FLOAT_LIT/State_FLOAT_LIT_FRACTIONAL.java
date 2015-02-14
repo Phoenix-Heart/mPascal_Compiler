@@ -5,6 +5,7 @@ import regex.State;
 public class State_FLOAT_LIT_FRACTIONAL extends State {
     private static State state;
     private State_FLOAT_LIT_FRACTIONAL() {
+        state = this;                   // added by Christina
     }
     // states are singletons
     public static State getState() {
