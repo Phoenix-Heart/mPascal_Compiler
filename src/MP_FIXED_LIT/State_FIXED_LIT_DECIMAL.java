@@ -1,5 +1,5 @@
+//Created by Hunter Lapp
 package MP_FIXED_LIT;
-
 import regex.State;
 
 public class State_FIXED_LIT_DECIMAL extends State {

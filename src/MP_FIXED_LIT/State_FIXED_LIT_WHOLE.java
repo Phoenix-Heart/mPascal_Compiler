@@ -1,3 +1,4 @@
+//Created by Hunter Lapp
 package MP_FIXED_LIT;
 
 import regex.State;
@@ -24,7 +25,11 @@ public class State_FIXED_LIT_WHOLE extends State {
              else {
             	 if (c =='.')
 	            context.changeState(State_FIXED_LIT_DECIMAL.getState());
+                else {
+                     context.changeState(regex.InvalidState.getState());
+                 }
 	        }
+
         }
 
 	        @Override
