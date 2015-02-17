@@ -5,7 +5,7 @@ import core.Selector;
 import core.Token;
 import fsm.MP_INTEGER_LIT.State_INTEGER_LIT_START;
 import fsm.MP_STRING_LIT.State_STRING_LIT_START;
-import fsm.error.MP_RUN_STING.State_RUN_STRING_START;
+import fsm.error.MP_RUN_STRING.State_RUN_STRING_START;
 
 import java.util.ArrayList;
 

@@ -1,10 +1,12 @@
-package fsm.error.MP_RUN_STING;
+package fsm.error.MP_RUN_STRING;
 
 import core.State;
-import core.keystates.InvalidState;
+import core.keystates.AcceptState;
 
-
-public class State_RUN_STRING_ACCEPT extends State {
+/**
+ * Created by night on 2/16/2015.
+ */
+public class State_RUN_STRING_ACCEPT extends AcceptState {
     private static State state;
     private State_RUN_STRING_ACCEPT() {
         state = this;                           // added by Christina
@@ -17,13 +19,8 @@ public class State_RUN_STRING_ACCEPT extends State {
         else return state;
     }
 
-        @Override
-        public void read(char c) {
-            context.changeState(InvalidState.getState());
-        }
-
-	    @Override
-	    public boolean accepted() {
-	        return true;
-	    }
+    @Override
+    public void read(char c) {
+        context.setInvalid();
+    }
 }

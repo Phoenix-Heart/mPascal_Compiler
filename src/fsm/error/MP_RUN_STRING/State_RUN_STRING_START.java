@@ -1,4 +1,8 @@
-package fsm.error.MP_RUN_STING;
+/*
+    Created by Christina Dunning
+ */
+
+package fsm.error.MP_RUN_STRING;
 
 import core.State;
 
