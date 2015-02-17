@@ -1,15 +1,16 @@
-package select;
+package core.select;
 
 import core.Context;
 import core.Selector;
 import core.Token;
 import fsm.MP_INTEGER_LIT.State_INTEGER_LIT_START;
 import fsm.MP_STRING_LIT.State_STRING_LIT_START;
+import fsm.error.MP_RUN_STING.State_RUN_STRING_START;
 
 import java.util.ArrayList;
 
 /**
- * Created by Christina on 2/6/2015.
+ * Created by Christina Dunning on 2/6/2015.
  */
 public class specialSelector extends Selector {
     public specialSelector() {
@@ -35,6 +36,7 @@ public class specialSelector extends Selector {
         //machines.add(new Context(State_FLOAT_LIT_START.getState(),Token.fsm.MP_FLOAT_LIT));
         machines.add(new Context(State_INTEGER_LIT_START.getState(), Token.MP_INTEGER_LIT));
         machines.add(new Context(State_STRING_LIT_START.getState(), Token.MP_STRING_LIT));
+        machines.add(new Context(State_RUN_STRING_START.getState(),Token.MP_RUN_STRING));
 
         super.populate(machines);
     }

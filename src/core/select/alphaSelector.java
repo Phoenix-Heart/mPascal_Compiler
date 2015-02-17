@@ -1,4 +1,4 @@
-package select;
+package core.select;
 
 import core.Context;
 import core.Selector;
@@ -8,7 +8,7 @@ import fsm.MP_IDENTIFIER.State_ID_Empty;
 import java.util.ArrayList;
 
 /**
- * Created by Christina on 2/6/2015.
+ * Created by Christina Dunning on 2/6/2015.
  */
 public class alphaSelector extends Selector {
     public alphaSelector() {

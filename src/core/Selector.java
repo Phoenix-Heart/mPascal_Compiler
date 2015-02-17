@@ -3,7 +3,7 @@ package core;
 import java.util.ArrayList;
 
 /**
- * Created by Christina on 2/5/2015.
+ * Created by Christina Dunning on 2/5/2015.
  * Aggregates the FSMs and selects an appropriate token at end of input
  */
 public class Selector {

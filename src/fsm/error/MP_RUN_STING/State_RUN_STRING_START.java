@@ -1,25 +1,25 @@
-//Created by Hunter Lapp
-package fsm.MP_FLOAT_LIT;
+package fsm.error.MP_RUN_STING;
 
 import core.State;
 
-public class State_FLOAT_LIT_EXPONENT extends State {
+
+public class State_RUN_STRING_START extends State {
     private static State state;
-    private State_FLOAT_LIT_EXPONENT() {
-        state = this;                   // added by Christina
+    private State_RUN_STRING_START() {
+        state = this;                           // added by Christina
     }
     // states are singletons
     public static State getState() {
         if(state==null) {
-            return new State_FLOAT_LIT_EXPONENT();
+            return new State_RUN_STRING_START();
         }
         else return state;
     }
 
         @Override
         public void read(char c) {
-            if(Character.isDigit(c)) {
-                context.changeState(State_FLOAT_LIT_EXPONENT.getState());
+            if(c == '\'') {
+                context.changeState(State_RUN_STRING_MIDDLE.getState());
             }
              else {
 	            context.setInvalid();
@@ -28,6 +28,6 @@ public class State_FLOAT_LIT_EXPONENT extends State {
 
 	        @Override
 	        public boolean accepted() {
-	            return true;
+	            return false;
 	        }
 }

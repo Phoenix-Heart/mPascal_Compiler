@@ -3,7 +3,7 @@ package fsm.MP_IDENTIFIER;
 import core.State;
 
 /**
- * Created by Christina on 2/4/2015.
+ * Created by Christina Dunning on 2/4/2015.
  * Represents a valid identifier that is not and cannot be a reserved word.
  */
 public class State_IDENTIFIER_TRAILING_UNDERSCORE extends State {

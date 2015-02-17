@@ -1,7 +1,7 @@
 //Created by Hunter Lapp
-package MP_FLOAT_LIT;
+package fsm.MP_FLOAT_LIT;
 
-import regex.State;
+import core.State;
 
 public class State_FLOAT_LIT_FRACTIONAL extends State {
     private static State state;
@@ -27,7 +27,7 @@ public class State_FLOAT_LIT_FRACTIONAL extends State {
             	 }
             	 else
             	 {
-            		 context.changeState(regex.InvalidState.getState());
+            		 context.setInvalid();
             	 }
 	        }
         }

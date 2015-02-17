@@ -1,7 +1,7 @@
 package core;
 
 /**
- * Created by Christina on 2/4/2015.
+ * Created by Christina Dunning on 2/4/2015.
  */
 public abstract class State {
     protected Context context;

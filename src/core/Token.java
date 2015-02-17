@@ -1,7 +1,7 @@
 package core;
 
 /**
- * created by Christina
+ * created by Christina Dunning
  * A complete list of all valid token types in microPascal
  */
 public enum Token

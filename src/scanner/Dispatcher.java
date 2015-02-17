@@ -2,13 +2,13 @@ package scanner;
 
 import core.Selector;
 import core.Token;
-import select.alphaSelector;
-import select.specialSelector;
+import core.select.alphaSelector;
+import core.select.specialSelector;
 
 import java.io.*;
 
 /**
- * Created by Christina on 2/4/2015.
+ * Created by Christina Dunning on 2/4/2015.
  */
 public class Dispatcher {
     private int numLine;
@@ -22,15 +22,7 @@ public class Dispatcher {
     private Selector alpha;
     private BufferedReader reader;
     private int ch;
-    /*
-    Need to implement:
-    read and scan file one char at a time
-    1. eat whitespace and comments
-    2. generate tokens
-    3. reset state
 
-
-     */
     Dispatcher(String filename) {
         ch = 0;
         select = null;

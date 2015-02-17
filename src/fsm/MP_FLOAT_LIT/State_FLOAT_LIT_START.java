@@ -1,8 +1,7 @@
 //Created by Hunter Lapp
-package MP_FLOAT_LIT;
+package fsm.MP_FLOAT_LIT;
 
-import regex.State;
-import MP_FLOAT_LIT.State_FLOAT_LIT_WHOLE;
+import core.State;
 
 public class State_FLOAT_LIT_START extends State {
     private static State state;
@@ -23,7 +22,7 @@ public class State_FLOAT_LIT_START extends State {
                 context.changeState(State_FLOAT_LIT_WHOLE.getState());
             }
              else {
-	            context.changeState(regex.InvalidState.getState());
+	            context.setInvalid();
 	        }
         }
 
