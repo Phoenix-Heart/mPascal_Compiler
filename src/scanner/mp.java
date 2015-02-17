@@ -1,8 +1,7 @@
 package scanner;
 
-import regex.Token;
+import core.Token;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 
 /**
@@ -14,7 +13,7 @@ public class mp {
         Token token = null;
         if(args.length==1) {
             String filename = args[0];
-            Scanner s = new Scanner(filename);
+            Dispatcher s = new Dispatcher(filename);
             while(token!= Token.MP_EOF) {
                 token = s.getToken();
                 tokens.add(token);
