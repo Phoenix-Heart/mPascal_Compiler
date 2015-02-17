@@ -60,6 +60,15 @@ public class Dispatcher {
             return 0;
         }
     }
+    private void updateLexeme(int c) {
+        if(isEOL(c)) {
+            lexeme += '\\';
+            lexeme += 'n';
+        }
+        else {
+            lexeme += (char)c;
+        }
+    }
     public Token getToken() {
         lexeme = "";
         // update current location prior to scanning
@@ -101,7 +110,8 @@ public class Dispatcher {
                     select = new specialSelector();
                 }
                 else {
-                    lexeme += (char)ch;
+                    updateLexeme(ch);
+                   // lexeme += (char)ch;
                     // need to read a new character, because of forward-checking.
                     ch = read();
                     return Token.MP_ERROR;
@@ -111,7 +121,8 @@ public class Dispatcher {
                     select.read(c);
                     if(select.hasToken()) {
                         token = select.getToken();
-                        lexeme += (char) ch;
+                        updateLexeme(ch);
+                        //lexeme += (char) ch;
                         ch = read();
                     }
                     else {
@@ -148,10 +159,10 @@ public class Dispatcher {
         return ('_'==(char)ch);
     }
     // white space includes spaces, tabs, carriage returns, line feeds, form feeds and unicode separators.
-    private boolean isWhiteSpace(int ch) {
+    public static boolean isWhiteSpace(int ch) {
         return Character.isWhitespace(ch);
     }
-    private boolean isSpecial(int ch) {
+    public static boolean isSpecial(int ch) {
         char c = (char) ch;
         switch(c) {
             case '+':

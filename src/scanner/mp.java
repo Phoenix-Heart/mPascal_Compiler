@@ -14,7 +14,7 @@ public class mp {
         if(args.length==1) {
             String filename = args[0];
             Dispatcher s = new Dispatcher(filename);
-            while(token!= Token.MP_EOF) {
+            while(token!= Token.MP_EOF && token != Token.MP_RUN_COMMENT && token != Token.MP_RUN_STRING && token != Token.MP_ERROR) {
                 token = s.getToken();
                 tokens.add(token);
                 System.out.println();
