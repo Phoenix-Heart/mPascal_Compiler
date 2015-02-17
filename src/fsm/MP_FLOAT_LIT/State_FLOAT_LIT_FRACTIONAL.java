@@ -21,15 +21,13 @@ public class State_FLOAT_LIT_FRACTIONAL extends State {
             if(Character.isDigit(c)) {
                 context.changeState(State_FLOAT_LIT_FRACTIONAL.getState());
             }
-             else {
-            	 if(c == 'e' || c == 'E'){
-            		 context.changeState(State_FLOAT_LIT_e.getState());
-            	 }
-            	 else
-            	 {
-            		 context.setInvalid();
-            	 }
-	        }
+             else if(c == 'e' || c == 'E'){
+                context.changeState(State_FLOAT_LIT_e.getState());
+            }
+            else
+            {
+                context.setInvalid();
+            }
         }
 
 	        @Override

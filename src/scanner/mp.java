@@ -1,5 +1,6 @@
 package scanner;
 
+import core.Selector;
 import core.Token;
 
 import java.util.ArrayList;
@@ -18,10 +19,18 @@ public class mp {
                 token = s.getToken();
                 tokens.add(token);
                 System.out.println();
-                System.out.print("Token "+ token.name());
-                System.out.print(", Lexeme  \""+s.getLexeme()+"\"");
-                System.out.print(", Line "+s.getLine());
-                System.out.print(", Column "+s.getColumn());
+                System.out.print("Token " + token.name());
+                if(token.name().length() <6) System.out.print("\t");
+                if(token.name().length() <10) System.out.print("\t");
+                if(token.name().length() <15) System.out.print("\t");
+                System.out.print("\tLine "+s.getLine());
+                System.out.print("\tColumn "+s.getColumn());
+                System.out.print("\tLexeme  \""+s.getLexeme());
+
+                if(token==Token.MP_RUN_COMMENT || token==Token.MP_ERROR || token==Token.MP_RUN_STRING) {
+                    System.out.println();
+                    System.out.print("Error found, exiting scanner.");
+                }
             }
         }
         else {

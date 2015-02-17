@@ -26,7 +26,7 @@ public class State_FLOAT_LIT_WHOLE extends State {
             	 {
             		 context.changeState(State_FLOAT_LIT_DECIMAL.getState());
             	 }
-            	 if (c == 'e' || c == 'E')
+            	 else if (c == 'e' || c == 'E')
             	 {
             		 context.changeState(State_FLOAT_LIT_e.getState());
             	 }
