@@ -1,6 +1,8 @@
-package fsm.MP_FLOAT_LIT;
+//Created by Hunter Lapp
+package MP_FLOAT_LIT;
 
-import core.State;
+import regex.State;
+import MP_FLOAT_LIT.State_FLOAT_LIT_DECIMAL;
 
 public class State_FLOAT_LIT_WHOLE extends State {
     private static State state;
@@ -29,6 +31,9 @@ public class State_FLOAT_LIT_WHOLE extends State {
             	 {
             		 context.changeState(State_FLOAT_LIT_e.getState());
             	 }
+                else {
+                     context.changeState(regex.InvalidState.getState());
+                 }
 	        }
         }
 

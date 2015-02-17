@@ -1,7 +1,7 @@
-package fsm.MP_FIXED_LIT;
+//Created by Hunter Lapp
+package MP_FIXED_LIT;
 
-import core.State;
-import core.keystates.InvalidState;
+import regex.State;
 
 public class State_FIXED_LIT_FRACTIONAL extends State {
     private static State state;
@@ -22,7 +22,7 @@ public class State_FIXED_LIT_FRACTIONAL extends State {
                 context.changeState(State_FIXED_LIT_FRACTIONAL.getState());
             }
              else {
-	            context.changeState(InvalidState.getState());
+	            context.changeState(regex.InvalidState.getState());
 	        }
         }
 

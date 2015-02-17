@@ -1,7 +1,7 @@
-package fsm.MP_FLOAT_LIT;
+//Created by Hunter Lapp
+package MP_FLOAT_LIT;
 
-import core.State;
-import core.keystates.InvalidState;
+import regex.State;
 
 public class State_FLOAT_LIT_FRACTIONAL extends State {
     private static State state;
@@ -27,7 +27,7 @@ public class State_FLOAT_LIT_FRACTIONAL extends State {
             	 }
             	 else
             	 {
-            		 context.changeState(InvalidState.getState());
+            		 context.changeState(regex.InvalidState.getState());
             	 }
 	        }
         }

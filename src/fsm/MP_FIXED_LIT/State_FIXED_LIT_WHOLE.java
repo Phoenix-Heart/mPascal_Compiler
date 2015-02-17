@@ -1,6 +1,8 @@
-package fsm.MP_FIXED_LIT;
+//Created by Hunter Lapp
+package MP_FIXED_LIT;
 
-import core.State;
+import regex.State;
+import MP_FIXED_LIT.State_FIXED_LIT_DECIMAL;
 
 public class State_FIXED_LIT_WHOLE extends State {
     private static State state;
@@ -22,8 +24,12 @@ public class State_FIXED_LIT_WHOLE extends State {
             }
              else {
             	 if (c =='.')
-	            context.setInvalid();
+	            context.changeState(State_FIXED_LIT_DECIMAL.getState());
+                else {
+                     context.changeState(regex.InvalidState.getState());
+                 }
 	        }
+
         }
 
 	        @Override
