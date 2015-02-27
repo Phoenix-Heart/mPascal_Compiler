@@ -11,7 +11,7 @@ program Tester(input, output);
           m := m + 1.25;   {fixed lit test}
           m := m + 1.5e+2; {float lit test}
           {test keywords}
-          and begin Boolean div do downto else end FALSE fixed Float for function
+          and beGin Boolean div do downto else end FALSE fixed Float for function
           if integer mod not or procedure program read repeat string then true to
           type until var while write writeln
           {test operators}
