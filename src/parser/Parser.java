@@ -96,7 +96,7 @@ public class Parser {
     private void FactorTail() {}
     private void MultiplyingOperator() {}
     private void Factor() {}
-    private void ProgamIdenifier() {}
+    private void ProgramIdentifier() {}
     private void VariableIdentifier() {}
     private void ProcedureIdentifier() {}
     private void FunctionIdentifier() {}
