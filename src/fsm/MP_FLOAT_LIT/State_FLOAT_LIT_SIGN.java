@@ -19,7 +19,7 @@ public class State_FLOAT_LIT_SIGN extends State {
         @Override
         public void read(char c) {
             if(Character.isDigit(c)) {
-                context.changeState(State_FLOAT_LIT_EXPONENT.getState());
+                context.changeState(MP_FLOAT_LIT.State_FLOAT_LIT_EXPONENT.getState());
             }
              else {
 	            context.setInvalid();
