@@ -23,7 +23,7 @@ public class Dispatcher {
     private BufferedReader reader;
     private int ch;
 
-    Dispatcher(String filename) {
+    public Dispatcher(String filename) {
         ch = 0;
         select = null;
         special = new specialSelector();
