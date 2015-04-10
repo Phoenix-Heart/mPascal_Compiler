@@ -187,6 +187,7 @@ public class Parser {
         OrdinalExpression();
     }
     private void IfStatement() throws ParseException {
+        // complete
         matchLookAhead(Token.MP_IF);
         BooleanExpression();
         matchLookAhead(Token.MP_THEN);
@@ -196,6 +197,7 @@ public class Parser {
     private void OptionalElsePart() throws ParseException {
         switch (lookahead) {
             case MP_ELSE:
+                /* need conflict resolution here, could be lambda */
                 matchLookAhead(Token.MP_ELSE);
                 Statement();
                 break;
