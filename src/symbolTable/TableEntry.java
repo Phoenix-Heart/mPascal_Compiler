@@ -28,5 +28,3 @@ enum Type {
 enum Kind {
     VARIABLE, PROCEDURE, PARAMETER, FUNCTION;
 }
-
-

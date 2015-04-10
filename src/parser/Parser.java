@@ -2,6 +2,7 @@ package parser;
 
 import core.Token;
 import scanner.Dispatcher;
+import sun.invoke.empty.Empty;
 
 import java.util.LinkedList;
 
@@ -55,33 +56,55 @@ public class Parser {
     private void StatementPart() {    }
     private void CompoundStatement() {    }
     private void StatementSequence() {    }
-    private void StatementTail() {    }
+    private void StatementTail() {
+        switch (lookahead) {
+            case MP_AND:
+                break;
+            default:
+                break;
+        }
+    }
     private void Statement() throws ParseException {
-        // use LL1 table to fill this in
+        // all done except IDENTIFIER case
         switch (lookahead) {
             case MP_SCOLON:
+                EmptyStatement();
                 break;
             case MP_BEGIN:
+                CompoundStatement();
                 break;
             case MP_ELSE:
+                EmptyStatement();
                 break;
             case MP_END:
+                EmptyStatement();
                 break;
             case MP_FOR:
+                ForStatement();
                 break;
             case MP_IF:
+                IfStatement();
                 break;
             case MP_READ:
+                ReadStatement();
                 break;
             case MP_REPEAT:
+                RepeatStatement();
                 break;
             case MP_UNTIL:
+                EmptyStatement();
                 break;
             case MP_WHILE:
+                WhileStatement();
                 break;
             case MP_WRITE:
+                WriteStatement();
                 break;
             case MP_IDENTIFIER:
+                /* need conflict resolution
+                EmptyStatement();
+                ProcedureStatement();
+                */
                 break;
             default:
                 LL1error();
@@ -89,22 +112,18 @@ public class Parser {
 
     }
     private void EmptyStatement() throws ParseException {
-        // use LL1 table to fill this in
+        // complete
         switch (lookahead) {
-            case MP_SCOLON:
-                // end of branch
-                break;
-            case MP_ELSE:
-                break;
-            case MP_END:
-                break;
-            case MP_UNTIL:
-                break;
+            case MP_SCOLON: break;
+            case MP_ELSE: break;
+            case MP_END: break;
+            case MP_UNTIL: break;
             default:
                 LL1error();
         }
     }
     private void ReadStatement() throws ParseException {
+        // complete
         matchLookAhead(Token.MP_READ);
         matchLookAhead(Token.MP_LPAREN);
         ReadParameter();
@@ -112,10 +131,11 @@ public class Parser {
         matchLookAhead(Token.MP_RPAREN);
     }
     private void ReadParameter() {
+        // complete
         VariableIdentifier();
     }
     private void ReadParameterTail() throws ParseException {
-        // use LL1 table to fill this in
+        // complete
         switch (lookahead) {
             case MP_COMMA:
                 matchLookAhead(Token.MP_COMMA);
@@ -128,6 +148,7 @@ public class Parser {
                 LL1error();
         }}
     private void WriteStatement() throws ParseException {
+        // complete
         switch (lookahead) {
             case MP_WRITE:
                 matchLookAhead(Token.MP_WRITE);
@@ -149,6 +170,7 @@ public class Parser {
 
     }
     private void WriteParameterTail() throws ParseException {
+        // complete
     switch (lookahead) {
         case MP_COMMA:
             matchLookAhead(Token.MP_COMMA);
@@ -161,22 +183,8 @@ public class Parser {
     }
     }
     private void WriteParameter() throws ParseException {
-        switch (lookahead) {
-            case MP_LPAREN:
-                break;
-            case MP_PLUS:
-                break;
-            case MP_MINUS:
-                break;
-            case MP_IDENTIFIER:
-                break;
-            case MP_INTEGER_LIT:
-                break;
-            case MP_NOT:
-                break;
-            default:
-                LL1error();
-        }
+        // complete
+        OrdinalExpression();
     }
     private void IfStatement() throws ParseException {
         matchLookAhead(Token.MP_IF);
