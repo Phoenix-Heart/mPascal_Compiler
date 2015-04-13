@@ -4,14 +4,16 @@ import java.util.*;
  * Created by hunter on 3/6/15.
  */
 public class SymbolTable {
-    private HashMap hm;
-    private String name;
+    private HashMap<String, TableEntry> hm;
+    private String name;    // is this necessary?
     private String label;
     private int nestingLevel;
     private static int labelCounter = 0;
+    private int nextoffset;         // # offset to give to the next entry
 
     public SymbolTable(String name, int nestingLevel)
     {
+        this.nextoffset = 0;
         this.hm = new HashMap();
         this.name = name;
         this.label = "l" + Integer.toString(labelCounter);
@@ -19,9 +21,13 @@ public class SymbolTable {
         this.nestingLevel = nestingLevel;
     }
 
-    public HashMap getHashmap()
-    {
-        return this.hm;
+    public void createNewEntry(String lex, Type t, Kind k, int mode, List<List<Object>> params) {
+        TableEntry entry = new TableEntry(lex, t, k, mode, nextoffset, params);
+        hm.put(lex, entry);
+        nextoffset++;
+    }
+    public TableEntry getEntry(String key) {
+        return hm.get(key);
     }
 
     public String getName()
@@ -39,11 +45,6 @@ public class SymbolTable {
         return this.nestingLevel;
     }
 
-    public void addSymbol(String name, Object o)
-    {
-        this.hm.put(name, o);
-    }
-
     public void printTable()
     {
         System.out.print("Table Name:  ");
@@ -57,9 +58,9 @@ public class SymbolTable {
         {
             System.out.println(hm.get(key).toString());
         }
+    }
 
-
-
-
+    public boolean hasEntry(String lexeme) {
+        return false;
     }
 }

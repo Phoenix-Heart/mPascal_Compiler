@@ -6,25 +6,19 @@ import java.util.List;
  * Created by Christina on 4/8/2015.
  */
 public class TableEntry {
-    private String lexeme;
-    private Type type;
-    private Kind kind;
-    private int mode;
-    private int size;
+    public final String lexeme;
+    public final Type type;
+    public final Kind kind;
+    public final int mode;
+    public final int offset;
     List<List<Object>> parameters;
 
-    public TableEntry(String lex, Type t, Kind k, int mode, int size, List<List<Object>> params) {
-        lexeme = lex;
-        type = t;
-        kind = k;
+    public TableEntry(String lex, Type t, Kind k, int mode, int offset, List<List<Object>> params) {
+        this.lexeme = lex;
+        this.type = t;
+        this.kind = k;
         this.mode = mode;
-        this.size = size;
-        parameters = params;
+        this.offset = offset;
+        this.parameters = params;
     }
-}
-enum Type {
-    INTEGER, FLOAT, STRING, BOOLEAN;
-}
-enum Kind {
-    VARIABLE, PROCEDURE, PARAMETER, FUNCTION;
 }

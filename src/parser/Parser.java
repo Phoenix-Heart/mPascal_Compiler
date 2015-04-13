@@ -2,7 +2,9 @@ package parser;
 
 import core.Token;
 import scanner.Dispatcher;
-import sun.invoke.empty.Empty;
+import symbolTable.Kind;
+import symbolTable.SymbolTable;
+import symbolTable.TableEntry;
 
 import java.util.LinkedList;
 
@@ -10,13 +12,15 @@ import java.util.LinkedList;
  * Created by Christina on 3/6/2015.
  */
 public class Parser {
-    Dispatcher dispatcher;
-    public Parser(Dispatcher dispatcher) {
-        this.dispatcher = dispatcher;
-    }
+    private Dispatcher dispatcher;
     private LinkedList stack;
     private Token lookahead;
+    private LinkedList<SymbolTable> tables;
 
+    public Parser(Dispatcher dispatcher) {
+        this.dispatcher = dispatcher;
+        this.tables = new LinkedList<SymbolTable>();
+    }
     public void Parser() {
         lookahead = dispatcher.getToken();
     }
@@ -30,12 +34,21 @@ public class Parser {
     private void LL1error() throws ParseException {
         throw new ParseException(String.format("Parse error on line %s, col %s. Unexpected token %s", dispatcher.getLine(), dispatcher.getColumn(), dispatcher.getLexeme(), lookahead.name()));
     }
+    private TableEntry getEntry(String lexeme) {
+        TableEntry entry = null;
+        for(SymbolTable table : tables) {
+            if(table.hasEntry(lexeme))
+            return table.getEntry(lexeme);
+        }
+        return null;
+    }
+
+    // save parse tree rules to file
+    private void parseTree(int n) {
+
+    }
     private void VariableDeclaration() {}
     private void VariableDeclarationPart() throws ParseException {
-        VariableDeclarationTail();
-        matchLookAhead(Token.MP_SCOLON);
-        VariableDeclaration();
-        matchLookAhead(Token.MP_VAR);
     }
 
     private void VariableDeclarationTail() throws ParseException {
@@ -65,7 +78,7 @@ public class Parser {
         }
     }
     private void Statement() throws ParseException {
-        // all done except IDENTIFIER case
+        // complete
         switch (lookahead) {
             case MP_SCOLON:
                 EmptyStatement();
@@ -101,10 +114,14 @@ public class Parser {
                 WriteStatement();
                 break;
             case MP_IDENTIFIER:
-                /* need conflict resolution
-                EmptyStatement();
-                ProcedureStatement();
-                */
+                // Identifier kind conflict resolution
+                String lex = dispatcher.getLexeme();
+                TableEntry entry = getEntry(lex);
+                if(entry.kind == Kind.PROCEDURE)
+                    ProcedureStatement();   // procedure identifier
+                else
+                    EmptyStatement();
+
                 break;
             default:
                 LL1error();
@@ -195,9 +212,10 @@ public class Parser {
         OptionalElsePart();
     }
     private void OptionalElsePart() throws ParseException {
+        // complete
         switch (lookahead) {
             case MP_ELSE:
-                /* need conflict resolution here, could be lambda */
+                /* using greedy/nearest match for conflict resolution */
                 matchLookAhead(Token.MP_ELSE);
                 Statement();
                 break;
@@ -210,18 +228,21 @@ public class Parser {
         }
     }
     private void RepeatStatement() throws ParseException {
+        // complete
         matchLookAhead(Token.MP_REPEAT);
         StatementSequence();
         matchLookAhead(Token.MP_UNTIL);
         BooleanExpression();
     }
     private void WhileStatement() throws ParseException {
+        // complete
         matchLookAhead(Token.MP_WHILE);
         BooleanExpression();
         matchLookAhead(Token.MP_DO);
         Statement();
     }
     private void ForStatement() throws ParseException {
+        // complete
         matchLookAhead(Token.MP_FOR);
         ControlVariable();
         matchLookAhead(Token.MP_ASSIGN);
@@ -232,12 +253,15 @@ public class Parser {
         Statement();
     }
     private void ControlVariable() {
+        // complete
         VariableIdentifier();
     }
     private void InitialValue() {
+        // complete
         OrdinalExpression();
     }
     private void StepValue() throws ParseException {
+        // complete
         switch (lookahead) {
             case MP_TO:
                 matchLookAhead(Token.MP_TO);
@@ -250,19 +274,34 @@ public class Parser {
         }
     }
     private void FinalValue() {
+        // complete
         OrdinalExpression();
     }
     private void ProcedureStatement() throws ParseException {
+        // complete
         ProcedureIdentifier();
         OptionalActualParameterList();
     }
     private void OptionalActualParameterList() throws ParseException {
-        matchLookAhead(Token.MP_LPAREN);
-        ActualParameter();
-        ActualParameterTail();
-        matchLookAhead(Token.MP_RPAREN);
+        // complete
+        switch (lookahead) {
+            case MP_LPAREN:
+                matchLookAhead(Token.MP_LPAREN);
+                ActualParameter();
+                ActualParameterTail();
+                matchLookAhead(Token.MP_RPAREN);
+                break;
+            case MP_SCOLON:
+            case MP_UNTIL:
+            case MP_ELSE:
+            case MP_END:
+                break;
+            default:
+                LL1error();
+        }
     }
     private void ActualParameterTail() throws ParseException {
+        // complete
         switch (lookahead) {
             case MP_COMMA:
                 matchLookAhead(Token.MP_COMMA);
@@ -276,21 +315,26 @@ public class Parser {
         }
     }
     private void ActualParameter() throws ParseException {
+        // complete
         OrdinalExpression();
     }
     private void Expression() throws ParseException {
+        // complete
         SimpleExpression();
         OptionalRelationalPart();
     }
     private void OptionalRelationalPart() throws ParseException {
+        // complete
         switch (lookahead) {
             case MP_COMMA:
             case MP_SCOLON:
-            case MP_RPAREN:
+            case MP_LPAREN:
             case MP_DOWNTO:
             case MP_DO:
             case MP_END:
+            case MP_ELSE:
             case MP_THEN:
+            case MP_TO:
             case MP_UNTIL:
                 break;
             case MP_EQUAL:
@@ -307,6 +351,7 @@ public class Parser {
         }
     }
     private void RelationalOperator() throws ParseException {
+        // complete
         switch (lookahead) {
             case MP_EQUAL:
                 matchLookAhead(Token.MP_EQUAL);
@@ -331,49 +376,37 @@ public class Parser {
         }
     }
     private void SimpleExpression() throws ParseException {
+        // complete
         OptionalSign();
         Term();
         TermTail();
     }
     private void TermTail() throws ParseException {
+        // complete
         switch (lookahead) {
             case MP_COMMA:
-                break;
             case MP_SCOLON:
-                break;
             case MP_RPAREN:
-                break;
             case MP_EQUAL:
-                break;
             case MP_LTHAN:
-                break;
             case MP_GTHAN:
-                break;
             case MP_LEQUAL:
-                break;
             case MP_GEQUAL:
-                break;
             case MP_NEQUAL:
+            case MP_DO:
+            case MP_DOWNTO:
+            case MP_ELSE:
+            case MP_END:
+            case MP_OR:
+            case MP_THEN:
+            case MP_TO:
+            case MP_UNTIL:
                 break;
             case MP_PLUS:
-                break;
             case MP_MINUS:
-                break;
-            case MP_DO:
-                break;
-            case MP_DOWNTO:
-                break;
-            case MP_ELSE:
-                break;
-            case MP_END:
-                break;
-            case MP_OR:
-                break;
-            case MP_THEN:
-                break;
-            case MP_TO:
-                break;
-            case MP_UNTIL:
+            AddingOperator();
+            Term();
+            TermTail();
                 break;
             default:
                 LL1error();
