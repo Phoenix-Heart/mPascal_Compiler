@@ -5,18 +5,18 @@ import java.util.*;
  */
 public class SymbolTable {
     private HashMap<String, TableEntry> hm;
-    private String name;    // is this necessary?
     private String label;
     private int nestingLevel;
     private static int labelCounter = 0;
     private int nextoffset;         // # offset to give to the next entry
+    private String name;
 
     public SymbolTable(String name, int nestingLevel)
     {
         this.nextoffset = 0;
         this.hm = new HashMap();
         this.name = name;
-        this.label = "l" + Integer.toString(labelCounter);
+        this.label = "L" + Integer.toString(labelCounter);
         labelCounter++;
         this.nestingLevel = nestingLevel;
     }
@@ -28,11 +28,6 @@ public class SymbolTable {
     }
     public TableEntry getEntry(String key) {
         return hm.get(key);
-    }
-
-    public String getName()
-    {
-        return this.name;
     }
 
     public String getLabel()

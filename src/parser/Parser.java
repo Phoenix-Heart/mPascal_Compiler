@@ -5,26 +5,48 @@ import scanner.Dispatcher;
 import symbolTable.Kind;
 import symbolTable.SymbolTable;
 import symbolTable.TableEntry;
+import symbolTable.Type;
 
-import java.util.ArrayList;
+import java.io.*;
+import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.List;
 
 /**
  * Created by Christina on 3/6/2015.
  */
 public class Parser {
+
     private Dispatcher dispatcher;
-    private LinkedList stack;
     private Token lookahead;
-    private LinkedList<SymbolTable> tables;
+    private LinkedList<SymbolTable> stack;
+    private EntryBuilder tableEntry;
     private String parse;
+    private int nest;
 
     public Parser(Dispatcher dispatcher) {
         this.dispatcher = dispatcher;
-        this.tables = new LinkedList<SymbolTable>();
+        this.stack = new LinkedList<SymbolTable>();
         this.parse = "";
+        nest = 0;
+        tableEntry = new EntryBuilder();
     }
-
+    public void startParse() throws ParseException {
+        lookahead = dispatcher.getToken();
+        SystemGoal();
+        System.out.println(parse);
+        saveParse();
+    }
+    private void saveParse() {
+        try {
+            BufferedWriter writer = new BufferedWriter(new FileWriter("parsefile.txt"));
+            writer.write(parse);
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
     private void matchLookAhead(Token token) throws ParseException {
 
         if(lookahead!=token) {
@@ -36,13 +58,49 @@ public class Parser {
         throw new ParseException(String.format("Parse error on line %s, col %s. Unexpected token %s", dispatcher.getLine(), dispatcher.getColumn(), dispatcher.getLexeme(), lookahead.name()));
     }
     private TableEntry getEntry(String lexeme) {
-        TableEntry entry = null;
-        for(SymbolTable table : tables) {
+        Iterator<SymbolTable> iter = stack.descendingIterator();
+        SymbolTable table;
+        while(iter.hasNext()) {
+            table = iter.next();
             if(table.hasEntry(lexeme))
             return table.getEntry(lexeme);
         }
         return null;
     }
+    private void createTable() throws ParseException {
+        if(dispatcher.getToken()==Token.MP_IDENTIFIER) {
+            stack.push(new SymbolTable(dispatcher.getLexeme(), nest));
+            nest++;
+        }
+        else {
+            throw new ParseException("Attempted to insert symbol table without identifier.");
+        }
+    }
+    private void destroyTable() {
+        stack.pop();
+        nest--;
+    }
+    private void addEntry() {
+        SymbolTable table = stack.peek();
+        if(tableEntry.name==null) {
+            System.out.println("Attempted to create unnamed symbol");
+        }
+        else if(tableEntry.kind==null) {
+            System.out.println("Attempted to create unidentified symbol");
+        }
+        else if(tableEntry.kind==Kind.FUNCTION) {
+            if(tableEntry.mode==0) {
+                System.out.println("Mode missing in function identifier");
+            }
+            else {
+                table.createNewEntry(tableEntry.name, tableEntry.type, tableEntry.kind, tableEntry.mode, tableEntry.params);
+            }
+        }
+        else {
+            table.createNewEntry(tableEntry.name, tableEntry.type, tableEntry.kind, tableEntry.mode, tableEntry.params);
+        }
+    }
+
 
     // save parse tree rules to file
     private void parseTree(String rule) {
@@ -50,6 +108,22 @@ public class Parser {
         parse += " ";
 
     }
+
+    private void SystemGoal() throws ParseException {
+        Program();
+    }
+    private void Program() throws ParseException {
+        ProgramHeading();
+        matchLookAhead(Token.MP_SCOLON);
+        Block();
+        matchLookAhead(Token.MP_PERIOD);
+    }
+    private void ProgramHeading() throws ParseException {
+        matchLookAhead(Token.MP_PROGRAM);
+        ProgramIdentifier();
+        createTable();
+    }
+    private void Block() {}
     private void VariableDeclaration() {}
     private void VariableDeclarationPart() throws ParseException {
     }
@@ -491,5 +565,45 @@ public class Parser {
     private void IdentifierList() {}
     private void IdentifierTail() {}
 
-
+    private class EntryBuilder {
+        private String name;
+        private Kind kind;
+        private Type type;
+        private int mode;
+        private List<List<Object>> params;
+        EntryBuilder() {
+            name = null;
+            kind = null;
+            type = null;
+            mode = 0;
+            params = null;
+        }
+        public void setName(String name) {
+            if(name==null)
+                this.name = name;
+            else
+                error("name");
+        }
+        public void setKind(Kind kind) {
+            if(kind==null)
+                this.kind = kind;
+            else
+                error("kind");
+        }
+        public void setType(Type type) {
+            if(type==null)
+                this.type = type;
+            else
+                error("type");
+        }
+        public void setMode(int mode) {
+            if(mode==0)
+                this.mode = mode;
+            else
+                error("mode");
+        }
+        private void error(String err) {
+            System.out.println("Attempted to overwrite existing entry value: "+err);
+        }
+    }
 }
