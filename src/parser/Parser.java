@@ -6,6 +6,7 @@ import symbolTable.Kind;
 import symbolTable.SymbolTable;
 import symbolTable.TableEntry;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 
 /**
@@ -16,14 +17,14 @@ public class Parser {
     private LinkedList stack;
     private Token lookahead;
     private LinkedList<SymbolTable> tables;
+    private String parse;
 
     public Parser(Dispatcher dispatcher) {
         this.dispatcher = dispatcher;
         this.tables = new LinkedList<SymbolTable>();
+        this.parse = "";
     }
-    public void Parser() {
-        lookahead = dispatcher.getToken();
-    }
+
     private void matchLookAhead(Token token) throws ParseException {
 
         if(lookahead!=token) {
@@ -44,7 +45,9 @@ public class Parser {
     }
 
     // save parse tree rules to file
-    private void parseTree(int n) {
+    private void parseTree(String rule) {
+        parse += rule;
+        parse += " ";
 
     }
     private void VariableDeclaration() {}
@@ -81,36 +84,38 @@ public class Parser {
         // complete
         switch (lookahead) {
             case MP_SCOLON:
+            case MP_ELSE:
+            case MP_END:
+            case MP_UNTIL:
+                parseTree("34");
                 EmptyStatement();
                 break;
             case MP_BEGIN:
+                parseTree("35");
                 CompoundStatement();
                 break;
-            case MP_ELSE:
-                EmptyStatement();
-                break;
-            case MP_END:
-                EmptyStatement();
-                break;
             case MP_FOR:
+                parseTree("42");
                 ForStatement();
                 break;
             case MP_IF:
+                parseTree("39");
                 IfStatement();
                 break;
             case MP_READ:
+                parseTree("36");
                 ReadStatement();
                 break;
             case MP_REPEAT:
+                parseTree("41");
                 RepeatStatement();
                 break;
-            case MP_UNTIL:
-                EmptyStatement();
-                break;
             case MP_WHILE:
+                parseTree("40");
                 WhileStatement();
                 break;
             case MP_WRITE:
+                parseTree("37");
                 WriteStatement();
                 break;
             case MP_IDENTIFIER:
@@ -119,8 +124,10 @@ public class Parser {
                 TableEntry entry = getEntry(lex);
                 if(entry.kind == Kind.PROCEDURE)
                     ProcedureStatement();   // procedure identifier
-                else
-                    EmptyStatement();
+                else if(entry.kind == Kind.FUNCTION || entry.kind == Kind.VARIABLE) {
+                    parseTree("38");
+                    AssignmentStatement();
+                }
 
                 break;
             default:
@@ -128,19 +135,23 @@ public class Parser {
         }
 
     }
+
     private void EmptyStatement() throws ParseException {
         // complete
         switch (lookahead) {
-            case MP_SCOLON: break;
-            case MP_ELSE: break;
-            case MP_END: break;
-            case MP_UNTIL: break;
+            case MP_SCOLON:
+            case MP_ELSE:
+            case MP_END:
+            case MP_UNTIL:
+                parseTree("44");
+                break;
             default:
                 LL1error();
         }
     }
     private void ReadStatement() throws ParseException {
         // complete
+        parseTree("45");
         matchLookAhead(Token.MP_READ);
         matchLookAhead(Token.MP_LPAREN);
         ReadParameter();
@@ -149,17 +160,20 @@ public class Parser {
     }
     private void ReadParameter() {
         // complete
+        parseTree("48");
         VariableIdentifier();
     }
     private void ReadParameterTail() throws ParseException {
         // complete
         switch (lookahead) {
             case MP_COMMA:
+                parseTree("46");
                 matchLookAhead(Token.MP_COMMA);
                 ReadParameter();
                 ReadParameterTail();
                 break;
             case MP_RPAREN:
+                parseTree("47");
                 break;
             default:
                 LL1error();
@@ -168,6 +182,7 @@ public class Parser {
         // complete
         switch (lookahead) {
             case MP_WRITE:
+                parseTree("49");
                 matchLookAhead(Token.MP_WRITE);
                 matchLookAhead(Token.MP_LPAREN);
                 WriteParameter();
@@ -175,6 +190,7 @@ public class Parser {
                 matchLookAhead(Token.MP_RPAREN);
                 break;
             case MP_WRITELN:
+                parseTree("50");
                 matchLookAhead(Token.MP_WRITELN);
                 matchLookAhead(Token.MP_LPAREN);
                 WriteParameter();
@@ -190,10 +206,12 @@ public class Parser {
         // complete
     switch (lookahead) {
         case MP_COMMA:
+            parseTree("51");
             matchLookAhead(Token.MP_COMMA);
             WriteParameter();
             WriteParameterTail();
         case MP_RPAREN:
+            parseTree("52");
             break;
         default:
             LL1error();
@@ -201,10 +219,28 @@ public class Parser {
     }
     private void WriteParameter() throws ParseException {
         // complete
+        parseTree("53");
         OrdinalExpression();
+    }
+    private void AssignmentStatement() {
+        // complete
+        String lex = dispatcher.getLexeme();
+        TableEntry entry = getEntry(lex);
+        if(entry.kind == Kind.FUNCTION) {
+            parseTree("55");
+            FunctionIdentifier();
+        }
+        else if (entry.kind == Kind.VARIABLE) {
+            parseTree("54");
+            VariableIdentifier();
+        }
+        else {
+            System.out.println(" (AssignmentStatement) This code should be unreachable.");
+        }
     }
     private void IfStatement() throws ParseException {
         // complete
+        parseTree("56");
         matchLookAhead(Token.MP_IF);
         BooleanExpression();
         matchLookAhead(Token.MP_THEN);
@@ -216,12 +252,14 @@ public class Parser {
         switch (lookahead) {
             case MP_ELSE:
                 /* using greedy/nearest match for conflict resolution */
+                parseTree("57");
                 matchLookAhead(Token.MP_ELSE);
                 Statement();
                 break;
             case MP_SCOLON:
             case MP_END:
             case MP_UNTIL:
+                parseTree("58");
                 break;
             default:
                 LL1error();
@@ -229,6 +267,7 @@ public class Parser {
     }
     private void RepeatStatement() throws ParseException {
         // complete
+        parseTree("59");
         matchLookAhead(Token.MP_REPEAT);
         StatementSequence();
         matchLookAhead(Token.MP_UNTIL);
@@ -236,6 +275,7 @@ public class Parser {
     }
     private void WhileStatement() throws ParseException {
         // complete
+        parseTree("60");
         matchLookAhead(Token.MP_WHILE);
         BooleanExpression();
         matchLookAhead(Token.MP_DO);
@@ -243,6 +283,7 @@ public class Parser {
     }
     private void ForStatement() throws ParseException {
         // complete
+        parseTree("61");
         matchLookAhead(Token.MP_FOR);
         ControlVariable();
         matchLookAhead(Token.MP_ASSIGN);
@@ -254,19 +295,23 @@ public class Parser {
     }
     private void ControlVariable() {
         // complete
+        parseTree("62");
         VariableIdentifier();
     }
     private void InitialValue() {
         // complete
+        parseTree("63");
         OrdinalExpression();
     }
     private void StepValue() throws ParseException {
         // complete
         switch (lookahead) {
             case MP_TO:
+                parseTree("64");
                 matchLookAhead(Token.MP_TO);
                 break;
             case MP_DOWNTO:
+                parseTree("65");
                 matchLookAhead(Token.MP_DOWNTO);
                 break;
             default:
@@ -275,10 +320,12 @@ public class Parser {
     }
     private void FinalValue() {
         // complete
+        parseTree("66");
         OrdinalExpression();
     }
     private void ProcedureStatement() throws ParseException {
         // complete
+        parseTree("67");
         ProcedureIdentifier();
         OptionalActualParameterList();
     }
@@ -286,6 +333,7 @@ public class Parser {
         // complete
         switch (lookahead) {
             case MP_LPAREN:
+                parseTree("68");
                 matchLookAhead(Token.MP_LPAREN);
                 ActualParameter();
                 ActualParameterTail();
@@ -295,6 +343,7 @@ public class Parser {
             case MP_UNTIL:
             case MP_ELSE:
             case MP_END:
+                parseTree("69");
                 break;
             default:
                 LL1error();
@@ -304,11 +353,13 @@ public class Parser {
         // complete
         switch (lookahead) {
             case MP_COMMA:
+                parseTree("70");
                 matchLookAhead(Token.MP_COMMA);
                 ActualParameter();
                 ActualParameterTail();
                 break;
             case MP_RPAREN:
+                parseTree("71");
                 break;
             default:
                 LL1error();
@@ -316,10 +367,12 @@ public class Parser {
     }
     private void ActualParameter() throws ParseException {
         // complete
+        parseTree("72");
         OrdinalExpression();
     }
     private void Expression() throws ParseException {
         // complete
+        parseTree("73");
         SimpleExpression();
         OptionalRelationalPart();
     }
@@ -336,6 +389,7 @@ public class Parser {
             case MP_THEN:
             case MP_TO:
             case MP_UNTIL:
+                parseTree("75");
                 break;
             case MP_EQUAL:
             case MP_LTHAN:
@@ -343,6 +397,7 @@ public class Parser {
             case MP_LEQUAL:
             case MP_GEQUAL:
             case MP_NEQUAL:
+                parseTree("74");
                 RelationalOperator();
                 SimpleExpression();
                 break;
@@ -354,21 +409,27 @@ public class Parser {
         // complete
         switch (lookahead) {
             case MP_EQUAL:
+                parseTree("76");
                 matchLookAhead(Token.MP_EQUAL);
                 break;
             case MP_LTHAN:
+                parseTree("77");
                 matchLookAhead(Token.MP_LTHAN);
                 break;
             case MP_GTHAN:
+                parseTree("78");
                 matchLookAhead(Token.MP_GTHAN);
                 break;
             case MP_LEQUAL:
+                parseTree("79");
                 matchLookAhead(Token.MP_LEQUAL);
                 break;
             case MP_GEQUAL:
+                parseTree("80");
                 matchLookAhead(Token.MP_GEQUAL);
                 break;
             case MP_NEQUAL:
+                parseTree("81");
                 matchLookAhead(Token.MP_NEQUAL);
                 break;
             default:
@@ -377,6 +438,7 @@ public class Parser {
     }
     private void SimpleExpression() throws ParseException {
         // complete
+        parseTree("82");
         OptionalSign();
         Term();
         TermTail();
@@ -401,12 +463,14 @@ public class Parser {
             case MP_THEN:
             case MP_TO:
             case MP_UNTIL:
+                parseTree("84");
                 break;
             case MP_PLUS:
             case MP_MINUS:
-            AddingOperator();
-            Term();
-            TermTail();
+                parseTree("83");
+                AddingOperator();
+                Term();
+                TermTail();
                 break;
             default:
                 LL1error();
