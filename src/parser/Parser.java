@@ -590,11 +590,55 @@ public class Parser {
         }
         matchLookAhead(Token.MP_IDENTIFIER);
     }
-    private void VariableIdentifier() throws ParseException {matchLookAhead(Token.MP_IDENTIFIER);}
-    private void ProcedureIdentifier() throws ParseException {matchLookAhead(Token.MP_IDENTIFIER);}
-    private void FunctionIdentifier() throws ParseException {matchLookAhead(Token.MP_IDENTIFIER);}
-    private void BooleanExpression() throws ParseException {matchLookAhead(Token.MP_IDENTIFIER);}
-    private void OrdinalExpression() throws ParseException {matchLookAhead(Token.MP_IDENTIFIER);}
-    private void IdentifierList() throws ParseException {}
+    private void VariableIdentifier() throws ParseException {
+        if(lookahead==Token.MP_IDENTIFIER) {                // the table entry needs to be updated before running our match.
+            tableEntry.setName(dispatcher.getLexeme());
+            tableEntry.setKind(Kind.PROGRAM);
+        }
+        matchLookAhead(Token.MP_IDENTIFIER);
+    }
+    private void ProcedureIdentifier() throws ParseException {
+        if(lookahead==Token.MP_IDENTIFIER) {                // the table entry needs to be updated before running our match.
+            tableEntry.setName(dispatcher.getLexeme());
+            tableEntry.setKind(Kind.PROGRAM);
+        }
+        matchLookAhead(Token.MP_IDENTIFIER);
+    }
+    private void FunctionIdentifier() throws ParseException {
+        if(lookahead==Token.MP_IDENTIFIER) {
+            tableEntry.setName(dispatcher.getLexeme());
+            tableEntry.setKind(Kind.PROGRAM);
+        }
+        matchLookAhead(Token.MP_IDENTIFIER);}
+    private void BooleanExpression() throws ParseException {
+        if(lookahead==Token.MP_IDENTIFIER) {
+            tableEntry.setName(dispatcher.getLexeme());
+            tableEntry.setKind(Kind.PROGRAM);
+        }
+        matchLookAhead(Token.MP_IDENTIFIER);}
+    private void OrdinalExpression() throws ParseException {
+        if(lookahead==Token.MP_IDENTIFIER) {
+            tableEntry.setName(dispatcher.getLexeme());
+            tableEntry.setKind(Kind.PROGRAM);
+        }
+        matchLookAhead(Token.MP_IDENTIFIER);
+    }
+    private void IdentifierList() throws ParseException {
+        switch(lookahead){
+            case MP_COMMA:
+                if(lookahead==Token.MP_IDENTIFIER) {                // the table entry needs to be updated before running our match.
+                    tableEntry.setName(dispatcher.getLexeme());
+                    tableEntry.setKind(Kind.PROGRAM);
+                }
+                IdentifierTail();
+                matchLookAhead(Token.MP_IDENTIFIER);
+                matchLookAhead(Token.MP_COMMA);
+                break;
+            case MP_COLON:
+                break;
+            default:
+                LL1error();
+        }
+    }
     private void IdentifierTail() throws ParseException {}
 }
