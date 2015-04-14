@@ -1,3 +1,5 @@
+package Analyzer;
+
 import symbolTable.SymbolTable;
 
 import java.util.LinkedList;

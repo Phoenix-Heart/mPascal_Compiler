@@ -1,4 +1,4 @@
-program Tester(input, output);
+program Tester;
 
        var I: Integer;
 

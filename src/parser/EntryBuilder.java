@@ -36,31 +36,34 @@ public class EntryBuilder {
     public List<TableEntry> getParams() {
         return params;
     }
-    public void setName(String name) {
-        if(name==null)
+    public void setName(String name) throws ParseException {
+        if(this.name==null) {
             this.name = name;
-        else
-            error("name");
+        }
+        else {
+            error("name", this.name.toString(), name.toString());
+        }
     }
-    public void setKind(Kind kind) {
-        if(kind==null)
+    public void setKind(Kind kind) throws ParseException {
+        if(this.kind==null)
             this.kind = kind;
         else
-            error("kind");
+            error("kind", this.kind.toString(), kind.toString());
     }
-    public void setType(Type type) {
-        if(type==null)
+    public void setType(Type type) throws ParseException {
+        if(this.type==null)
             this.type = type;
         else
-            error("type");
+            error("type", this.type.toString(), type.toString());
     }
-    public void setMode(Mode mode) {
-        if(mode==null)
+    public void setMode(Mode mode) throws ParseException {
+        if(this.mode==null)
             this.mode = mode;
         else
-            error("mode");
+            error("mode", this.mode.toString(), mode.toString());
     }
-    private void error(String err) {
-        System.out.println("Attempted to overwrite existing entry value: "+err);
+    private void error(String err, String value, String newvalue) throws ParseException {
+        throw new ParseException(String.format("Attempted to overwrite %s entry %s with %s",err, value, newvalue));
+
     }
 }

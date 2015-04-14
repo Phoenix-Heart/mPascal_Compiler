@@ -1,12 +1,11 @@
 package scanner;
 
-import core.Selector;
 import core.Token;
 
 import java.util.ArrayList;
 
 /**
- * Created by Christina Dunning on 2/4/2015.
+ * Created by Christina on 2/4/2015.
  */
 public class mp {
     public static void main(String[] args) {
@@ -16,7 +15,7 @@ public class mp {
             String filename = args[0];
             Dispatcher s = new Dispatcher(filename);
             while(token!= Token.MP_EOF && token != Token.MP_RUN_COMMENT && token != Token.MP_RUN_STRING && token != Token.MP_ERROR) {
-                token = s.getToken();
+                token = s.nextToken();
                 tokens.add(token);
                 System.out.println();
                 System.out.print("Token " + token.name());
@@ -25,7 +24,7 @@ public class mp {
                 if(token.name().length() <15) System.out.print("\t");
                 System.out.print("\tLine "+s.getLine());
                 System.out.print("\tColumn "+s.getColumn());
-                System.out.print("\tLexeme  \""+s.getLexeme());
+                System.out.print("\tLexeme  "+s.getLexeme());
 
                 if(token==Token.MP_RUN_COMMENT || token==Token.MP_ERROR || token==Token.MP_RUN_STRING) {
                     System.out.println();

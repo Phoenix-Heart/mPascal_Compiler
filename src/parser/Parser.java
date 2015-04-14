@@ -5,12 +5,10 @@ import scanner.Dispatcher;
 import symbolTable.Kind;
 import symbolTable.SymbolTable;
 import symbolTable.TableEntry;
-import symbolTable.Type;
 
 import java.io.*;
 import java.util.Iterator;
 import java.util.LinkedList;
-import java.util.List;
 
 /**
  * Created by Christina on 3/6/2015.
@@ -23,6 +21,7 @@ public class Parser {
     private EntryBuilder tableEntry;
     private String parse;
     private int nest;
+    private EntryBuilder stackEntry;
 
     public Parser(Dispatcher dispatcher) {
         this.dispatcher = dispatcher;
@@ -32,16 +31,18 @@ public class Parser {
         tableEntry = new EntryBuilder();
     }
     public void startParse() throws ParseException {
-        lookahead = dispatcher.getToken();
+        lookahead = dispatcher.nextToken();
         SystemGoal();
         System.out.println(parse);
         saveParse();
     }
     // copy trace to file
-    private void saveParse() {
+    public void saveParse() {
         try {
             BufferedWriter writer = new BufferedWriter(new FileWriter("parsefile.txt"));
+            writer.write("## Trace File ##\n");
             writer.write(parse);
+            writer.close();
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         } catch (IOException e) {
@@ -54,7 +55,7 @@ public class Parser {
         if(lookahead!=token) {
             throw new ParseException(String.format("Parse error on line %s, col %s. Found %s, expected %s.", dispatcher.getLine(), dispatcher.getColumn(), dispatcher.getLexeme(), token.name()));
         }
-        lookahead = dispatcher.getToken();
+        lookahead = dispatcher.nextToken();
     }
     // generic error message when an unexpected token is discovered.
     private void LL1error() throws ParseException {
@@ -73,13 +74,14 @@ public class Parser {
     }
     // create a new symbol table and add it to the stack
     private void createTable() throws ParseException {
-        if(dispatcher.getToken()==Token.MP_IDENTIFIER) {
-            stack.push(new SymbolTable(dispatcher.getLexeme(), nest));
+        if(tableEntry.getName()!=null) {
+            stack.push(new SymbolTable(tableEntry.getName(), nest));
             nest++;
         }
         else {
             throw new ParseException("Attempted to insert symbol table without identifier.");
         }
+        tableEntry = new EntryBuilder();
     }
     // remove top symbol table from the stack
     private void destroyTable() {
@@ -88,6 +90,7 @@ public class Parser {
     }
     // add a row to the symbol table using information retrieved during parse.
     private void addEntry() {
+        // need to fill out logic, catch all errors & ensure program,procedure,function preserve entry for new table creation.
         SymbolTable table = stack.peek();
         if(tableEntry.getName()==null) {
             System.out.println("Attempted to create unnamed symbol");
@@ -105,6 +108,7 @@ public class Parser {
         }
         else {
             table.createNewEntry(tableEntry.getName(), tableEntry.getType(), tableEntry.getKind(), tableEntry.getMode(), tableEntry.getParams());
+            tableEntry = new EntryBuilder();
         }
     }
 
@@ -120,7 +124,10 @@ public class Parser {
         Parse Stubs Below
      ************************************************/
 
+    // section written by Andrew
+
     private void SystemGoal() throws ParseException {
+        parseTree("1");
         Program();
     }
     private void Program() throws ParseException {
@@ -130,6 +137,7 @@ public class Parser {
         matchLookAhead(Token.MP_PERIOD);
     }
     private void ProgramHeading() throws ParseException {
+        parseTree("2");
         matchLookAhead(Token.MP_PROGRAM);
         ProgramIdentifier();
         createTable();
@@ -165,6 +173,9 @@ public class Parser {
                 break;
         }
     }
+
+    // section written by Christina
+
     private void Statement() throws ParseException {
         // complete
         switch (lookahead) {
@@ -244,7 +255,7 @@ public class Parser {
         ReadParameterTail();
         matchLookAhead(Token.MP_RPAREN);
     }
-    private void ReadParameter() {
+    private void ReadParameter() throws ParseException {
         // complete
         parseTree("48");
         VariableIdentifier();
@@ -308,7 +319,7 @@ public class Parser {
         parseTree("53");
         OrdinalExpression();
     }
-    private void AssignmentStatement() {
+    private void AssignmentStatement() throws ParseException {
         // complete
         String lex = dispatcher.getLexeme();
         TableEntry entry = getEntry(lex);
@@ -379,12 +390,12 @@ public class Parser {
         matchLookAhead(Token.MP_DO);
         Statement();
     }
-    private void ControlVariable() {
+    private void ControlVariable() throws ParseException {
         // complete
         parseTree("62");
         VariableIdentifier();
     }
-    private void InitialValue() {
+    private void InitialValue() throws ParseException {
         // complete
         parseTree("63");
         OrdinalExpression();
@@ -404,7 +415,7 @@ public class Parser {
                 LL1error();
         }
     }
-    private void FinalValue() {
+    private void FinalValue() throws ParseException {
         // complete
         parseTree("66");
         OrdinalExpression();
@@ -562,18 +573,28 @@ public class Parser {
                 LL1error();
         }
     }
+
+    // section written by Hunter
+
     private void OptionalSign() {}
     private void AddingOperator() {}
     private void Term() {}
     private void FactorTail() {}
     private void MultiplyingOperator() {}
     private void Factor() {}
-    private void ProgramIdentifier() {}
-    private void VariableIdentifier() {}
-    private void ProcedureIdentifier() {}
-    private void FunctionIdentifier() {}
-    private void BooleanExpression() {}
-    private void OrdinalExpression() {}
-    private void IdentifierList() {}
-    private void IdentifierTail() {}
+    private void ProgramIdentifier() throws ParseException {
+        parseTree("107");
+        if(lookahead==Token.MP_IDENTIFIER) {                // the table entry needs to be updated before running our match.
+            tableEntry.setName(dispatcher.getLexeme());
+            tableEntry.setKind(Kind.PROGRAM);
+        }
+        matchLookAhead(Token.MP_IDENTIFIER);
+    }
+    private void VariableIdentifier() throws ParseException {matchLookAhead(Token.MP_IDENTIFIER);}
+    private void ProcedureIdentifier() throws ParseException {matchLookAhead(Token.MP_IDENTIFIER);}
+    private void FunctionIdentifier() throws ParseException {matchLookAhead(Token.MP_IDENTIFIER);}
+    private void BooleanExpression() throws ParseException {matchLookAhead(Token.MP_IDENTIFIER);}
+    private void OrdinalExpression() throws ParseException {matchLookAhead(Token.MP_IDENTIFIER);}
+    private void IdentifierList() throws ParseException {}
+    private void IdentifierTail() throws ParseException {}
 }

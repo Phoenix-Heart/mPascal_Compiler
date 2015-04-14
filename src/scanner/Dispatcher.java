@@ -70,6 +70,10 @@ public class Dispatcher {
         }
     }
     public Token getToken() {
+        return token;
+    }
+
+    public Token nextToken() {
         lexeme = "";
         // update current location prior to scanning
         column = nextcol;
@@ -98,7 +102,7 @@ public class Dispatcher {
                     }
                 }
                 ch = read();
-                return getToken();
+                return nextToken();
             }
 
             // prepare to scan for a token. Scan first character and choose appropriate selector.
