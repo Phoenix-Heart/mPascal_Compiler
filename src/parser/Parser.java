@@ -37,6 +37,7 @@ public class Parser {
         System.out.println(parse);
         saveParse();
     }
+    // copy trace to file
     private void saveParse() {
         try {
             BufferedWriter writer = new BufferedWriter(new FileWriter("parsefile.txt"));
@@ -47,6 +48,7 @@ public class Parser {
             e.printStackTrace();
         }
     }
+    // assert token is a match.
     private void matchLookAhead(Token token) throws ParseException {
 
         if(lookahead!=token) {
@@ -54,9 +56,11 @@ public class Parser {
         }
         lookahead = dispatcher.getToken();
     }
+    // generic error message when an unexpected token is discovered.
     private void LL1error() throws ParseException {
         throw new ParseException(String.format("Parse error on line %s, col %s. Unexpected token %s", dispatcher.getLine(), dispatcher.getColumn(), dispatcher.getLexeme(), lookahead.name()));
     }
+    // get entry to use during identifier conflict resolution
     private TableEntry getEntry(String lexeme) {
         Iterator<SymbolTable> iter = stack.descendingIterator();
         SymbolTable table;
@@ -67,6 +71,7 @@ public class Parser {
         }
         return null;
     }
+    // create a new symbol table and add it to the stack
     private void createTable() throws ParseException {
         if(dispatcher.getToken()==Token.MP_IDENTIFIER) {
             stack.push(new SymbolTable(dispatcher.getLexeme(), nest));
@@ -76,28 +81,30 @@ public class Parser {
             throw new ParseException("Attempted to insert symbol table without identifier.");
         }
     }
+    // remove top symbol table from the stack
     private void destroyTable() {
         stack.pop();
         nest--;
     }
+    // add a row to the symbol table using information retrieved during parse.
     private void addEntry() {
         SymbolTable table = stack.peek();
-        if(tableEntry.name==null) {
+        if(tableEntry.getName()==null) {
             System.out.println("Attempted to create unnamed symbol");
         }
-        else if(tableEntry.kind==null) {
+        else if(tableEntry.getKind()==null) {
             System.out.println("Attempted to create unidentified symbol");
         }
-        else if(tableEntry.kind==Kind.FUNCTION) {
-            if(tableEntry.mode==0) {
+        else if(tableEntry.getKind()==Kind.FUNCTION) {
+            if(tableEntry.getMode()==null) {
                 System.out.println("Mode missing in function identifier");
             }
             else {
-                table.createNewEntry(tableEntry.name, tableEntry.type, tableEntry.kind, tableEntry.mode, tableEntry.params);
+                table.createNewEntry(tableEntry.getName(), tableEntry.getType(), tableEntry.getKind(), tableEntry.getMode(), tableEntry.getParams());
             }
         }
         else {
-            table.createNewEntry(tableEntry.name, tableEntry.type, tableEntry.kind, tableEntry.mode, tableEntry.params);
+            table.createNewEntry(tableEntry.getName(), tableEntry.getType(), tableEntry.getKind(), tableEntry.getMode(), tableEntry.getParams());
         }
     }
 
@@ -108,6 +115,10 @@ public class Parser {
         parse += " ";
 
     }
+
+    /*************************************************
+        Parse Stubs Below
+     ************************************************/
 
     private void SystemGoal() throws ParseException {
         Program();
@@ -168,25 +179,9 @@ public class Parser {
                 parseTree("35");
                 CompoundStatement();
                 break;
-            case MP_FOR:
-                parseTree("42");
-                ForStatement();
-                break;
-            case MP_IF:
-                parseTree("39");
-                IfStatement();
-                break;
             case MP_READ:
                 parseTree("36");
                 ReadStatement();
-                break;
-            case MP_REPEAT:
-                parseTree("41");
-                RepeatStatement();
-                break;
-            case MP_WHILE:
-                parseTree("40");
-                WhileStatement();
                 break;
             case MP_WRITE:
                 parseTree("37");
@@ -204,6 +199,23 @@ public class Parser {
                 }
 
                 break;
+            case MP_FOR:
+                parseTree("42");
+                ForStatement();
+                break;
+            case MP_IF:
+                parseTree("39");
+                IfStatement();
+                break;
+            case MP_REPEAT:
+                parseTree("41");
+                RepeatStatement();
+                break;
+            case MP_WHILE:
+                parseTree("40");
+                WhileStatement();
+                break;
+
             default:
                 LL1error();
         }
@@ -564,46 +576,4 @@ public class Parser {
     private void OrdinalExpression() {}
     private void IdentifierList() {}
     private void IdentifierTail() {}
-
-    private class EntryBuilder {
-        private String name;
-        private Kind kind;
-        private Type type;
-        private int mode;
-        private List<List<Object>> params;
-        EntryBuilder() {
-            name = null;
-            kind = null;
-            type = null;
-            mode = 0;
-            params = null;
-        }
-        public void setName(String name) {
-            if(name==null)
-                this.name = name;
-            else
-                error("name");
-        }
-        public void setKind(Kind kind) {
-            if(kind==null)
-                this.kind = kind;
-            else
-                error("kind");
-        }
-        public void setType(Type type) {
-            if(type==null)
-                this.type = type;
-            else
-                error("type");
-        }
-        public void setMode(int mode) {
-            if(mode==0)
-                this.mode = mode;
-            else
-                error("mode");
-        }
-        private void error(String err) {
-            System.out.println("Attempted to overwrite existing entry value: "+err);
-        }
-    }
 }

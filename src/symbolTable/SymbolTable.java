@@ -1,4 +1,6 @@
 package symbolTable;
+import javafx.scene.control.Tab;
+
 import java.util.*;
 /**
  * Created by hunter on 3/6/15.
@@ -21,7 +23,7 @@ public class SymbolTable {
         this.nestingLevel = nestingLevel;
     }
 
-    public void createNewEntry(String lex, Type t, Kind k, int mode, List<List<Object>> params) {
+    public void createNewEntry(String lex, Type t, Kind k, Mode mode, List<TableEntry> params) {
         TableEntry entry = new TableEntry(lex, t, k, mode, nextoffset, params);
         hm.put(lex, entry);
         nextoffset++;
