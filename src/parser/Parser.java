@@ -125,6 +125,7 @@ public class Parser {
      ************************************************/
 
     // section written by Andrew
+    // edited by Christina
 
     private void SystemGoal() throws ParseException {
         parseTree("1");
@@ -142,34 +143,202 @@ public class Parser {
         ProgramIdentifier();
         createTable();
     }
-    private void Block() {}
-    private void VariableDeclaration() {}
+    private void Block() throws ParseException
+    {
+        StatementPart();
+        ProcedureAndFunctionDeclarationPart();
+        VariableDeclarationPart();
+    }
+
     private void VariableDeclarationPart() throws ParseException {
-    }
-
-    private void VariableDeclarationTail() throws ParseException {
-    }
-
-
-    private void Type() {    }
-    private void ProcedureDeclaration() {    }
-    private void FunctionDeclaration() {    }
-    private void ProcedureHeading() {    }
-
-    private void FunctionHeading() {         }
-    private void OptionalFormalParameterList() {    }
-    private void FormalParameterSectionTail() {    }
-    private void FormalParameterSection() {    }
-    private void ValueParameterSection() {}
-    private void VariableParameterSection() {    }
-    private void StatementPart() {    }
-    private void CompoundStatement() {    }
-    private void StatementSequence() {    }
-    private void StatementTail() {
+        //nest='v';   v for variable declaration
         switch (lookahead) {
-            case MP_AND:
+            case MP_INTEGER:
+                VariableDeclarationTail();
+                matchLookAhead(Token.MP_SCOLON);
+                VariableDeclaration();
+                matchLookAhead(Token.MP_VAR);
                 break;
             default:
+                LL1error();
+        }
+    }
+
+    private void VariableDeclarationTail() throws ParseException
+    {
+        VariableDeclarationTail();
+        matchLookAhead(Token.MP_SCOLON);
+        VariableDeclaration();
+    }
+
+    private void VariableDeclaration() throws ParseException
+    {
+        Type();
+        matchLookAhead(Token.MP_COLON);
+        IdentifierList();
+    }
+
+    private void Type() throws ParseException {
+        switch (lookahead) {
+            case MP_INTEGER:
+                matchLookAhead(Token.MP_INTEGER);
+                break;
+            case MP_FLOAT:
+                matchLookAhead(Token.MP_FLOAT);
+                break;
+            case MP_STRING:
+                matchLookAhead(Token.MP_STRING);
+                break;
+            case MP_BOOLEAN:
+                matchLookAhead(Token.MP_BOOLEAN);
+                break;
+            default:
+                LL1error();
+        }
+    }
+
+    private void ProcedureAndFunctionDeclarationPart() throws ParseException {
+        switch (lookahead) {
+            case MP_PROCEDURE:
+                ProcedureDeclaration();
+                ProcedureAndFunctionDeclarationPart();
+                break;
+            case MP_FUNCTION:
+                FunctionDeclaration();
+                ProcedureAndFunctionDeclarationPart();
+                break;
+            default:
+                LL1error();
+        }
+    }
+
+    private void ProcedureDeclaration() throws ParseException
+    {
+        //nest ='p';    p for procedure
+        ProcedureHeading();
+        matchLookAhead(Token.MP_SCOLON);
+        Block();
+        matchLookAhead(Token.MP_SCOLON);
+    }
+
+    private void FunctionDeclaration() throws ParseException
+    {
+        //nest ='f';    f for function
+        FunctionHeading();
+        matchLookAhead(Token.MP_SCOLON);
+        Block();
+        matchLookAhead(Token.MP_SCOLON);
+    }
+
+    private void ProcedureHeading() throws ParseException
+    {
+        matchLookAhead(Token.MP_PROCEDURE);
+        //st.addToken(lookahead, nest);
+        ProcedureIdentifier();
+        OptionalFormalParameterList();
+    }
+
+    private void FunctionHeading() throws ParseException
+    {
+        matchLookAhead(Token.MP_FUNCTION);
+        //st.addToken(lookAhead, nest);
+        matchLookAhead(Token.MP_IDENTIFIER);
+        OptionalFormalParameterList();
+        Type();
+    }
+
+    private void OptionalFormalParameterList() throws ParseException
+    {
+        switch(lookahead){
+            case MP_LPAREN:
+                matchLookAhead(Token.MP_LPAREN);
+                FormalParameterSection();
+                FormalParameterSectionTail();
+                break;
+            default:
+                LL1error();
+        }
+    }
+
+    private void FormalParameterSectionTail() throws ParseException
+    {
+        switch(lookahead){
+            case MP_SCOLON:
+                matchLookAhead(Token.MP_SCOLON);
+                FormalParameterSection();
+                FormalParameterSectionTail();
+                break;
+            default:
+                LL1error();
+        }
+    }
+
+    private void FormalParameterSection() throws ParseException
+    {
+        switch(lookahead){
+            case MP_IDENTIFIER:
+                ValueParameterSection();
+                break;
+            case MP_VAR:
+                VariableParameterSection();
+                break;
+            default:
+                LL1error();
+        }
+    }
+
+    private void ValueParameterSection() throws ParseException
+    {
+        IdentifierList();
+        matchLookAhead(Token.MP_COLON);
+        Type();
+    }
+
+    private void VariableParameterSection() throws ParseException
+    {
+        switch(lookahead){
+            case MP_VAR:
+                matchLookAhead(Token.MP_VAR);
+                IdentifierList();
+                matchLookAhead(Token.MP_COLON);
+                Type();
+            default:
+                LL1error();
+        }
+    }
+
+    private void StatementPart() throws ParseException
+    {
+        //nest='s'    s for statement
+        CompoundStatement();
+    }
+
+    private void CompoundStatement() throws ParseException
+    {
+        switch(lookahead){
+            case MP_BEGIN:
+                matchLookAhead(Token.MP_BEGIN);
+                StatementSequence();
+                matchLookAhead(Token.MP_END);
+            default:
+                LL1error();
+        }
+    }
+
+    private void StatementSequence() throws ParseException
+    {
+        Statement();
+        StatementTail();
+    }
+
+    private void StatementTail() throws ParseException {
+        switch (lookahead) {
+            case MP_END:
+                break;
+            default:
+                matchLookAhead(Token.MP_SCOLON);
+                Statement();
+                StatementTail();
                 break;
         }
     }
