@@ -11,7 +11,6 @@ public class Analyzer {
     LinkedList<SymbolTable> tables;
 
     public Analyzer() {
-        tables = new LinkedList<SymbolTable>();
     }
 
 }
