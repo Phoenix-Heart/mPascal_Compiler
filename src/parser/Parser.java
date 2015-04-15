@@ -577,11 +577,136 @@ public class Parser {
     // section written by Hunter
 
     private void OptionalSign() {}
-    private void AddingOperator() {}
-    private void Term() {}
-    private void FactorTail() {}
-    private void MultiplyingOperator() {}
-    private void Factor() {}
+    private void AddingOperator() throws ParseException{
+        switch(lookahead){
+            case MP_PLUS:
+                parseTree("88");
+                matchLookAhead(Token.MP_PLUS);
+                break;
+            case MP_MINUS:
+                parseTree("89");
+                matchLookAhead(Token.MP_MINUS);
+                break;
+            default:
+                LL1error();
+        }
+    }
+
+    private void Term() throws ParseException{
+        parseTree("91");
+        Factor();
+        FactorTail();
+    }
+    private void FactorTail() throws ParseException
+    {
+        switch(lookahead){
+            case MP_FLOAT_DIVIDE:
+            case MP_TIMES:
+            case MP_MOD:
+            case MP_AND:
+                parseTree("92");
+                MultiplyingOperator();
+                Factor();
+                FactorTail();
+                break;
+            case MP_DO:
+            case MP_DOWNTO:
+            case MP_ELSE:
+            case MP_END:
+            case MP_OR:
+            case MP_THEN:
+            case MP_TO:
+            case MP_UNTIL:
+            case MP_COMMA:
+            case MP_SCOLON:
+            case MP_RPAREN:
+            case MP_EQUAL:
+            case MP_GTHAN:
+            case MP_LTHAN:
+            case MP_LEQUAL:
+            case MP_GEQUAL:
+            case MP_NEQUAL:
+            case MP_PLUS:
+            case MP_MINUS:
+                parseTree("93");
+                break;
+            default:
+                LL1error();
+        }
+    }
+    private void MultiplyingOperator() throws ParseException
+    {
+        switch(lookahead){
+            case MP_TIMES:
+                parseTree("94");
+                matchLookAhead(Token.MP_TIMES);
+                break;
+            case MP_FLOAT_DIVIDE:
+                parseTree("95");
+                matchLookAhead(Token.MP_FLOAT_DIVIDE);
+                break;
+            case MP_DIV:
+                parseTree("96");
+                matchLookAhead(Token.MP_DIV);
+                break;
+            case MP_MOD:
+                parseTree("97");
+                matchLookAhead(Token.MP_MOD);
+                break;
+            case MP_AND:
+                parseTree("98");
+                matchLookAhead(Token.MP_AND);
+                break;
+
+            default:
+                LL1error();
+        }
+    }
+
+    private void Factor() throws ParseException
+    {
+        switch(lookahead){
+            case MP_NOT:
+                parseTree("104");
+                matchLookAhead(Token.MP_NOT);
+                Factor();
+                break;
+            case MP_LPAREN:
+                parseTree("105");
+                matchLookAhead(Token.MP_LPAREN);
+                Expression();
+                matchLookAhead(Token.MP_RPAREN);
+                break;
+            case MP_INTEGER_LIT:
+                parseTree("99");
+                matchLookAhead(Token.MP_INTEGER_LIT);
+                break;
+            case MP_FIXED_LIT:
+                parseTree("?");
+                matchLookAhead(Token.MP_FIXED_LIT);
+                break;
+            case MP_FLOAT_LIT:
+                parseTree("100");
+                matchLookAhead(Token.MP_FLOAT_LIT);
+                break;
+            case MP_TRUE:
+                parseTree("102");
+                break;
+            case MP_FALSE:
+                parseTree("103");
+                break;
+            case MP_IDENTIFIER:
+                parseTree("106");
+                if(lookahead==Token.MP_IDENTIFIER) {
+                    tableEntry.setName(dispatcher.getLexeme());
+                    tableEntry.setKind(Kind.PROGRAM);
+                }
+                matchLookAhead(Token.MP_IDENTIFIER);
+                break;
+            default:
+                LL1error();
+        }
+    }
     private void ProgramIdentifier() throws ParseException {
         parseTree("107");
         if(lookahead==Token.MP_IDENTIFIER) {                // the table entry needs to be updated before running our match.
@@ -591,6 +716,7 @@ public class Parser {
         matchLookAhead(Token.MP_IDENTIFIER);
     }
     private void VariableIdentifier() throws ParseException {
+        parseTree("108");
         if(lookahead==Token.MP_IDENTIFIER) {                // the table entry needs to be updated before running our match.
             tableEntry.setName(dispatcher.getLexeme());
             tableEntry.setKind(Kind.PROGRAM);
@@ -598,25 +724,29 @@ public class Parser {
         matchLookAhead(Token.MP_IDENTIFIER);
     }
     private void ProcedureIdentifier() throws ParseException {
-        if(lookahead==Token.MP_IDENTIFIER) {                // the table entry needs to be updated before running our match.
+        parseTree("109");
+        if(lookahead==Token.MP_IDENTIFIER) {
             tableEntry.setName(dispatcher.getLexeme());
             tableEntry.setKind(Kind.PROGRAM);
         }
         matchLookAhead(Token.MP_IDENTIFIER);
     }
     private void FunctionIdentifier() throws ParseException {
+        parseTree("110");
         if(lookahead==Token.MP_IDENTIFIER) {
             tableEntry.setName(dispatcher.getLexeme());
             tableEntry.setKind(Kind.PROGRAM);
         }
         matchLookAhead(Token.MP_IDENTIFIER);}
     private void BooleanExpression() throws ParseException {
+        parseTree("111");
         if(lookahead==Token.MP_IDENTIFIER) {
             tableEntry.setName(dispatcher.getLexeme());
             tableEntry.setKind(Kind.PROGRAM);
         }
         matchLookAhead(Token.MP_IDENTIFIER);}
     private void OrdinalExpression() throws ParseException {
+        parseTree("112");
         if(lookahead==Token.MP_IDENTIFIER) {
             tableEntry.setName(dispatcher.getLexeme());
             tableEntry.setKind(Kind.PROGRAM);
@@ -624,21 +754,40 @@ public class Parser {
         matchLookAhead(Token.MP_IDENTIFIER);
     }
     private void IdentifierList() throws ParseException {
+
         switch(lookahead){
             case MP_COMMA:
-                if(lookahead==Token.MP_IDENTIFIER) {                // the table entry needs to be updated before running our match.
+                parseTree("113");
+                if(lookahead==Token.MP_IDENTIFIER) {
                     tableEntry.setName(dispatcher.getLexeme());
                     tableEntry.setKind(Kind.PROGRAM);
                 }
-                IdentifierTail();
                 matchLookAhead(Token.MP_IDENTIFIER);
-                matchLookAhead(Token.MP_COMMA);
-                break;
-            case MP_COLON:
+                IdentifierTail();
                 break;
             default:
                 LL1error();
         }
     }
-    private void IdentifierTail() throws ParseException {}
+
+    private void IdentifierTail() throws ParseException
+    {
+        switch(lookahead){
+            case MP_COMMA:
+                parseTree("114");
+                matchLookAhead(Token.MP_COMMA);
+                if(lookahead==Token.MP_IDENTIFIER) {
+                    tableEntry.setName(dispatcher.getLexeme());
+                    tableEntry.setKind(Kind.PROGRAM);
+                }
+                matchLookAhead(Token.MP_IDENTIFIER);
+                IdentifierTail();
+                break;
+            case MP_COLON:
+                parseTree("115");
+                break;
+            default:
+                LL1error();
+        }
+    }
 }
