@@ -132,32 +132,50 @@ public class Parser {
         Program();
     }
     private void Program() throws ParseException {
+        parseTree("2");
         ProgramHeading();
         matchLookAhead(Token.MP_SCOLON);
         Block();
         matchLookAhead(Token.MP_PERIOD);
     }
     private void ProgramHeading() throws ParseException {
-        parseTree("2");
+        parseTree("3");
         matchLookAhead(Token.MP_PROGRAM);
         ProgramIdentifier();
         createTable();
     }
     private void Block() throws ParseException
     {
-        StatementPart();
-        ProcedureAndFunctionDeclarationPart();
-        VariableDeclarationPart();
+        switch(lookahead){
+            case MP_BEGIN:
+            case MP_FUNCTION:
+            case MP_PROCEDURE:
+            case MP_VAR:
+                parseTree("4");
+                VariableDeclarationPart();
+                ProcedureAndFunctionDeclarationPart();
+                StatementPart();
+                break;
+            default:
+                LL1error();
+        }
+
     }
 
     private void VariableDeclarationPart() throws ParseException {
         //nest='v';   v for variable declaration
         switch (lookahead) {
-            case MP_INTEGER:
-                VariableDeclarationTail();
-                matchLookAhead(Token.MP_SCOLON);
-                VariableDeclaration();
+            case MP_VAR:
+                parseTree("5");
                 matchLookAhead(Token.MP_VAR);
+                VariableDeclaration();
+                matchLookAhead(Token.MP_SCOLON);
+                VariableDeclarationTail();
+                break;
+            case MP_PROCEDURE:
+            case MP_FUNCTION:
+            case MP_BEGIN:
+                parseTree("6");
                 break;
             default:
                 LL1error();
@@ -166,30 +184,47 @@ public class Parser {
 
     private void VariableDeclarationTail() throws ParseException
     {
-        VariableDeclarationTail();
-        matchLookAhead(Token.MP_SCOLON);
-        VariableDeclaration();
+        switch(lookahead){
+            case MP_IDENTIFIER:
+                parseTree("7");
+                VariableDeclaration();
+                matchLookAhead(Token.MP_SCOLON);
+                VariableDeclarationTail();
+            case MP_PROCEDURE:
+            case MP_FUNCTION:
+            case MP_BEGIN:
+                parseTree("8");
+                break;
+            default:
+                LL1error();
+        }
+
     }
 
     private void VariableDeclaration() throws ParseException
     {
-        Type();
-        matchLookAhead(Token.MP_COLON);
+        parseTree("9");
         IdentifierList();
+        matchLookAhead(Token.MP_COLON);
+        Type();
     }
 
     private void Type() throws ParseException {
         switch (lookahead) {
             case MP_INTEGER:
+                parseTree("10");
                 matchLookAhead(Token.MP_INTEGER);
                 break;
             case MP_FLOAT:
+                parseTree("11");
                 matchLookAhead(Token.MP_FLOAT);
                 break;
             case MP_STRING:
+                parseTree("12");
                 matchLookAhead(Token.MP_STRING);
                 break;
             case MP_BOOLEAN:
+                parseTree("13");
                 matchLookAhead(Token.MP_BOOLEAN);
                 break;
             default:
@@ -200,12 +235,17 @@ public class Parser {
     private void ProcedureAndFunctionDeclarationPart() throws ParseException {
         switch (lookahead) {
             case MP_PROCEDURE:
+                parseTree("14");
                 ProcedureDeclaration();
                 ProcedureAndFunctionDeclarationPart();
                 break;
             case MP_FUNCTION:
+                parseTree("15");
                 FunctionDeclaration();
                 ProcedureAndFunctionDeclarationPart();
+                break;
+            case MP_BEGIN:
+                parseTree("16");
                 break;
             default:
                 LL1error();
@@ -214,6 +254,7 @@ public class Parser {
 
     private void ProcedureDeclaration() throws ParseException
     {
+        parseTree("17");
         //nest ='p';    p for procedure
         ProcedureHeading();
         matchLookAhead(Token.MP_SCOLON);
@@ -223,6 +264,7 @@ public class Parser {
 
     private void FunctionDeclaration() throws ParseException
     {
+        parseTree("18");
         //nest ='f';    f for function
         FunctionHeading();
         matchLookAhead(Token.MP_SCOLON);
@@ -232,6 +274,7 @@ public class Parser {
 
     private void ProcedureHeading() throws ParseException
     {
+        parseTree("19");
         matchLookAhead(Token.MP_PROCEDURE);
         //st.addToken(lookahead, nest);
         ProcedureIdentifier();
@@ -240,10 +283,12 @@ public class Parser {
 
     private void FunctionHeading() throws ParseException
     {
+        parseTree("20");
         matchLookAhead(Token.MP_FUNCTION);
         //st.addToken(lookAhead, nest);
         matchLookAhead(Token.MP_IDENTIFIER);
         OptionalFormalParameterList();
+        matchLookAhead(Token.MP_COLON);
         Type();
     }
 
@@ -251,9 +296,15 @@ public class Parser {
     {
         switch(lookahead){
             case MP_LPAREN:
+                parseTree("21");
                 matchLookAhead(Token.MP_LPAREN);
                 FormalParameterSection();
                 FormalParameterSectionTail();
+                matchLookAhead(Token.MP_RPAREN);
+                break;
+            case MP_COLON:
+            case MP_SCOLON:
+                parseTree("22");
                 break;
             default:
                 LL1error();
@@ -264,9 +315,13 @@ public class Parser {
     {
         switch(lookahead){
             case MP_SCOLON:
+                parseTree("23");
                 matchLookAhead(Token.MP_SCOLON);
                 FormalParameterSection();
                 FormalParameterSectionTail();
+                break;
+            case MP_RPAREN:
+                parseTree("24");
                 break;
             default:
                 LL1error();
@@ -277,9 +332,11 @@ public class Parser {
     {
         switch(lookahead){
             case MP_IDENTIFIER:
+                parseTree("25");
                 ValueParameterSection();
                 break;
             case MP_VAR:
+                parseTree("26");
                 VariableParameterSection();
                 break;
             default:
@@ -289,6 +346,7 @@ public class Parser {
 
     private void ValueParameterSection() throws ParseException
     {
+        parseTree("27");
         IdentifierList();
         matchLookAhead(Token.MP_COLON);
         Type();
@@ -298,10 +356,12 @@ public class Parser {
     {
         switch(lookahead){
             case MP_VAR:
+                parseTree("28");
                 matchLookAhead(Token.MP_VAR);
                 IdentifierList();
                 matchLookAhead(Token.MP_COLON);
                 Type();
+                break;
             default:
                 LL1error();
         }
@@ -310,6 +370,7 @@ public class Parser {
     private void StatementPart() throws ParseException
     {
         //nest='s'    s for statement
+        parseTree("29");
         CompoundStatement();
     }
 
@@ -317,9 +378,11 @@ public class Parser {
     {
         switch(lookahead){
             case MP_BEGIN:
+                parseTree("30");
                 matchLookAhead(Token.MP_BEGIN);
                 StatementSequence();
                 matchLookAhead(Token.MP_END);
+                break;
             default:
                 LL1error();
         }
@@ -327,19 +390,39 @@ public class Parser {
 
     private void StatementSequence() throws ParseException
     {
-        Statement();
-        StatementTail();
+        switch(lookahead){
+            case MP_END:
+            case MP_FOR:
+            case MP_IF:
+            case MP_READ:
+            case MP_REPEAT:
+            case MP_UNTIL:
+            case MP_WHILE:
+            case MP_WRITELN:
+            case MP_IDENTIFIER:
+                parseTree("31");
+                Statement();
+                StatementTail();
+                break;
+            default:
+                LL1error();
+        }
     }
 
     private void StatementTail() throws ParseException {
         switch (lookahead) {
             case MP_END:
-                break;
-            default:
+            case MP_UNTIL:
+                parseTree("33");
                 matchLookAhead(Token.MP_SCOLON);
                 Statement();
                 StatementTail();
                 break;
+            case MP_SCOLON:
+                parseTree("32");
+                break;
+            default:
+                LL1error();
         }
     }
 
@@ -424,11 +507,6 @@ public class Parser {
         ReadParameterTail();
         matchLookAhead(Token.MP_RPAREN);
     }
-    private void ReadParameter() throws ParseException {
-        // complete
-        parseTree("48");
-        VariableIdentifier();
-    }
     private void ReadParameterTail() throws ParseException {
         // complete
         switch (lookahead) {
@@ -443,7 +521,13 @@ public class Parser {
                 break;
             default:
                 LL1error();
-        }}
+        }
+    }
+    private void ReadParameter() throws ParseException {
+        // complete
+        parseTree("48");
+        VariableIdentifier();
+    }
     private void WriteStatement() throws ParseException {
         // complete
         switch (lookahead) {
@@ -470,23 +554,39 @@ public class Parser {
     }
     private void WriteParameterTail() throws ParseException {
         // complete
-    switch (lookahead) {
-        case MP_COMMA:
-            parseTree("51");
-            matchLookAhead(Token.MP_COMMA);
-            WriteParameter();
-            WriteParameterTail();
-        case MP_RPAREN:
-            parseTree("52");
-            break;
+        switch (lookahead) {
+            case MP_COMMA:
+                parseTree("51");
+                matchLookAhead(Token.MP_COMMA);
+                WriteParameter();
+                WriteParameterTail();
+                break;
+            case MP_RPAREN:
+                parseTree("52");
+                break;
         default:
             LL1error();
-    }
+        }
     }
     private void WriteParameter() throws ParseException {
         // complete
-        parseTree("53");
-        OrdinalExpression();
+        switch(lookahead){
+            case MP_FALSE:
+            case MP_NOT:
+            case MP_TRUE:
+            case MP_IDENTIFIER:
+            case MP_INTEGER_LIT:
+            case MP_FLOAT_LIT:
+            case MP_STRING_LIT:
+            case MP_LPAREN:
+            case MP_PLUS:
+            case MP_MINUS:
+                parseTree("53");
+                OrdinalExpression();
+                break;
+            default:
+                LL1error();
+        }
     }
     private void AssignmentStatement() throws ParseException {
         // complete
@@ -495,6 +595,7 @@ public class Parser {
         if(entry.kind == Kind.FUNCTION) {
             parseTree("55");
             FunctionIdentifier();
+
         }
         else if (entry.kind == Kind.VARIABLE) {
             parseTree("54");
@@ -503,6 +604,9 @@ public class Parser {
         else {
             System.out.println(" (AssignmentStatement) This code should be unreachable.");
         }
+        
+        matchLookAhead(Token.MP_ASSIGN);
+        Expression();
     }
     private void IfStatement() throws ParseException {
         // complete
@@ -566,8 +670,23 @@ public class Parser {
     }
     private void InitialValue() throws ParseException {
         // complete
-        parseTree("63");
-        OrdinalExpression();
+        switch(lookahead){
+            case MP_FALSE:
+            case MP_NOT:
+            case MP_TRUE:
+            case MP_IDENTIFIER:
+            case MP_INTEGER_LIT:
+            case MP_FLOAT_LIT:
+            case MP_STRING_LIT:
+            case MP_LPAREN:
+            case MP_PLUS:
+            case MP_MINUS:
+                parseTree("63");
+                OrdinalExpression();
+                break;
+            default:
+                LL1error();
+        }
     }
     private void StepValue() throws ParseException {
         // complete
@@ -586,8 +705,23 @@ public class Parser {
     }
     private void FinalValue() throws ParseException {
         // complete
-        parseTree("66");
-        OrdinalExpression();
+        switch(lookahead){
+            case MP_FALSE:
+            case MP_NOT:
+            case MP_TRUE:
+            case MP_IDENTIFIER:
+            case MP_INTEGER_LIT:
+            case MP_FLOAT_LIT:
+            case MP_STRING_LIT:
+            case MP_LPAREN:
+            case MP_PLUS:
+            case MP_MINUS:
+                parseTree("66");
+                OrdinalExpression();
+                break;
+            default:
+                LL1error();
+        }
     }
     private void ProcedureStatement() throws ParseException {
         // complete
@@ -633,14 +767,45 @@ public class Parser {
     }
     private void ActualParameter() throws ParseException {
         // complete
-        parseTree("72");
-        OrdinalExpression();
+        switch(lookahead){
+            case MP_FALSE:
+            case MP_NOT:
+            case MP_TRUE:
+            case MP_IDENTIFIER:
+            case MP_INTEGER_LIT:
+            case MP_FLOAT_LIT:
+            case MP_STRING_LIT:
+            case MP_LPAREN:
+            case MP_PLUS:
+            case MP_MINUS:
+                parseTree("72");
+                OrdinalExpression();
+                break;
+            default:
+                LL1error();
+        }
     }
     private void Expression() throws ParseException {
         // complete
-        parseTree("73");
-        SimpleExpression();
-        OptionalRelationalPart();
+        switch(lookahead){
+            case MP_FALSE:
+            case MP_NOT:
+            case MP_TRUE:
+            case MP_IDENTIFIER:
+            case MP_INTEGER_LIT:
+            case MP_FLOAT_LIT:
+            case MP_STRING_LIT:
+            case MP_LPAREN:
+            case MP_PLUS:
+            case MP_MINUS:
+                parseTree("73");
+                SimpleExpression();
+                OptionalRelationalPart();
+                break;
+            default:
+                LL1error();
+        }
+
     }
     private void OptionalRelationalPart() throws ParseException {
         // complete
@@ -704,10 +869,24 @@ public class Parser {
     }
     private void SimpleExpression() throws ParseException {
         // complete
-        parseTree("82");
-        OptionalSign();
-        Term();
-        TermTail();
+        switch(lookahead){
+            case MP_FALSE:
+            case MP_NOT:
+            case MP_IDENTIFIER:
+            case MP_INTEGER_LIT:
+            case MP_FLOAT_LIT:
+            case MP_STRING_LIT:
+            case MP_PLUS:
+            case MP_MINUS:
+                parseTree("82");
+                OptionalSign();
+                Term();
+                TermTail();
+                break;
+            default:
+                LL1error();
+        }
+
     }
     private void TermTail() throws ParseException {
         // complete
@@ -745,7 +924,31 @@ public class Parser {
 
     // section written by Hunter
 
-    private void OptionalSign() {}
+    private void OptionalSign() {
+        switch(lookahead){
+            case MP_FALSE:
+            case MP_NOT:
+            case MP_TRUE:
+            case MP_IDENTIFIER:
+            case MP_INTEGER_LIT:
+            case MP_FLOAT_LIT:
+            case MP_STRING_LIT:
+            case MP_LPAREN:
+                parseTree("87");
+                break;
+            case MP_PLUS:
+                parseTree("85");
+                matchLookAhead(Token.MP_PLUS);
+                break;
+            case MP_MINUS:
+                parseTree("86");
+                matchLookAhead(Token.MP_MINUS);
+                break;
+            default:
+                LL1error();
+        }
+        
+    }
     private void AddingOperator() throws ParseException{
         switch(lookahead){
             case MP_PLUS:
@@ -762,9 +965,21 @@ public class Parser {
     }
 
     private void Term() throws ParseException{
-        parseTree("91");
-        Factor();
-        FactorTail();
+        switch(lookahead){
+            case MP_FALSE:
+            case MP_NOT:
+            case MP_TRUE:
+            case MP_IDENTIFIER:
+            case MP_INTEGER_LIT:
+            case MP_FLOAT_LIT:
+            case MP_STRING_LIT:
+            case MP_RPAREN:
+                parseTree("91");
+                Factor();
+                FactorTail();
+            default:
+                LL1error();
+        }
     }
     private void FactorTail() throws ParseException
     {
@@ -908,19 +1123,56 @@ public class Parser {
         }
         matchLookAhead(Token.MP_IDENTIFIER);}
     private void BooleanExpression() throws ParseException {
-        parseTree("111");
-        if(lookahead==Token.MP_IDENTIFIER) {
-            tableEntry.setName(dispatcher.getLexeme());
-            tableEntry.setKind(Kind.PROGRAM);
+        swtich(lookahead){
+            case MP_FALSE:
+            case MP_NOT:
+            case MP_TRUE:
+            case MP_IDENTIFIER:
+            case MP_INTEGER_LIT:
+            case MP_FLOAT_LIT:
+            case MP_STRING_LIT:
+            case MP_RPAREN:
+            case MP_PLUS:
+            case MP_MINUS:
+                parseTree("111");
+                Expression();
+                break;
+            default:
+                LL1error();
         }
-        matchLookAhead(Token.MP_IDENTIFIER);}
-    private void OrdinalExpression() throws ParseException {
-        parseTree("112");
+        /*
         if(lookahead==Token.MP_IDENTIFIER) {
             tableEntry.setName(dispatcher.getLexeme());
             tableEntry.setKind(Kind.PROGRAM);
         }
         matchLookAhead(Token.MP_IDENTIFIER);
+        */
+    }
+    private void OrdinalExpression() throws ParseException {
+        swtich(lookahead){
+            case MP_FALSE:
+            case MP_NOT:
+            case MP_TRUE:
+            case MP_IDENTIFIER:
+            case MP_INTEGER_LIT:
+            case MP_FLOAT_LIT:
+            case MP_STRING_LIT:
+            case MP_RPAREN:
+            case MP_PLUS:
+            case MP_MINUS:
+                parseTree("112");
+                Expression();
+                break;
+            default:
+                LL1error();
+        }
+        /*
+        if(lookahead==Token.MP_IDENTIFIER) {
+            tableEntry.setName(dispatcher.getLexeme());
+            tableEntry.setKind(Kind.PROGRAM);
+        }
+        matchLookAhead(Token.MP_IDENTIFIER);
+        */
     }
     private void IdentifierList() throws ParseException {
 
