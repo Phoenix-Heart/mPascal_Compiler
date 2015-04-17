@@ -924,7 +924,7 @@ public class Parser {
 
     // section written by Hunter
 
-    private void OptionalSign() {
+    private void OptionalSign() throws ParseException {
         switch(lookahead){
             case MP_FALSE:
             case MP_NOT:
@@ -1123,7 +1123,7 @@ public class Parser {
         }
         matchLookAhead(Token.MP_IDENTIFIER);}
     private void BooleanExpression() throws ParseException {
-        swtich(lookahead){
+        switch(lookahead){
             case MP_FALSE:
             case MP_NOT:
             case MP_TRUE:
@@ -1149,7 +1149,7 @@ public class Parser {
         */
     }
     private void OrdinalExpression() throws ParseException {
-        swtich(lookahead){
+        switch(lookahead){
             case MP_FALSE:
             case MP_NOT:
             case MP_TRUE:

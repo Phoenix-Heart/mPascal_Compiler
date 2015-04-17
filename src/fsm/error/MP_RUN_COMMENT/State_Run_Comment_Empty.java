@@ -6,21 +6,21 @@ import core.keystates.RejectState;
 /**
  * Created by Christina Dunning on 2/16/2015.
  */
-public class State_RUN_COMMENT_EMPTY extends RejectState {
+public class State_Run_Comment_Empty extends RejectState {
     private static State state;
-    private State_RUN_COMMENT_EMPTY() {
+    private State_Run_Comment_Empty() {
         state = this;
     }
     // states are singletons
     public static State getState() {
         if(state==null) {
-            return new State_RUN_COMMENT_EMPTY();
+            return new State_Run_Comment_Empty();
         }
         else return state;
     }
     @Override
     public void read(char c) {
-        if(c=='{') context.changeState(State_RUN_COMMENT_MIDDLE.getState());
+        if(c=='{') context.changeState(State_Run_Comment_Middle.getState());
         else    context.setInvalid();
     }
 }
