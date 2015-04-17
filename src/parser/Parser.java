@@ -424,11 +424,6 @@ public class Parser {
         ReadParameterTail();
         matchLookAhead(Token.MP_RPAREN);
     }
-    private void ReadParameter() throws ParseException {
-        // complete
-        parseTree("48");
-        VariableIdentifier();
-    }
     private void ReadParameterTail() throws ParseException {
         // complete
         switch (lookahead) {
@@ -444,6 +439,11 @@ public class Parser {
             default:
                 LL1error();
         }}
+    private void ReadParameter() throws ParseException {
+        // complete
+        parseTree("48");
+        VariableIdentifier();
+    }
     private void WriteStatement() throws ParseException {
         // complete
         switch (lookahead) {
@@ -756,10 +756,15 @@ public class Parser {
                 parseTree("89");
                 matchLookAhead(Token.MP_MINUS);
                 break;
+            case MP_OR:
+                parseTree("90");
+                matchLookAhead(Token.MP_OR);
             default:
                 LL1error();
         }
     }
+
+    // add rule 90
 
     private void Term() throws ParseException{
         parseTree("91");
@@ -834,6 +839,7 @@ public class Parser {
 
     private void Factor() throws ParseException
     {
+        // add rule 101
         switch(lookahead){
             case MP_NOT:
                 parseTree("104");
@@ -858,6 +864,9 @@ public class Parser {
                 parseTree("100");
                 matchLookAhead(Token.MP_FLOAT_LIT);
                 break;
+            case MP_STRING_LIT:
+                parseTree("101");
+                matchLookAhead(Token.MP_STRING_LIT);
             case MP_TRUE:
                 parseTree("102");
                 break;
