@@ -1,5 +1,5 @@
 package symbolTable;
-import javafx.scene.control.Tab;
+//import javafx.scene.control.Tab;
 
 import java.util.*;
 /**
