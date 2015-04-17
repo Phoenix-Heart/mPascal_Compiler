@@ -38,6 +38,8 @@ public class Parser {
     }
     // copy trace to file
     public void saveParse() {
+        System.out.println("## Trace ##");
+        System.out.println(parse);
         try {
             BufferedWriter writer = new BufferedWriter(new FileWriter("parsefile.txt"));
             writer.write("## Trace File ##\n");
@@ -59,7 +61,7 @@ public class Parser {
     }
     // generic error message when an unexpected token is discovered.
     private void LL1error() throws ParseException {
-        throw new ParseException(String.format("Parse error on line %s, col %s. Unexpected token %s", dispatcher.getLine(), dispatcher.getColumn(), dispatcher.getLexeme(), lookahead.name()));
+        throw new ParseException(String.format("Parse error on line %s, col %s. Unexpected token %s, name %s", dispatcher.getLine(), dispatcher.getColumn(), dispatcher.getToken(), dispatcher.getLexeme(), lookahead.name()));
     }
     // get entry to use during identifier conflict resolution
     private TableEntry getEntry(String lexeme) {
@@ -201,7 +203,7 @@ public class Parser {
 
     }
 
-    private void VariableDeclaration() throws ParseException
+    private void VariableDeclaration() throws ParseException    //need to make a list here for variables and set type for them.
     {
         parseTree("9");
         IdentifierList();
@@ -1181,7 +1183,16 @@ public class Parser {
                 parseTree("113");
                 if(lookahead==Token.MP_IDENTIFIER) {
                     tableEntry.setName(dispatcher.getLexeme());
-                    tableEntry.setKind(Kind.PROGRAM);
+                    tableEntry.setKind(Kind.VARIABLE);
+                }
+                matchLookAhead(Token.MP_COMMA);
+                IdentifierTail();
+                break;
+            case MP_IDENTIFIER:
+                parseTree("112");
+                if(lookahead==Token.MP_IDENTIFIER) {
+                    tableEntry.setName(dispatcher.getLexeme());
+                    tableEntry.setKind(Kind.VARIABLE);
                 }
                 matchLookAhead(Token.MP_IDENTIFIER);
                 IdentifierTail();
@@ -1199,7 +1210,7 @@ public class Parser {
                 matchLookAhead(Token.MP_COMMA);
                 if(lookahead==Token.MP_IDENTIFIER) {
                     tableEntry.setName(dispatcher.getLexeme());
-                    tableEntry.setKind(Kind.PROGRAM);
+                    tableEntry.setKind(Kind.PROGRAM); 
                 }
                 matchLookAhead(Token.MP_IDENTIFIER);
                 IdentifierTail();
