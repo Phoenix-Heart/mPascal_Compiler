@@ -5,6 +5,7 @@ import scanner.Dispatcher;
 import symbolTable.Kind;
 import symbolTable.SymbolTable;
 import symbolTable.TableEntry;
+import symbolTable.Type;
 
 import java.io.*;
 import java.util.Iterator;
@@ -192,6 +193,7 @@ public class Parser {
                 VariableDeclaration();
                 matchLookAhead(Token.MP_SCOLON);
                 VariableDeclarationTail();
+                break;
             case MP_PROCEDURE:
             case MP_FUNCTION:
             case MP_BEGIN:
@@ -203,18 +205,20 @@ public class Parser {
 
     }
 
-    private void VariableDeclaration() throws ParseException    //need to make a list here for variables and set type for them.
+    private void VariableDeclaration() throws ParseException    //need to use a list here for variables and set type for them.
     {
         parseTree("9");
         IdentifierList();
         matchLookAhead(Token.MP_COLON);
         Type();
+        addEntry();
     }
 
     private void Type() throws ParseException {
         switch (lookahead) {
             case MP_INTEGER:
                 parseTree("10");
+                tableEntry.setType(Type.INTEGER);
                 matchLookAhead(Token.MP_INTEGER);
                 break;
             case MP_FLOAT:
@@ -416,12 +420,12 @@ public class Parser {
             case MP_END:
             case MP_UNTIL:
                 parseTree("33");
-                matchLookAhead(Token.MP_SCOLON);
-                Statement();
-                StatementTail();
                 break;
             case MP_SCOLON:
                 parseTree("32");
+                matchLookAhead(Token.MP_SCOLON);
+                Statement();
+                StatementTail();
                 break;
             default:
                 LL1error();
