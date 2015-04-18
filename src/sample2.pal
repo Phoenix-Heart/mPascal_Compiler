@@ -1,7 +1,5 @@
 program Program4;
-  var Sum : Integer;
-  var  I : Integer;
-  var N : Integer;
+  var Sum, I, N : Integer;
   begin
      Read(N);
      I   := 0;

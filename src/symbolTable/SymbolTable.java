@@ -1,6 +1,8 @@
 package symbolTable;
 //import javafx.scene.control.Tab;
 
+import parser.EntryBuilder;
+
 import java.util.*;
 /**
  * Created by hunter on 3/6/15.
@@ -21,12 +23,6 @@ public class SymbolTable {
         this.label = "L" + Integer.toString(labelCounter);
         labelCounter++;
         this.nestingLevel = nestingLevel;
-    }
-
-    public void createNewEntry(String lex, Type t, Kind k, Mode mode, List<TableEntry> params) {
-        TableEntry entry = new TableEntry(lex, t, k, mode, nextoffset, params);
-        hm.put(lex, entry);
-        nextoffset++;
     }
     public TableEntry getEntry(String key) {
         return hm.get(key);
@@ -58,6 +54,12 @@ public class SymbolTable {
     }
 
     public boolean hasEntry(String lexeme) {
-        return false;
+        return hm.containsKey(lexeme);
+    }
+
+    public void createNewEntry(String lexeme, EntryBuilder tableEntry) {
+        TableEntry entry = new TableEntry(lexeme, nextoffset, tableEntry);
+        hm.put(lexeme, entry);
+        nextoffset++;
     }
 }

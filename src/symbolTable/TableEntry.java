@@ -1,5 +1,7 @@
 package symbolTable;
 
+import parser.EntryBuilder;
+
 import java.util.List;
 
 /**
@@ -20,5 +22,13 @@ public class TableEntry {
         this.mode = mode;
         this.offset = offset;
         this.parameters = params;
+    }
+    public TableEntry(String name, int offset, EntryBuilder entry) {
+        this.lexeme = entry.getLexeme();
+        this.type = entry.getType();
+        this.kind = entry.getKind();
+        this.mode = entry.getMode();
+        this.offset = offset;
+        this.parameters = entry.getParams();
     }
 }

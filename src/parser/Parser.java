@@ -55,16 +55,17 @@ public class Parser {
     private void matchLookAhead(Token token) throws ParseException {
 
         if(lookahead!=token) {
-            throw new ParseException(String.format("Parse error on line %s, col %s. Found %s, expected %s.", dispatcher.getLine(), dispatcher.getColumn(), dispatcher.getLexeme(), token.name()));
+            throw new ParseException(String.format("Parse error on line %s, col %s. Found %s, expected %s.", dispatcher.getLine(), dispatcher.getColumn(), dispatcher.getLexeme()));
         }
         lookahead = dispatcher.nextToken();
     }
     // generic error message when an unexpected token is discovered.
     private void LL1error() throws ParseException {
-        throw new ParseException(String.format("Parse error on line %s, col %s. Unexpected token %s, name %s", dispatcher.getLine(), dispatcher.getColumn(), dispatcher.getToken(), dispatcher.getLexeme(), lookahead.name()));
+        throw new ParseException(String.format("Parse error on line %s, col %s. Unexpected token %s, lexeme %s", dispatcher.getLine(), dispatcher.getColumn(), dispatcher.getToken(), dispatcher.getLexeme()));
     }
     // get entry to use during identifier conflict resolution
-    private TableEntry getEntry(String lexeme) {
+    private TableEntry getEntry() {
+        String lexeme = dispatcher.getLexeme();
         Iterator<SymbolTable> iter = stack.descendingIterator();
         SymbolTable table;
         while(iter.hasNext()) {
@@ -76,8 +77,8 @@ public class Parser {
     }
     // create a new symbol table and add it to the stack
     private void createTable() throws ParseException {
-        if(tableEntry.getName()!=null) {
-            stack.push(new SymbolTable(tableEntry.getName(), nest));
+        if(tableEntry.getLexeme()!=null) {
+            stack.push(new SymbolTable(tableEntry.getLexeme(), nest));
             nest++;
         }
         else {
@@ -91,41 +92,48 @@ public class Parser {
         nest--;
     }
     // add a row to the symbol table using information retrieved during parse.
-    private void addEntry() {
+    private void addEntry() throws ParseException {
         // need to fill out logic, catch all errors & ensure program,procedure,function preserve entry for new table creation.
+
         SymbolTable table = stack.peek();
-        if(tableEntry.getName()==null) {
-            System.out.println("Attempted to create unnamed symbol");
+        if(tableEntry.getLexeme()==null) {
+            throw new ParseException(String.format("Missing lexeme in %s declaration.", tableEntry.getKind()));
         }
         else if(tableEntry.getKind()==null) {
-            System.out.println("Attempted to create unidentified symbol");
+            throw new ParseException(String.format("Missing Kind in declaration. Lexeme %s", tableEntry.getLexeme()));
         }
-        else if(tableEntry.getKind()==Kind.FUNCTION) {
-            if(tableEntry.getMode()==null) {
-                System.out.println("Mode missing in function identifier");
-            }
-            else {
-                table.createNewEntry(tableEntry.getName(), tableEntry.getType(), tableEntry.getKind(), tableEntry.getMode(), tableEntry.getParams());
-            }
-        }
-        else if(tableEntry.getKind()==Kind.VARIABLE) {
-            if(tableEntry.getKind()==null) {
-
-            }
-            if(!tableEntry.hasName()) {
-
-            }
-            if(tableEntry.getName()==null) {
-
-            }
-            while(tableEntry.hasName()) {
-                table.createNewEntry(tableEntry.getName(), tableEntry.getType(), tableEntry.getKind(), tableEntry.getMode(), tableEntry.getParams());
+        switch ((tableEntry.getKind())) {
+            case FUNCTION:
+                if(tableEntry.getMode()==null)
+                    throw new ParseException(String.format("Missing mode in function declaration. Lexeme %s", tableEntry.getLexeme()));
+                else
+                    table.createNewEntry(tableEntry.getLexeme(), tableEntry);
+                // entry reset after new table creation
+                break;
+            case PROCEDURE:
+                table.createNewEntry(tableEntry.getLexeme(),tableEntry);
+                // entry reset after new table creation
+                break;
+            case PARAMETER:
+                if(tableEntry.getType()==null)
+                    throw new ParseException(String.format("Missing type in parameter declaration. Lexeme %s", tableEntry.getLexeme()));
+                table.createNewEntry(tableEntry.getLexeme(),tableEntry);
+                // reset entry
                 tableEntry = new EntryBuilder();
-            }
-        }
-        else {
-            table.createNewEntry(tableEntry.getName(), tableEntry.getType(), tableEntry.getKind(), tableEntry.getMode(), tableEntry.getParams());
-            tableEntry = new EntryBuilder();
+                break;
+            case VARIABLE:
+                if(tableEntry.getType()==null)
+                    throw new ParseException(String.format("Missing type in variable declaration. Lexeme %s", tableEntry.getLexeme()));
+                else {
+                    for(String lexeme : tableEntry.getLexemes()) {
+                        table.createNewEntry(lexeme, tableEntry);
+                    }
+                }
+                // reset entry
+                tableEntry = new EntryBuilder();
+                break;
+            case PROGRAM:
+                throw new ParseException("Attempted to enter PROGRAM identifier into table. Program identifiers used in table creation, not entries.");
         }
     }
 
@@ -157,6 +165,7 @@ public class Parser {
     }
     private void ProgramHeading() throws ParseException {
         parseTree("3");
+        tableEntry.setKind(Kind.PROGRAM);
         matchLookAhead(Token.MP_PROGRAM);
         ProgramIdentifier();
         createTable();
@@ -184,6 +193,7 @@ public class Parser {
         switch (lookahead) {
             case MP_VAR:
                 parseTree("5");
+                tableEntry.setKind(Kind.VARIABLE);
                 matchLookAhead(Token.MP_VAR);
                 VariableDeclaration();
                 matchLookAhead(Token.MP_SCOLON);
@@ -214,7 +224,7 @@ public class Parser {
                 parseTree("8");
                 break;
             default:
-                LL1error();
+                // LL1error();      temporarily allowing all to go to lambda.
         }
 
     }
@@ -237,14 +247,17 @@ public class Parser {
                 break;
             case MP_FLOAT:
                 parseTree("11");
+                tableEntry.setType(Type.INTEGER);
                 matchLookAhead(Token.MP_FLOAT);
                 break;
             case MP_STRING:
                 parseTree("12");
+                tableEntry.setType(Type.STRING);
                 matchLookAhead(Token.MP_STRING);
                 break;
             case MP_BOOLEAN:
                 parseTree("13");
+                tableEntry.setType(Type.BOOLEAN);
                 matchLookAhead(Token.MP_BOOLEAN);
                 break;
             default:
@@ -295,8 +308,8 @@ public class Parser {
     private void ProcedureHeading() throws ParseException
     {
         parseTree("19");
+        tableEntry.setKind(Kind.PROCEDURE);
         matchLookAhead(Token.MP_PROCEDURE);
-        //st.addToken(lookahead, nest);
         ProcedureIdentifier();
         OptionalFormalParameterList();
     }
@@ -304,12 +317,14 @@ public class Parser {
     private void FunctionHeading() throws ParseException
     {
         parseTree("20");
+        tableEntry.setKind(Kind.FUNCTION);
         matchLookAhead(Token.MP_FUNCTION);
-        //st.addToken(lookAhead, nest);
+        tableEntry.setLexeme(dispatcher.getLexeme());
         matchLookAhead(Token.MP_IDENTIFIER);
         OptionalFormalParameterList();
         matchLookAhead(Token.MP_COLON);
         Type();
+        addEntry();
     }
 
     private void OptionalFormalParameterList() throws ParseException
@@ -367,20 +382,41 @@ public class Parser {
     private void ValueParameterSection() throws ParseException
     {
         parseTree("27");
+        EntryBuilder temp = tableEntry;
+        tableEntry = new EntryBuilder();
+        tableEntry.setKind(Kind.PARAMETER);
         IdentifierList();
         matchLookAhead(Token.MP_COLON);
         Type();
+        // hacky stuff follows
+        int offset = 0;
+        for (String lexeme : tableEntry.getLexemes()) {
+            temp.addParam(new TableEntry(lexeme, offset, tableEntry));
+            offset++;
+        }
+        tableEntry = temp;
+
     }
 
     private void VariableParameterSection() throws ParseException
     {
-        switch(lookahead){
+        switch(lookahead) {
             case MP_VAR:
                 parseTree("28");
+                EntryBuilder temp = tableEntry;
+                tableEntry = new EntryBuilder();
+                tableEntry.setKind(Kind.VARIABLE);
                 matchLookAhead(Token.MP_VAR);
                 IdentifierList();
                 matchLookAhead(Token.MP_COLON);
                 Type();
+                // hacky stuff follows
+                int offset = 0;
+                for (String lexeme : tableEntry.getLexemes()) {
+                    temp.addParam(new TableEntry(lexeme, offset, tableEntry));
+                    offset++;
+                }
+                tableEntry = temp;
                 break;
             default:
                 LL1error();
@@ -389,7 +425,6 @@ public class Parser {
 
     private void StatementPart() throws ParseException
     {
-        //nest='s'    s for statement
         parseTree("29");
         CompoundStatement();
     }
@@ -472,8 +507,9 @@ public class Parser {
                 break;
             case MP_IDENTIFIER:
                 // Identifier kind conflict resolution
-                String lex = dispatcher.getLexeme();
-                TableEntry entry = getEntry(lex);
+                TableEntry entry = getEntry();
+                if (entry==null)
+                    System.out.println("Entry null");
                 if(entry.kind == Kind.PROCEDURE)
                     ProcedureStatement();   // procedure identifier
                 else if(entry.kind == Kind.FUNCTION || entry.kind == Kind.VARIABLE) {
@@ -609,8 +645,7 @@ public class Parser {
     }
     private void AssignmentStatement() throws ParseException {
         // complete
-        String lex = dispatcher.getLexeme();
-        TableEntry entry = getEntry(lex);
+        TableEntry entry = getEntry();
         if(entry.kind == Kind.FUNCTION) {
             parseTree("55");
             FunctionIdentifier();
@@ -888,24 +923,10 @@ public class Parser {
     }
     private void SimpleExpression() throws ParseException {
         // complete
-        switch(lookahead){
-            case MP_FALSE:
-            case MP_NOT:
-            case MP_IDENTIFIER:
-            case MP_INTEGER_LIT:
-            case MP_FLOAT_LIT:
-            case MP_STRING_LIT:
-            case MP_PLUS:
-            case MP_MINUS:
                 parseTree("82");
                 OptionalSign();
                 Term();
                 TermTail();
-                break;
-            default:
-                LL1error();
-        }
-
     }
     private void TermTail() throws ParseException {
         // complete
@@ -1101,8 +1122,7 @@ public class Parser {
             case MP_IDENTIFIER:
                 parseTree("106");
                 if(lookahead==Token.MP_IDENTIFIER) {
-                    tableEntry.setName(dispatcher.getLexeme());
-                    tableEntry.setKind(Kind.PROGRAM);
+                    tableEntry.setLexeme(dispatcher.getLexeme());
                 }
                 matchLookAhead(Token.MP_IDENTIFIER);
                 break;
@@ -1113,32 +1133,28 @@ public class Parser {
     private void ProgramIdentifier() throws ParseException {
         parseTree("107");
         if(lookahead==Token.MP_IDENTIFIER) {                // the table entry needs to be updated before running our match.
-            tableEntry.setName(dispatcher.getLexeme());
-            tableEntry.setKind(Kind.PROGRAM);
+            tableEntry.setLexeme(dispatcher.getLexeme());
         }
         matchLookAhead(Token.MP_IDENTIFIER);
     }
     private void VariableIdentifier() throws ParseException {
         parseTree("108");
         if(lookahead==Token.MP_IDENTIFIER) {                // the table entry needs to be updated before running our match.
-            tableEntry.setName(dispatcher.getLexeme());
-            tableEntry.setKind(Kind.PROGRAM);
+            tableEntry.setLexeme(dispatcher.getLexeme());
         }
         matchLookAhead(Token.MP_IDENTIFIER);
     }
     private void ProcedureIdentifier() throws ParseException {
         parseTree("109");
         if(lookahead==Token.MP_IDENTIFIER) {
-            tableEntry.setName(dispatcher.getLexeme());
-            tableEntry.setKind(Kind.PROGRAM);
+            tableEntry.setLexeme(dispatcher.getLexeme());
         }
         matchLookAhead(Token.MP_IDENTIFIER);
     }
     private void FunctionIdentifier() throws ParseException {
         parseTree("110");
         if(lookahead==Token.MP_IDENTIFIER) {
-            tableEntry.setName(dispatcher.getLexeme());
-            tableEntry.setKind(Kind.PROGRAM);
+            tableEntry.setLexeme(dispatcher.getLexeme());
         }
         matchLookAhead(Token.MP_IDENTIFIER);}
     private void BooleanExpression() throws ParseException {
@@ -1159,13 +1175,6 @@ public class Parser {
             default:
                 LL1error();
         }
-        /*
-        if(lookahead==Token.MP_IDENTIFIER) {
-            tableEntry.setName(dispatcher.getLexeme());
-            tableEntry.setKind(Kind.PROGRAM);
-        }
-        matchLookAhead(Token.MP_IDENTIFIER);
-        */
     }
     private void OrdinalExpression() throws ParseException {
         switch(lookahead){
@@ -1185,31 +1194,19 @@ public class Parser {
             default:
                 LL1error();
         }
-        /*
-        if(lookahead==Token.MP_IDENTIFIER) {
-            tableEntry.setName(dispatcher.getLexeme());
-            tableEntry.setKind(Kind.PROGRAM);
-        }
-        matchLookAhead(Token.MP_IDENTIFIER);
-        */
     }
     private void IdentifierList() throws ParseException {
 
         switch(lookahead){
             case MP_COMMA:
                 parseTree("113");
-                if(lookahead==Token.MP_IDENTIFIER) {
-                    tableEntry.setName(dispatcher.getLexeme());
-                    tableEntry.setKind(Kind.VARIABLE);
-                }
                 matchLookAhead(Token.MP_COMMA);
                 IdentifierTail();
                 break;
             case MP_IDENTIFIER:
                 parseTree("112");
                 if(lookahead==Token.MP_IDENTIFIER) {
-                    tableEntry.setName(dispatcher.getLexeme());
-                    tableEntry.setKind(Kind.VARIABLE);
+                    tableEntry.setLexeme(dispatcher.getLexeme());
                 }
                 matchLookAhead(Token.MP_IDENTIFIER);
                 IdentifierTail();
@@ -1225,8 +1222,7 @@ public class Parser {
                 parseTree("114");
                 matchLookAhead(Token.MP_COMMA);
                 if(lookahead==Token.MP_IDENTIFIER) {
-                    tableEntry.setName(dispatcher.getLexeme());
-                    tableEntry.setKind(Kind.PROGRAM); 
+                    tableEntry.setLexeme(dispatcher.getLexeme());
                 }
                 matchLookAhead(Token.MP_IDENTIFIER);
                 IdentifierTail();

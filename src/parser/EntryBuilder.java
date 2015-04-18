@@ -11,23 +11,26 @@ import java.util.List;
 
 // stores temporary information about a table entry. Allows only one update per field.
 public class EntryBuilder {
-    private LinkedList<String> names;
+    private LinkedList<String> lexemes;
     private Kind kind;
     private Type type;
     private Mode mode;
-    private List<TableEntry> params;
+    private LinkedList<TableEntry> params;
     EntryBuilder() {
-        names = new LinkedList();
+        lexemes = new LinkedList();
         kind = null;
         type = null;
         mode = null;
         params = null;
     }
-    public boolean hasName() {
-        return !names.isEmpty();
+    public boolean hasLexeme() {
+        return !lexemes.isEmpty();
     }
-    public String getName() {
-        return names.pop();
+    public String getLexeme() {
+        return lexemes.peek();
+    }
+    public LinkedList<String> getLexemes() {
+        return lexemes;
     }
     public Kind getKind() {
         return kind;
@@ -41,8 +44,8 @@ public class EntryBuilder {
     public List<TableEntry> getParams() {
         return params;
     }
-    public void setName(String name) throws ParseException {
-        names.push(name);
+    public void setLexeme(String lexeme) throws ParseException {
+        lexemes.push(lexeme);
     }
     public void setKind(Kind kind) throws ParseException {
         if(this.kind==null)
@@ -61,6 +64,9 @@ public class EntryBuilder {
             this.mode = mode;
         else
             error("mode", this.mode.toString(), mode.toString());
+    }
+    public void addParam(TableEntry entry) {
+        params.push(entry);
     }
     private void error(String err, String value, String newvalue) throws ParseException {
         throw new ParseException(String.format("Attempted to overwrite %s entry %s with %s",err, value, newvalue));
