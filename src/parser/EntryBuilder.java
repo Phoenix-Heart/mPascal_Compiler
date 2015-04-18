@@ -5,24 +5,29 @@ import symbolTable.Mode;
 import symbolTable.TableEntry;
 import symbolTable.Type;
 
+import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 // stores temporary information about a table entry. Allows only one update per field.
 public class EntryBuilder {
-    private String name;
+    private LinkedList<String> names;
     private Kind kind;
     private Type type;
     private Mode mode;
     private List<TableEntry> params;
     EntryBuilder() {
-        name = null;
+        names = new LinkedList();
         kind = null;
         type = null;
         mode = null;
         params = null;
     }
+    public boolean hasName() {
+        return !names.isEmpty();
+    }
     public String getName() {
-        return name;
+        return names.pop();
     }
     public Kind getKind() {
         return kind;
@@ -37,12 +42,7 @@ public class EntryBuilder {
         return params;
     }
     public void setName(String name) throws ParseException {
-        if(this.name==null) {
-            this.name = name;
-        }
-        else {
-            error("name", this.name.toString(), name.toString());
-        }
+        names.push(name);
     }
     public void setKind(Kind kind) throws ParseException {
         if(this.kind==null)

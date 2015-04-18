@@ -21,7 +21,6 @@ public class Parser {
     private EntryBuilder tableEntry;
     private String parse;
     private int nest;
-    private EntryBuilder stackEntry;
 
     public Parser(Dispatcher dispatcher) {
         this.dispatcher = dispatcher;
@@ -106,6 +105,21 @@ public class Parser {
             }
             else {
                 table.createNewEntry(tableEntry.getName(), tableEntry.getType(), tableEntry.getKind(), tableEntry.getMode(), tableEntry.getParams());
+            }
+        }
+        else if(tableEntry.getKind()==Kind.VARIABLE) {
+            if(tableEntry.getKind()==null) {
+
+            }
+            if(!tableEntry.hasName()) {
+
+            }
+            if(tableEntry.getName()==null) {
+
+            }
+            while(tableEntry.hasName()) {
+                table.createNewEntry(tableEntry.getName(), tableEntry.getType(), tableEntry.getKind(), tableEntry.getMode(), tableEntry.getParams());
+                tableEntry = new EntryBuilder();
             }
         }
         else {
@@ -462,7 +476,6 @@ public class Parser {
                     parseTree("38");
                     AssignmentStatement();
                 }
-
                 break;
             case MP_FOR:
                 parseTree("42");
@@ -1201,7 +1214,6 @@ public class Parser {
                 LL1error();
         }
     }
-
     private void IdentifierTail() throws ParseException
     {
         switch(lookahead){
