@@ -8,5 +8,5 @@ program Program4;
        Sum := Sum + I;
        I   := I + 1;
        Write(I, Sum);
-     until (I > N) and (I <= 100)
+     until I > N and I <= 100
   end.

@@ -10,7 +10,7 @@ import symbolTable.Type;
 import java.io.*;
 import java.util.Iterator;
 import java.util.LinkedList;
-
+import java.util.HashMap;
 /**
  * Created by Christina on 3/6/2015.
  */
@@ -22,6 +22,7 @@ public class Parser {
     private EntryBuilder tableEntry;
     private String parse;
     private int nest;
+    private HashMap rules = RuleLookup.getRules();
 
     public Parser(Dispatcher dispatcher) {
         this.dispatcher = dispatcher;
@@ -38,8 +39,6 @@ public class Parser {
     }
     // copy trace to file
     public void saveParse() {
-        System.out.println("## Trace ##");
-        System.out.println(parse);
         try {
             BufferedWriter writer = new BufferedWriter(new FileWriter("parsefile.txt"));
             writer.write("## Trace File ##\n");
@@ -142,6 +141,8 @@ public class Parser {
     private void parseTree(String rule) {
         parse += rule;
         parse += " ";
+        System.out.print(rule + " ");
+        System.out.println(rules.get(Integer.parseInt(rule)));
 
     }
 
