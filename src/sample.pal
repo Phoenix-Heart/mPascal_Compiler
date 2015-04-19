@@ -1,9 +1,6 @@
 program Tester;
-
        var I: Integer;
-
         begin {tester}
-
           Writeln; Writeln;
           Write('Please enter an integer value for I: ');
           Read(I);
