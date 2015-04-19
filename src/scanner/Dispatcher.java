@@ -62,8 +62,8 @@ public class Dispatcher {
     }
     private void updateLexeme(int c) {
         if(isEOL(c)) {
-            lexeme += '\\';
-            lexeme += 'n';
+        //    lexeme += '\\';
+        //    lexeme += 'n';
         }
         else {
             lexeme += (char)c;
@@ -143,7 +143,7 @@ public class Dispatcher {
        return lexeme;
     }
     public static boolean isEOL(int ch) {
-        if(((char)ch=='\n')||((char)ch=='\r'))
+        if(((char)ch=='\n'))
             return true;
         else return false;
     }

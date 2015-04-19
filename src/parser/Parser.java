@@ -22,7 +22,7 @@ public class Parser {
     private EntryBuilder tableEntry;
     private String parse;
     private int nest;
-    private HashMap rules = RuleLookup.getRules();
+    //private HashMap rules = RuleLookup.getRules();
 
     public Parser(Dispatcher dispatcher) {
         this.dispatcher = dispatcher;
@@ -141,8 +141,8 @@ public class Parser {
     private void parseTree(String rule) {
         parse += rule;
         parse += " ";
-        System.out.print(rule + " ");
-        System.out.println(rules.get(Integer.parseInt(rule)));
+        //System.out.print(rule + " ");
+        //System.out.println(rules.get(Integer.parseInt(rule)));
 
     }
 
@@ -572,7 +572,6 @@ public class Parser {
 
     }
     private void WriteParameterTail() throws ParseException {
-
         switch (lookahead) {
             case MP_COMMA:
                 parseTree("51");
@@ -588,7 +587,6 @@ public class Parser {
         }
     }
     private void WriteParameter() throws ParseException {
-
         parseTree("53");
         OrdinalExpression();
     }
@@ -748,6 +746,7 @@ public class Parser {
         switch (lookahead) {
             case MP_COMMA:
             case MP_SCOLON:
+            case MP_RPAREN:     // added for fix
             case MP_LPAREN:
             case MP_DOWNTO:
             case MP_DO:
