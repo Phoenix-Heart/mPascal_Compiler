@@ -22,7 +22,7 @@ public class Parser {
     private EntryBuilder tableEntry;
     private String parse;
     private int nest;
-    //private HashMap rules = RuleLookup.getRules();
+    private HashMap rules = RuleLookup.getRules();
 
     public Parser(Dispatcher dispatcher) {
         this.dispatcher = dispatcher;
@@ -54,7 +54,7 @@ public class Parser {
     private void matchLookAhead(Token token) throws ParseException {
 
         if(lookahead!=token) {
-            throw new ParseException(String.format("Parse error on line %s, col %s. Found %s, expected %s.", dispatcher.getLine(), dispatcher.getColumn(), dispatcher.getLexeme()));
+            throw new ParseException(String.format("Parse error on line %s, col %s. Found %s, expected %s.", dispatcher.getLine(), dispatcher.getColumn(), dispatcher.getLexeme(), dispatcher.getToken()));
         }
         lookahead = dispatcher.nextToken();
     }
@@ -141,8 +141,8 @@ public class Parser {
     private void parseTree(String rule) {
         parse += rule;
         parse += " ";
-        //System.out.print(rule + " ");
-        //System.out.println(rules.get(Integer.parseInt(rule)));
+        System.out.print(rule + " ");
+        System.out.println(rules.get(Integer.parseInt(rule)));
 
     }
 
