@@ -54,7 +54,7 @@ public class Parser {
     private void matchLookAhead(Token token) throws ParseException {
 
         if(lookahead!=token) {
-            throw new ParseException(String.format("Parse error on line %s, col %s. Found %s, expected %s.", dispatcher.getLine(), dispatcher.getColumn(), dispatcher.getLexeme(), dispatcher.getToken()));
+            throw new ParseException(String.format("Parse error on line %s, col %s. Found %s, expected %s.", dispatcher.getLine(), dispatcher.getColumn(), dispatcher.getToken(), dispatcher.getLexeme()));
         }
         lookahead = dispatcher.nextToken();
     }
