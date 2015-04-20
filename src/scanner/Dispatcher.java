@@ -22,8 +22,10 @@ public class Dispatcher {
     private Selector alpha;
     private BufferedReader reader;
     private int ch;
+    private boolean done;
 
     public Dispatcher(String filename) {
+        done = false;
         ch = 0;
         select = null;
         special = new specialSelector();
@@ -78,10 +80,13 @@ public class Dispatcher {
         // update current location prior to scanning
         column = nextcol;
         numLine = nextline;
+        if(done) {
+            return Token.MP_EOF;
+        }
 
         try {
             if(!reader.ready()) {
-                return Token.MP_EOF;
+                done = true;
             }
             // if no input has been read yet, read the first character.
             // otherwise, this should be set to the first unrecognized character from the last scan.
