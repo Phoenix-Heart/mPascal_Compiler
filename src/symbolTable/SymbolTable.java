@@ -19,13 +19,13 @@ public class SymbolTable {
     {
         this.nextoffset = 0;
         this.hm = new HashMap();
-        this.name = name;
+        this.name = name.toLowerCase();
         this.label = "L" + Integer.toString(labelCounter);
         labelCounter++;
         this.nestingLevel = nestingLevel;
     }
     public TableEntry getEntry(String key) {
-        return hm.get(key);
+        return hm.get(key.toLowerCase());
     }
 
     public String getLabel()
@@ -54,16 +54,16 @@ public class SymbolTable {
     }
 
     public boolean hasEntry(String lexeme) {
-        return hm.containsKey(lexeme);
+        return hm.containsKey(lexeme.toLowerCase());
     }
 
     public void createNewEntry(String lexeme, EntryBuilder tableEntry) {
-        TableEntry entry = new TableEntry(lexeme, nextoffset, tableEntry);
+        TableEntry entry = new TableEntry(lexeme.toLowerCase(), nextoffset, tableEntry);
         hm.put(lexeme, entry);
         nextoffset++;
     }
 
     public void addEntry(TableEntry entry) {
-        hm.put(entry.lexeme,entry);
+        hm.put(entry.lexeme.toLowerCase(),entry);
     }
 }
