@@ -492,7 +492,7 @@ public class Parser {
                     parseTree(43);
                     ProcedureStatement();   // procedure identifier
                 }
-                else if(entry.kind == Kind.VARIABLE) {
+                else if(entry.kind == Kind.VARIABLE || entry.kind == Kind.FUNCTION) {
                     parseTree(38);
                     AssignmentStatement();
                 }
@@ -997,6 +997,10 @@ public class Parser {
             case MP_FLOAT_LIT:
                 parseTree(100);
                 matchLookAhead(Token.MP_FLOAT_LIT);
+                break;
+            case MP_STRING_LIT:
+                parseTree(101);
+                matchLookAhead(Token.MP_STRING_LIT);
                 break;
             case MP_TRUE:
                 parseTree(102);

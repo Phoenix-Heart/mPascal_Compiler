@@ -8,11 +8,13 @@ program Program4;
                 m:= 21
             else
                 N:= 99;
-        f1:= "string";
+        f1:= 'string';
 
         end ;
   begin
+
      Read(N);
+     Write(f1(I,N,'hello'));
      I   := 0;
      Sum := 0;
      repeat
