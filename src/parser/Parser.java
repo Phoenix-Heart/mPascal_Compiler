@@ -170,6 +170,7 @@ public class Parser {
         matchLookAhead(Token.MP_PROGRAM);
         ProgramIdentifier();
         createTable();
+        tableEntry = new EntryBuilder();
     }
     private void Block() throws ParseException
     {
@@ -225,6 +226,7 @@ public class Parser {
         matchLookAhead(Token.MP_COLON);
         Type();
         addEntry();
+        tableEntry.setKind(Kind.VARIABLE);
     }
 
     private void Type() throws ParseException {

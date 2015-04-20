@@ -1,5 +1,6 @@
 program Program4;
   var Sum, I, N : Integer;
+   t : Float;
   begin
      Read(N);
      I   := 0;
