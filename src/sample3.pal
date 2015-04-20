@@ -1,0 +1,20 @@
+program Program4;
+  var Sum, I, N : Integer;
+   t : Float;
+   function f1 (var i : boolean; s : String) : String ;
+        begin
+            if i = True then
+                N:= 21
+            else
+                N:= 99
+        end ;
+  begin
+     Read(N);
+     I   := 0;
+     Sum := 0;
+     repeat
+       Sum := Sum + I;
+       I   := I + 1;
+       Write(I, Sum);
+     until (I > N) and (I <= 100)
+     end .

@@ -54,7 +54,7 @@ public class Parser {
     private void matchLookAhead(Token token) throws ParseException {
 
         if(lookahead!=token) {
-            throw new ParseException(String.format("Parse error on line %s, col %s. Found %s, expected %s.", dispatcher.getLine(), dispatcher.getColumn(), dispatcher.getToken(), dispatcher.getLexeme()));
+            throw new ParseException(String.format("Parse error on line %s, col %s. Found %s, expected %s.", dispatcher.getLine(), dispatcher.getColumn(),dispatcher.getToken(), token));
         }
         lookahead = dispatcher.nextToken();
     }
@@ -63,7 +63,7 @@ public class Parser {
         throw new ParseException(String.format("Parse error on line %s, col %s. Unexpected token %s, lexeme %s", dispatcher.getLine(), dispatcher.getColumn(), dispatcher.getToken(), dispatcher.getLexeme()));
     }
     // get entry to use during identifier conflict resolution
-    private TableEntry getEntry() {
+    private TableEntry getEntry() throws ParseException {
         String lexeme = dispatcher.getLexeme();
         Iterator<SymbolTable> iter = stack.descendingIterator();
         SymbolTable table;
@@ -72,7 +72,7 @@ public class Parser {
             if(table.hasEntry(lexeme))
             return table.getEntry(lexeme);
         }
-        return null;
+        throw new ParseException(String.format("Symbol Table entry not found. Line %s, Col %s, Token %s, Lexeme %s .",dispatcher.getLine(), dispatcher.getColumn(), lookahead, lexeme ));
     }
     // create a new symbol table and add it to the stack
     private void createTable() throws ParseException {
@@ -83,6 +83,11 @@ public class Parser {
         else {
             throw new ParseException("Attempted to insert symbol table without identifier.");
         }
+        for (TableEntry entry : tableEntry.getParams()) {
+            SymbolTable table = stack.peek();
+            table.addEntry(entry);
+        }
+
         tableEntry = new EntryBuilder();
     }
     // remove top symbol table from the stack
@@ -90,6 +95,7 @@ public class Parser {
         stack.pop();
         nest--;
     }
+
     // add a row to the symbol table using information retrieved during parse.
     private void addEntry() throws ParseException {
         // need to fill out logic, catch all errors & ensure program,procedure,function preserve entry for new table creation.
@@ -103,9 +109,10 @@ public class Parser {
         }
         switch ((tableEntry.getKind())) {
             case FUNCTION:
-                if(tableEntry.getMode()==null)
-                    throw new ParseException(String.format("Missing mode in function declaration. Lexeme %s", tableEntry.getLexeme()));
-                else
+                // temp allowing function without a mode
+                //if(tableEntry.getMode()==null)
+                    //throw new ParseException(String.format("Missing mode in function declaration. Lexeme %s", tableEntry.getLexeme()));
+                //else
                     table.createNewEntry(tableEntry.getLexeme(), tableEntry);
                 // entry reset after new table creation
                 break;
@@ -170,7 +177,6 @@ public class Parser {
         matchLookAhead(Token.MP_PROGRAM);
         ProgramIdentifier();
         createTable();
-        tableEntry = new EntryBuilder();
     }
     private void Block() throws ParseException
     {
@@ -189,6 +195,7 @@ public class Parser {
                 VariableDeclaration();
                 matchLookAhead(Token.MP_SCOLON);
                 VariableDeclarationTail();
+                tableEntry = new EntryBuilder();
                 break;
             case MP_PROCEDURE:
             case MP_FUNCTION:
@@ -301,6 +308,8 @@ public class Parser {
         matchLookAhead(Token.MP_PROCEDURE);
         ProcedureIdentifier();
         OptionalFormalParameterList();
+        addEntry();
+        createTable();
     }
 
     private void FunctionHeading() throws ParseException
@@ -313,6 +322,7 @@ public class Parser {
         matchLookAhead(Token.MP_COLON);
         Type();
         addEntry();
+        createTable();
     }
 
     private void OptionalFormalParameterList() throws ParseException
@@ -479,7 +489,7 @@ public class Parser {
                     parseTree("43");
                     ProcedureStatement();   // procedure identifier
                 }
-                else if(entry.kind == Kind.FUNCTION || entry.kind == Kind.VARIABLE) {
+                else if(entry.kind == Kind.VARIABLE) {
                     parseTree("38");
                     AssignmentStatement();
                 }
@@ -987,9 +997,11 @@ public class Parser {
                 break;
             case MP_TRUE:
                 parseTree("102");
+                matchLookAhead(Token.MP_TRUE);
                 break;
             case MP_FALSE:
                 parseTree("103");
+                matchLookAhead(Token.MP_FALSE);
                 break;
             case MP_IDENTIFIER:
                 TableEntry entry = getEntry();

@@ -62,4 +62,8 @@ public class SymbolTable {
         hm.put(lexeme, entry);
         nextoffset++;
     }
+
+    public void addEntry(TableEntry entry) {
+        hm.put(entry.lexeme,entry);
+    }
 }

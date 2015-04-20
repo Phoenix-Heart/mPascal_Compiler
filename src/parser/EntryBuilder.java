@@ -21,7 +21,7 @@ public class EntryBuilder {
         kind = null;
         type = null;
         mode = null;
-        params = null;
+        params = new LinkedList<TableEntry>();
     }
     public boolean hasLexeme() {
         return !lexemes.isEmpty();
