@@ -2,11 +2,14 @@ program Program4;
   var Sum, I, N : Integer;
    t : Float;
    function f1 (var i : boolean; s : String) : String ;
+        var m : Integer;
         begin
             if i = True then
-                N:= 21
+                m:= 21
             else
-                N:= 99
+                N:= 99;
+        f1:= "string";
+
         end ;
   begin
      Read(N);
