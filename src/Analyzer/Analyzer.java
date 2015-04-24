@@ -94,19 +94,19 @@ public class Analyzer {
             return null;
         }
     }
-    // print expression out to a file
-    private void saveLine(String line) {
+    // print single line out to a file.
+    private void putLine(String line) {
 
     }
-    private void Save(String statement) {
+    // print input out to file exactly, does not start a new line.
+    private void put(String statement) {
 
     }
     private void MULS(String leftop, String rightop) {
         if(leftop!=null)
-            saveLine("PUSH leftop");
+            putLine("PUSH leftop");
         if(rightop!=null)
-            saveLine("PUSH rightop");
-        saveLine("MULS");
-
+            putLine("PUSH rightop");
+        putLine("MULS");
     }
 }
