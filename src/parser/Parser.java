@@ -70,7 +70,7 @@ public class Parser {
         while(iter.hasNext()) {
             table = iter.next();
             if(table.hasEntry(lexeme))
-            return table.getEntry(lexeme);
+                return table.getEntry(lexeme);
         }
         throw new ParseException(String.format("Symbol Table entry not found. Line %s, Col %s, Token %s, Lexeme %s .",dispatcher.getLine(), dispatcher.getColumn(), lookahead, lexeme ));
     }
@@ -111,9 +111,9 @@ public class Parser {
             case FUNCTION:
                 // temp allowing function without a mode
                 //if(tableEntry.getMode()==null)
-                    //throw new ParseException(String.format("Missing mode in function declaration. Lexeme %s", tableEntry.getLexeme()));
+                //throw new ParseException(String.format("Missing mode in function declaration. Lexeme %s", tableEntry.getLexeme()));
                 //else
-                    table.createNewEntry(tableEntry.getLexeme(), tableEntry);
+                table.createNewEntry(tableEntry.getLexeme(), tableEntry);
                 // entry reset after new table creation
                 break;
             case PROCEDURE:

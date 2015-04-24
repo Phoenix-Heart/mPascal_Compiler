@@ -13,14 +13,16 @@ public class TableEntry {
     public final Kind kind;
     public final Mode mode;
     public final int offset;
+    public final int nest;
     List<TableEntry> parameters;
 
-    public TableEntry(String lex, Type t, Kind k, Mode mode, int offset, List<TableEntry> params) {
+    public TableEntry(String lex, Type t, Kind k, Mode mode, int offset, int nest, List<TableEntry> params) {
         this.lexeme = lex;
         this.type = t;
         this.kind = k;
         this.mode = mode;
         this.offset = offset;
+        this.nest = nest;
         this.parameters = params;
     }
     public TableEntry(String name, int offset, EntryBuilder entry) {
@@ -29,6 +31,7 @@ public class TableEntry {
         this.kind = entry.getKind();
         this.mode = entry.getMode();
         this.offset = offset;
+        this.nest = entry.nest;
         this.parameters = entry.getParams();
     }
 }

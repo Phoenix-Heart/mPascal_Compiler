@@ -16,7 +16,9 @@ public class EntryBuilder {
     private Type type;
     private Mode mode;
     private LinkedList<TableEntry> params;
-    EntryBuilder() {
+    public int nest;
+
+    public EntryBuilder() {
         lexemes = new LinkedList();
         kind = null;
         type = null;
@@ -72,4 +74,12 @@ public class EntryBuilder {
         throw new ParseException(String.format("Attempted to overwrite %s entry %s with %s",err, value, newvalue));
 
     }
+
+    public void setNest(int nestingLevel) {
+        nest = nestingLevel;
+    }
+
+    //   public void setNest(int nestingLevel) {
+     //   this.nest = nest;
+   // }
 }

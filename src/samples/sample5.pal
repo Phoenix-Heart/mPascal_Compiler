@@ -1,0 +1,15 @@
+program Tester;
+        begin
+        var A, B, C : Integer;
+          Ch: Float;
+          procedure Fred;
+            var A, X: Integer;
+            procedure Mary;
+              var B, X, C: Integer;
+              begin {mary}
+                B:= 1; X:= 2; C := 3;
+                A := B + X * C;
+            end; {mary}
+            begin {fred}
+              A:= 75;
+        end. {tester}
