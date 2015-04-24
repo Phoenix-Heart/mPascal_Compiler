@@ -38,6 +38,7 @@ public class Analyzer {
     private static Type genRecursive(SemanticRecord record) {
         Type leftType;
         Type rightType;
+        //record.operator;
         if((record.rightOperand.isOperand)&&(record.leftOperand.isOperand)) {
             // start calculation here
             // output = ??
@@ -94,7 +95,18 @@ public class Analyzer {
         }
     }
     // print expression out to a file
-    private void Save(String operator, String[] operands) {
+    private void saveLine(String line) {
+
+    }
+    private void Save(String statement) {
+
+    }
+    private void MULS(String leftop, String rightop) {
+        if(leftop!=null)
+            saveLine("PUSH leftop");
+        if(rightop!=null)
+            saveLine("PUSH rightop");
+        saveLine("MULS");
 
     }
 }
