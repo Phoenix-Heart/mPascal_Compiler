@@ -61,8 +61,6 @@ public class Analyzer {
             // continue calculation here
             // ie. do type check and then
             // perform intermediate calculation from stack
-
-
         }
         return null;
     }
@@ -102,11 +100,13 @@ public class Analyzer {
     private void put(String statement) {
 
     }
-    private void MULS(String leftop, String rightop) {
-        if(leftop!=null)
-            putLine("PUSH leftop");
-        if(rightop!=null)
-            putLine("PUSH rightop");
+    private void MULS(Argument leftArg, Argument rightArg) {
+    // type checking needed
+        // push values on stack if not already in stack
+        if(!leftArg.inStack)
+            putLine("PUSH "+leftArg.symbol);
+        if(!rightArg.inStack)
+            putLine("PUSH "+rightArg.symbol);
         putLine("MULS");
     }
 }
