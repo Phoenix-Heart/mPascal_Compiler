@@ -60,7 +60,6 @@ public class SymbolTable {
     public void createNewEntry(String lexeme, EntryBuilder tableEntry) {
         TableEntry entry = new TableEntry(lexeme.toLowerCase(), nextoffset, tableEntry);
         tableEntry.setNest(nestingLevel);
-        TableEntry entry = new TableEntry(lexeme, nextoffset, tableEntry);
         hm.put(lexeme, entry);
         nextoffset++;
     }
