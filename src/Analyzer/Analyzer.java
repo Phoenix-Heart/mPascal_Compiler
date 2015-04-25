@@ -147,7 +147,7 @@ public class Analyzer {
     }
 
     public void writeParameter(SemanticRecord record) throws SemanticException {
-        String toWrite = getSymbol(record.operand);
+        String toWrite = getRepresentation(record);
         writePush(toWrite);
         switch(record.operator)
         {
@@ -178,12 +178,35 @@ public class Analyzer {
 
     public void compare(SemanticRecord s)
     {
-        if (s.leftOperand.isOperand && s.rightOperand.isOperand)
-        {
+        SemanticRecord l = s.leftOperand;
+        SemanticRecord r = s.rightOperand;
 
+        {
+            if(l.isSimple() && r.isSimple())
+            {
+
+            }
         }
 
     }
+
+
+    public String getRepresentation(SemanticRecord s) throws SemanticException
+    {
+        if (s.isSimple())
+        {
+            if (s.operator.isLiteral())
+            {
+                return("#" + s.operand);
+            }
+            else return getSymbol(s.operand);
+        }
+        else
+        {
+           throw new SemanticException("attempted to use a non-atomic token in an atomic context");
+        }
+    }
+
 
 
 

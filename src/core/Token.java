@@ -27,5 +27,11 @@ public enum Token
                 return false;
         }
     }
+
+    public boolean isAtomic()
+    {
+        return (this.isLiteral() || this.equals(MP_IDENTIFIER));
+
+    }
 }
 

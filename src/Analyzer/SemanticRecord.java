@@ -30,7 +30,9 @@ public class SemanticRecord {
         rightOperand = null;
         operator = null;
     }
-    //use for write, writeline.
+    //use for things that may be literals. in this case operand is the
+    //value of the literal if token is a literal, otherwise it is the
+    //token's lexeme
     public SemanticRecord(String operand, Token token)
     {
         this.operator = token;
@@ -38,5 +40,25 @@ public class SemanticRecord {
         this.rightOperand = null;
         this.operand = operand;
         this.isOperand = false;
+    }
+
+    public Boolean isSimple()
+    {
+        if (this.operator == null)
+            return false;
+        else return this.operator.isAtomic();
+    }
+
+    public static boolean typeCompatible(SemanticRecord s1, SemanticRecord s2)
+    {
+        if (s1.isSimple() && s2.isSimple())
+        {
+            if (s1.operator.equals(s2.operator))
+            {
+                return true;
+            }
+            else return false;
+        }
+        return false;
     }
 }
