@@ -142,7 +142,20 @@ public class Analyzer {
         }
     }
 
-    public void writeParameter(String s)
+    public void writeParameter(SemanticRecord record)
     {
+        String toWrite = getSymbol(record.operand);
+        putLine("PUSH " + toWrite);
+        switch(record.operator)
+        {
+            case MP_WRITE:
+                putLine("WRTS");
+                break;
+            case MP_WRITELN:
+                putLine("WRTLNS");
+                break;
+            default:
+                System.out.println("bad token");
+        }
     }
 }

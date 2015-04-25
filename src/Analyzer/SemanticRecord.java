@@ -30,4 +30,13 @@ public class SemanticRecord {
         rightOperand = null;
         operator = null;
     }
+
+    public SemanticRecord(String operand, Token token)
+    {
+        this.operator = token;
+        this.leftOperand = null;
+        this.rightOperand = null;
+        this.operand = operand;
+        this.isOperand = false;
+    }
 }
