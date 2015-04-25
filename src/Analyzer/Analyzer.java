@@ -7,6 +7,7 @@ import symbolTable.TableEntry;
 import symbolTable.TableStack;
 import symbolTable.Type;
 
+import java.io.*;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Vector;
@@ -18,10 +19,19 @@ public class Analyzer {
     private static TableStack tables = TableStack.getStack();
     private static HashMap<Token,HashMap<Type,MachineOp>> opTable;
     private String endline = "\n";
+    private Writer writer;
+
 
     public Analyzer() {
         addOp(Token.MP_PLUS, Type.INTEGER, MachineOp.Adds);
         addOp(Token.MP_READ, Type.STRING, MachineOp.Read);
+        try {
+            Writer writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream("outfile.txt"), "utf-8"));
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
     }
     private void addOp(Token token, Type type, MachineOp op) {
         opTable.put(token, new HashMap<Type, MachineOp>(Type.values().length));
@@ -94,10 +104,25 @@ public class Analyzer {
     }
     // print single line out to a file.
     private void putLine(String line) {
+        try
+        {
+        writer.write(line + endline);
+        }
+        catch(IOException e)
+        {
+            e.printStackTrace();
+        }
 
     }
     // print input out to file exactly, does not start a new line.
     private void put(String statement) {
+        try{
+            writer.write(statement);
+        }
+        catch(IOException e)
+        {
+            e.printStackTrace();
+        }
 
     }
     private void MULS(Argument leftArg, Argument rightArg) {
@@ -108,5 +133,16 @@ public class Analyzer {
         if(!rightArg.inStack)
             putLine("PUSH "+rightArg.symbol);
         putLine("MULS");
+    }
+
+    public void readParameter(String s){
+        {
+            String toRead = getSymbol(s);
+            putLine("RD" + toRead);
+        }
+    }
+
+    public void writeParameter(String s)
+    {
     }
 }
