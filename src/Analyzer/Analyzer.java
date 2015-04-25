@@ -39,6 +39,11 @@ public class Analyzer {
 
     }
 
+    private void writePush(String s)
+    {
+        putLine("PUSH " + s);
+    }
+
     // take a record (with at least one valid operation and valid operators). Generate and save the code.
     public static void generate(SemanticRecord record) {
         genRecursive(record);
@@ -50,8 +55,7 @@ public class Analyzer {
         Type rightType;
         //record.operator;
         if((record.rightOperand.isOperand)&&(record.leftOperand.isOperand)) {
-            // start calculation here
-            // output = ??
+
         }
         else {
             if(!record.rightOperand.isOperand) {
@@ -129,9 +133,9 @@ public class Analyzer {
     // type checking needed
         // push values on stack if not already in stack
         if(!leftArg.inStack)
-            putLine("PUSH "+leftArg.symbol);
+            writePush(leftArg.symbol);
         if(!rightArg.inStack)
-            putLine("PUSH "+rightArg.symbol);
+            writePush(rightArg.symbol);
         putLine("MULS");
     }
 
@@ -142,10 +146,9 @@ public class Analyzer {
         }
     }
 
-    public void writeParameter(SemanticRecord record)
-    {
+    public void writeParameter(SemanticRecord record) throws SemanticException {
         String toWrite = getSymbol(record.operand);
-        putLine("PUSH " + toWrite);
+        writePush(toWrite);
         switch(record.operator)
         {
             case MP_WRITE:
@@ -155,7 +158,34 @@ public class Analyzer {
                 putLine("WRTLNS");
                 break;
             default:
-                System.out.println("bad token");
+                throw new SemanticException("bad token in Write parameter:" + record.operator);
         }
     }
+
+    public void optionalSign(Token sign) throws SemanticException
+    {
+        switch(sign)
+        {
+            case MP_PLUS:
+                break;
+            case MP_MINUS:
+                putLine("NEGS");
+                break;
+            default:
+                throw new SemanticException("optional sign parsed but not found");
+        }
+    }
+
+    public void compare(SemanticRecord s)
+    {
+        if (s.leftOperand.isOperand && s.rightOperand.isOperand)
+        {
+
+        }
+
+    }
+
+
+
+
 }

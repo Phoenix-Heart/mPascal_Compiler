@@ -30,7 +30,7 @@ public class SemanticRecord {
         rightOperand = null;
         operator = null;
     }
-
+    //use for write, writeline.
     public SemanticRecord(String operand, Token token)
     {
         this.operator = token;
