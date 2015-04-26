@@ -6,11 +6,13 @@ import symbolTable.Kind;
 import symbolTable.SymbolTable;
 import symbolTable.TableEntry;
 import symbolTable.Type;
+import analyzer.*;
 
 import java.io.*;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.HashMap;
+
 /**
  * Created by Christina on 3/6/2015.
  */
@@ -23,6 +25,7 @@ public class Parser {
     private String parse;
     private int nest;
     private HashMap rules = RuleLookup.getRules();
+    private Analyzer analyzer = new Analyzer();
 
     public Parser(Dispatcher dispatcher) {
         this.dispatcher = dispatcher;
@@ -163,6 +166,7 @@ public class Parser {
     // section written by Andrew
 
     private void SystemGoal() throws ParseException {
+        analyzer.preSetup();
         parseTree(1);
         Program();
         matchLookAhead(Token.MP_EOF);

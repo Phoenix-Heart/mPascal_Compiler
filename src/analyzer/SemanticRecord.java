@@ -1,10 +1,7 @@
-package Analyzer;
+package analyzer;
 
 import core.Token;
-import symbolTable.TableEntry;
 import symbolTable.Type;
-
-import java.util.ArrayList;
 
 /**
  * Created by Christina on 4/14/2015.

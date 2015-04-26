@@ -1,4 +1,4 @@
-package Analyzer;
+package analyzer;
 
 import symbolTable.Kind;
 import symbolTable.Type;

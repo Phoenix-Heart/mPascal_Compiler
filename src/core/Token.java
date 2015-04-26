@@ -1,6 +1,5 @@
 package core;
 
-import Analyzer.SemanticException;
 import symbolTable.Type;
 
 /**

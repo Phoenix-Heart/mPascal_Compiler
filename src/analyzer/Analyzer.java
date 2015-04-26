@@ -1,16 +1,13 @@
-package Analyzer;
+package analyzer;
 
 import core.Token;
 import parser.ParseException;
-import symbolTable.SymbolTable;
 import symbolTable.TableEntry;
 import symbolTable.TableStack;
 import symbolTable.Type;
 
 import java.io.*;
 import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.Vector;
 
 
 /**
