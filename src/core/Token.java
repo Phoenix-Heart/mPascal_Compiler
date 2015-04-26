@@ -1,5 +1,8 @@
 package core;
 
+import Analyzer.SemanticException;
+import symbolTable.Type;
+
 /**
  * created by Christina Dunning
  * A complete list of all valid token types in microPascal
@@ -31,6 +34,23 @@ public enum Token
     public boolean isAtomic()
     {
         return (this.isLiteral() || this.equals(MP_IDENTIFIER));
+
+    }
+    public Type literalType()
+    {
+        switch(this)
+        {
+            case MP_INTEGER_LIT:
+                return Type.INTEGER;
+            case MP_FIXED_LIT:
+                return Type.FIXED;
+            case MP_FLOAT_LIT:
+                return Type.FLOAT;
+            case MP_STRING_LIT:
+                return Type.STRING;
+            default:
+                return null;
+        }
 
     }
 }

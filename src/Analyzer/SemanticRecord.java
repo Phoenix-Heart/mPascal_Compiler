@@ -2,6 +2,7 @@ package Analyzer;
 
 import core.Token;
 import symbolTable.TableEntry;
+import symbolTable.Type;
 
 import java.util.ArrayList;
 
@@ -10,6 +11,7 @@ import java.util.ArrayList;
  */
 public class SemanticRecord {
     public final Token operator;
+    public Type type;
     public final SemanticRecord leftOperand;
     public final SemanticRecord rightOperand;
     public final String operand;
@@ -21,6 +23,7 @@ public class SemanticRecord {
         this.rightOperand = rightOperand;
         this.isOperand = false;
         operand = null;
+        type = null;
     }
     // operand is a lexeme
     public SemanticRecord(String operand) {
@@ -29,6 +32,7 @@ public class SemanticRecord {
         leftOperand = null;
         rightOperand = null;
         operator = null;
+        type = null;
     }
     //use for things that may be literals. in this case operand is the
     //value of the literal if token is a literal, otherwise it is the
@@ -40,6 +44,17 @@ public class SemanticRecord {
         this.rightOperand = null;
         this.operand = operand;
         this.isOperand = false;
+        this.type = null;
+    }
+
+    public Type getType()
+    {
+        return this.type;
+    }
+
+    public void setType(Type type)
+    {
+        this.type = type;
     }
 
     public Boolean isSimple()
@@ -47,18 +62,5 @@ public class SemanticRecord {
         if (this.operator == null)
             return false;
         else return this.operator.isAtomic();
-    }
-
-    public static boolean typeCompatible(SemanticRecord s1, SemanticRecord s2)
-    {
-        if (s1.isSimple() && s2.isSimple())
-        {
-            if (s1.operator.equals(s2.operator))
-            {
-                return true;
-            }
-            else return false;
-        }
-        return false;
     }
 }

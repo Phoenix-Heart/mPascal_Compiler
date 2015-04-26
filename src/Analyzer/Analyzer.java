@@ -12,6 +12,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Vector;
 
+
 /**
  * Created by Christina on 4/8/2015.
  */
@@ -19,14 +20,16 @@ public class Analyzer {
     private static TableStack tables = TableStack.getStack();
     private static HashMap<Token,HashMap<Type,MachineOp>> opTable;
     private String endline = "\n";
+    private String writeFile = "generated_code.il";
     private Writer writer;
+    private int labelCounter = 0;
 
 
     public Analyzer() {
         addOp(Token.MP_PLUS, Type.INTEGER, MachineOp.Adds);
         addOp(Token.MP_READ, Type.STRING, MachineOp.Read);
         try {
-            Writer writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream("outfile.txt"), "utf-8"));
+            Writer writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(writeFile), "utf-8"));
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         } catch (FileNotFoundException e) {
@@ -37,6 +40,13 @@ public class Analyzer {
         opTable.put(token, new HashMap<Type, MachineOp>(Type.values().length));
         opTable.get(token).put(type, op);
 
+    }
+
+    private String getLabel()
+    {
+        String currentLabel = "l" + Integer.toString(labelCounter);
+        labelCounter++;
+        return currentLabel;
     }
 
     private void writePush(String s)
@@ -97,6 +107,30 @@ public class Analyzer {
         }
         return null;
     }
+    private static Type unsafeGetType(SemanticRecord s)
+    {
+        if(s.isSimple())
+        {
+            Type t;
+            if (s.operator.isAtomic())
+                t = s.operator.literalType();
+            else t = getType(s.operand);
+            return t;
+        }
+        return null;
+    }
+
+    private boolean typeCompatible(SemanticRecord s1, SemanticRecord s2)
+    {
+        if (s1.isSimple() && s2.isSimple())
+        {
+            Type t1 = unsafeGetType(s1);
+            Type t2 = unsafeGetType(s2);
+            return t1.equals(t2);
+        }
+        return false;
+    }
+
     // search the operation table for the correct machine operator for the given type
     private MachineOp opLookup(Token token, Type type) {
         if(opTable.containsKey(token) && opTable.get(token).containsKey(type)) {
@@ -129,6 +163,13 @@ public class Analyzer {
         }
 
     }
+
+    public void preSetup()
+    {
+        putLine("PUSH D0");
+        putLine("MOV SP D0");
+    }
+
     private void MULS(Argument leftArg, Argument rightArg) {
     // type checking needed
         // push values on stack if not already in stack
@@ -176,19 +217,46 @@ public class Analyzer {
         }
     }
 
-    public void compare(SemanticRecord s)
-    {
+    public void compare(SemanticRecord s) throws SemanticException{
         SemanticRecord l = s.leftOperand;
         SemanticRecord r = s.rightOperand;
-
+        Type lType = l.getType();
+        Type rType = r.getType();
+        if(l == null || r== null)
+            throw new SemanticException("tried to compare without knowing types");
+        else if (lType.isFloatish() && !(rType.isFloatish()))
         {
-            if(l.isSimple() && r.isSimple())
-            {
-
-            }
+            putLine("CASTSF");
         }
+        else
+        {
+            switch(s.operator)
+            {
+                case MP_EQUAL:
+                    put("CMPEQS");
+                    break;
+                case MP_GEQUAL:
+                    put("CMPGES");
+                    break;
+                case MP_GTHAN:
+                    put("CMPGTS");
+                    break;
+                case MP_LEQUAL:
+                    put("CMPLES");
+                    break;
+                case MP_LTHAN:
+                    put("CMPLTS");
+                    break;
+                default:
+                    throw new SemanticException("tried to do a bad compare with token " + s.operator);
+            }
+            if (lType.isFloatish() || rType.isFloatish())
+            {
+                put("F\n");
+            }
 
-    }
+        }
+        }
 
 
     public String getRepresentation(SemanticRecord s) throws SemanticException
