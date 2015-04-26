@@ -22,7 +22,7 @@ public class Analyzer {
     private int labelCounter = 0;
 
 
-    public Analyzer() {
+    public Analyzer(){
         addOp(Token.MP_PLUS, Type.INTEGER, MachineOp.Adds);
         addOp(Token.MP_READ, Type.STRING, MachineOp.Read);
         try {
@@ -61,12 +61,12 @@ public class Analyzer {
     }
 
     // take a record (with at least one valid operation and valid operators). Generate and save the code.
-    public static void generate(SemanticRecord record) {
+    public void generate(SemanticRecord record) {
         genRecursive(record);
     }
     // recursively descend and generate code from record.
 
-    private static Type genRecursive(SemanticRecord record) {
+    private Type genRecursive(SemanticRecord record) {
         Type leftType;
         Type rightType;
         //record.operator;
@@ -94,7 +94,7 @@ public class Analyzer {
         }
         return null;
     }
-    private static String getSymbol(String operand) {
+    private String getSymbol(String operand) {
         TableEntry entry;
         try {
             entry = tables.getEntry(operand);
@@ -104,7 +104,7 @@ public class Analyzer {
         }
         return null;
     }
-    private static Type getType(String operand) {
+    private Type getType(String operand) {
         try {
             TableEntry entry  = tables.getEntry(operand);
             return entry.type;
@@ -113,7 +113,7 @@ public class Analyzer {
         }
         return null;
     }
-    private static Type unsafeGetType(SemanticRecord s)
+    private Type unsafeGetType(SemanticRecord s)
     {
         if(s.isSimple())
         {
@@ -173,6 +173,12 @@ public class Analyzer {
     {
         putLine("PUSH D0");
         putLine("MOV SP D0");
+    }
+
+    public void varDeclaration(String s)
+    {
+        writePush(getSymbol(s));
+        putLine("ADD SP #1 SP");
     }
 
     private void MULS(Argument leftArg, Argument rightArg) {

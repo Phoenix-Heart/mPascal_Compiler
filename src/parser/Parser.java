@@ -7,6 +7,7 @@ import analyzer.*;
 
 import java.io.*;
 import java.util.HashMap;
+import java.util.List;
 
 /**
  * Created by Christina on 3/6/2015.
@@ -15,7 +16,7 @@ public class Parser {
 
     private Dispatcher dispatcher;
     private Token lookahead;
-    private TableStack stack;
+    private static TableStack stack = TableStack.getStack();
     private EntryBuilder tableEntry;
     private String parse;
     private int nest;
@@ -24,7 +25,6 @@ public class Parser {
 
     public Parser(Dispatcher dispatcher) {
         this.dispatcher = dispatcher;
-        this.stack = TableStack.getStack();
         this.parse = "";
         nest = 0;
         tableEntry = new EntryBuilder();
@@ -70,8 +70,8 @@ public class Parser {
         parse += " ";
         parse += r;
         parse += "\n";
-        System.out.print(rule + " ");
-        System.out.println(r);
+        //System.out.print(rule + " ");
+        //System.out.println(r);
 
     }
 
@@ -157,12 +157,18 @@ public class Parser {
         IdentifierList();
         matchLookAhead(Token.MP_COLON);
         Type();
+        List<String> varsToDeclare = tableEntry.getLexemes();
         boolean flag = stack.addEntry(tableEntry);
         if(flag)
         {
             tableEntry = new EntryBuilder();
         }
         tableEntry.setKind(Kind.VARIABLE);
+        for(String elem: varsToDeclare)
+        {
+            analyzer.varDeclaration(elem);
+        }
+
     }
 
     private void Type() throws ParseException {

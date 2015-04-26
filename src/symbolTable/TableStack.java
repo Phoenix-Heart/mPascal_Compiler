@@ -12,7 +12,7 @@ import java.util.LinkedList;
  * Created by Christina on 4/21/2015.
  */
 public class TableStack {
-    private LinkedList<SymbolTable> stack;
+    private static LinkedList<SymbolTable> stack;
     private int nest;
     private static TableStack singleton;
 

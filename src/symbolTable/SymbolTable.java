@@ -39,10 +39,14 @@ public class SymbolTable {
         System.out.print(this.label);
         System.out.print("\nNesting Level: ");
         System.out.print(this.nestingLevel);
-        System.out.print("\n\nSymbols");
-        for (Object key:this.hm.keySet())
+        System.out.print("\n\nSymbols\n");
+        for (Object key :this.hm.keySet())
         {
-            System.out.println(hm.get(key).toString());
+            TableEntry e = hm.get(key);
+            System.out.println(e.lexeme);
+            System.out.println(e.kind);
+            System.out.println(e.offset);
+            System.out.println(e.type);
         }
     }
 
