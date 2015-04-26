@@ -39,6 +39,15 @@ public class Analyzer {
 
     }
 
+    public void closeFile()
+    {
+        try {
+            writer.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
     private String getLabel()
     {
         String currentLabel = "l" + Integer.toString(labelCounter);
@@ -158,7 +167,6 @@ public class Analyzer {
         {
             e.printStackTrace();
         }
-
     }
 
     public void preSetup()

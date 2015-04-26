@@ -85,6 +85,7 @@ public class Parser {
         analyzer.preSetup();
         parseTree(1);
         Program();
+        analyzer.closeFile();
         matchLookAhead(Token.MP_EOF);
     }
     private void Program() throws ParseException {

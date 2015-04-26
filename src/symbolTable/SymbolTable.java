@@ -18,12 +18,12 @@ public class SymbolTable {
     {
         this.nextoffset = 0;
         this.hm = new HashMap();
-        this.name = name.toLowerCase();
+        this.name = name.toUpperCase();
 
         this.nestingLevel = nestingLevel;
     }
     public TableEntry getEntry(String key) {
-        return hm.get(key.toLowerCase());
+        return hm.get(key.toUpperCase());
     }
 
     public int getNestingLevel()
