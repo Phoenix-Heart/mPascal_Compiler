@@ -15,10 +15,10 @@ import java.util.HashMap;
  */
 public class Analyzer {
     private static TableStack tables = TableStack.getStack();
-    private static HashMap<Token,HashMap<Type,MachineOp>> opTable;
+    private static HashMap<Token,HashMap<Type,MachineOp>> opTable = new HashMap<>();
     private String endline = "\n";
     private String writeFile = "generated_code.il";
-    private Writer writer;
+    private BufferedWriter writer;
     private int labelCounter = 0;
 
 
@@ -26,10 +26,10 @@ public class Analyzer {
         addOp(Token.MP_PLUS, Type.INTEGER, MachineOp.Adds);
         addOp(Token.MP_READ, Type.STRING, MachineOp.Read);
         try {
-            Writer writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(writeFile), "utf-8"));
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
+                writer = new BufferedWriter(new FileWriter(writeFile));
         } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
             e.printStackTrace();
         }
     }

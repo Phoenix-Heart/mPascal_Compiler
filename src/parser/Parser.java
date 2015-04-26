@@ -2,15 +2,10 @@ package parser;
 
 import core.Token;
 import scanner.Dispatcher;
-import symbolTable.Kind;
-import symbolTable.SymbolTable;
-import symbolTable.TableEntry;
-import symbolTable.Type;
+import symbolTable.*;
 import analyzer.*;
 
 import java.io.*;
-import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.HashMap;
 
 /**
@@ -20,7 +15,7 @@ public class Parser {
 
     private Dispatcher dispatcher;
     private Token lookahead;
-    private LinkedList<SymbolTable> stack;
+    private TableStack stack;
     private EntryBuilder tableEntry;
     private String parse;
     private int nest;
@@ -29,7 +24,7 @@ public class Parser {
 
     public Parser(Dispatcher dispatcher) {
         this.dispatcher = dispatcher;
-        this.stack = new LinkedList<SymbolTable>();
+        this.stack = TableStack.getStack();
         this.parse = "";
         nest = 0;
         tableEntry = new EntryBuilder();
@@ -65,86 +60,7 @@ public class Parser {
     private void LL1error() throws ParseException {
         throw new ParseException(String.format("Parse error on line %s, col %s. Unexpected token %s, lexeme %s", dispatcher.getLine(), dispatcher.getColumn(), dispatcher.getToken(), dispatcher.getLexeme()));
     }
-    // get entry to use during identifier conflict resolution
-    private TableEntry getEntry() throws ParseException {
-        String lexeme = dispatcher.getLexeme();
-        Iterator<SymbolTable> iter = stack.descendingIterator();
-        SymbolTable table;
-        while(iter.hasNext()) {
-            table = iter.next();
-            if(table.hasEntry(lexeme))
-                return table.getEntry(lexeme);
-        }
-        throw new ParseException(String.format("Symbol Table entry not found. Line %s, Col %s, Token %s, Lexeme %s .",dispatcher.getLine(), dispatcher.getColumn(), lookahead, lexeme ));
-    }
-    // create a new symbol table and add it to the stack
-    private void createTable() throws ParseException {
-        if(tableEntry.getLexeme()!=null) {
-            stack.push(new SymbolTable(tableEntry.getLexeme(), nest));
-            nest++;
-        }
-        else {
-            throw new ParseException("Attempted to insert symbol table without identifier.");
-        }
-        for (TableEntry entry : tableEntry.getParams()) {
-            SymbolTable table = stack.peek();
-            table.addEntry(entry);
-        }
 
-        tableEntry = new EntryBuilder();
-    }
-    // remove top symbol table from the stack
-    private void destroyTable() {
-        stack.pop();
-        nest--;
-    }
-
-    // add a row to the symbol table using information retrieved during parse.
-    private void addEntry() throws ParseException {
-        // need to fill out logic, catch all errors & ensure program,procedure,function preserve entry for new table creation.
-
-        SymbolTable table = stack.peek();
-        if(tableEntry.getLexeme()==null) {
-            throw new ParseException(String.format("Missing lexeme in %s declaration.", tableEntry.getKind()));
-        }
-        else if(tableEntry.getKind()==null) {
-            throw new ParseException(String.format("Missing Kind in declaration. Lexeme %s", tableEntry.getLexeme()));
-        }
-        switch ((tableEntry.getKind())) {
-            case FUNCTION:
-                // temp allowing function without a mode
-                //if(tableEntry.getMode()==null)
-                //throw new ParseException(String.format("Missing mode in function declaration. Lexeme %s", tableEntry.getLexeme()));
-                //else
-                table.createNewEntry(tableEntry.getLexeme(), tableEntry);
-                // entry reset after new table creation
-                break;
-            case PROCEDURE:
-                table.createNewEntry(tableEntry.getLexeme(),tableEntry);
-                // entry reset after new table creation
-                break;
-            case PARAMETER:
-                if(tableEntry.getType()==null)
-                    throw new ParseException(String.format("Missing type in parameter declaration. Lexeme %s", tableEntry.getLexeme()));
-                table.createNewEntry(tableEntry.getLexeme(),tableEntry);
-                // reset entry
-                tableEntry = new EntryBuilder();
-                break;
-            case VARIABLE:
-                if(tableEntry.getType()==null)
-                    throw new ParseException(String.format("Missing type in variable declaration. Lexeme %s", tableEntry.getLexeme()));
-                else {
-                    for(String lexeme : tableEntry.getLexemes()) {
-                        table.createNewEntry(lexeme, tableEntry);
-                    }
-                }
-                // reset entry
-                tableEntry = new EntryBuilder();
-                break;
-            case PROGRAM:
-                throw new ParseException("Attempted to enter PROGRAM identifier into table. Program identifiers used in table creation, not entries.");
-        }
-    }
 
 
     // save parse tree rules to file
@@ -183,7 +99,8 @@ public class Parser {
         tableEntry.setKind(Kind.PROGRAM);
         matchLookAhead(Token.MP_PROGRAM);
         ProgramIdentifier();
-        createTable();
+        stack.createTable(tableEntry);
+        tableEntry = new EntryBuilder();
     }
     private void Block() throws ParseException
     {
@@ -239,7 +156,11 @@ public class Parser {
         IdentifierList();
         matchLookAhead(Token.MP_COLON);
         Type();
-        addEntry();
+        boolean flag = stack.addEntry(tableEntry);
+        if(flag)
+        {
+            tableEntry = new EntryBuilder();
+        }
         tableEntry.setKind(Kind.VARIABLE);
     }
 
@@ -315,8 +236,13 @@ public class Parser {
         matchLookAhead(Token.MP_PROCEDURE);
         ProcedureIdentifier();
         OptionalFormalParameterList();
-        addEntry();
-        createTable();
+        boolean flag = stack.addEntry(tableEntry);
+        if(flag)
+        {
+            tableEntry = new EntryBuilder();
+        }
+        stack.createTable(tableEntry);
+        tableEntry = new EntryBuilder();
     }
 
     private void FunctionHeading() throws ParseException
@@ -328,8 +254,13 @@ public class Parser {
         OptionalFormalParameterList();
         matchLookAhead(Token.MP_COLON);
         Type();
-        addEntry();
-        createTable();
+        boolean flag = stack.addEntry(tableEntry);
+        if(flag)
+        {
+            tableEntry = new EntryBuilder();
+        }
+        stack.createTable(tableEntry);
+        tableEntry = new EntryBuilder();
     }
 
     private void OptionalFormalParameterList() throws ParseException
@@ -491,7 +422,22 @@ public class Parser {
                 break;
             case MP_IDENTIFIER:
                 // Identifier kind conflict resolution
-                TableEntry entry = getEntry();
+                TableEntry entry;
+                try
+                {
+                   entry = stack.getEntry(dispatcher.getLexeme());
+                } catch (ParseException p)
+                {
+                    throw new ParseException(p.getMessage() + String.format("Line %s, Col %s, Token %s", dispatcher.getLine(), dispatcher.getColumn(), dispatcher.getToken().toString()));
+                }
+                try
+                {
+                    Kind myKind = entry.kind;
+                } catch (NullPointerException np)
+                {
+                    throw new ParseException(String.format("Line %s, Col %s, Token %s", dispatcher.getLine(), dispatcher.getColumn(), dispatcher.getToken().toString()));
+                }
+
                 if(entry.kind == Kind.PROCEDURE) {
                     parseTree(43);
                     ProcedureStatement();   // procedure identifier
@@ -611,7 +557,14 @@ public class Parser {
     }
     private void AssignmentStatement() throws ParseException {
 
-        TableEntry entry = getEntry();
+        TableEntry entry;
+        try
+        {
+            entry = stack.getEntry(dispatcher.getLexeme());
+        } catch (ParseException p)
+        {
+            throw new ParseException(p.getMessage() + String.format("Line %s, Col %s, Token %s", dispatcher.getLine(), dispatcher.getColumn(), dispatcher.getToken().toString()));
+        }
         if(entry.kind == Kind.FUNCTION) {
             parseTree(55);
             FunctionIdentifier();
@@ -1015,7 +968,14 @@ public class Parser {
                 matchLookAhead(Token.MP_FALSE);
                 break;
             case MP_IDENTIFIER:
-                TableEntry entry = getEntry();
+                TableEntry entry;
+                try
+                {
+                    entry = stack.getEntry(dispatcher.getLexeme());
+                } catch (ParseException p)
+                {
+                    throw new ParseException(p.getMessage() + String.format("Line %s, Col %s, Token %s", dispatcher.getLine(), dispatcher.getColumn(), dispatcher.getToken().toString()));
+                }
                 if(entry.kind == Kind.VARIABLE) {
                     parseTree(116);
                     VariableIdentifier();

@@ -47,17 +47,17 @@ public class SymbolTable {
     }
 
     public boolean hasEntry(String lexeme) {
-        return hm.containsKey(lexeme.toLowerCase());
+        return hm.containsKey(lexeme.toUpperCase());
     }
 
     public void createNewEntry(String lexeme, EntryBuilder tableEntry) {
-        TableEntry entry = new TableEntry(lexeme.toLowerCase(), nextoffset, tableEntry);
+        TableEntry entry = new TableEntry(lexeme.toUpperCase(), nextoffset, tableEntry);
         tableEntry.setNest(nestingLevel);
-        hm.put(lexeme, entry);
+        hm.put(lexeme.toUpperCase(), entry);
         nextoffset++;
     }
 
     public void addEntry(TableEntry entry) {
-        hm.put(entry.lexeme.toLowerCase(),entry);
+        hm.put(entry.lexeme.toUpperCase(),entry);
     }
 }

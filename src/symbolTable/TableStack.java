@@ -15,8 +15,7 @@ public class TableStack {
     private LinkedList<SymbolTable> stack;
     private int nest;
     private static TableStack singleton;
-    private Dispatcher dispatcher;
-    private EntryBuilder builder;
+
 
     private TableStack() {
         singleton = this;
@@ -38,8 +37,7 @@ public class TableStack {
             if(table.hasEntry(lexeme))
                 return table.getEntry(lexeme);
         }
-        throw new ParseException(String.format("Symbol Table entry not found. Line %s, Col %s, Token %s, Lexeme %s .",
-                dispatcher.getLine(), dispatcher.getColumn(), dispatcher.getToken(), lexeme ));
+        throw new ParseException("Symbol table entry not found. Lexeme: " + lexeme + ".  ");
     }
     // create a new symbol table and add it to the stack
     public void createTable(EntryBuilder builder) throws ParseException {
@@ -54,17 +52,20 @@ public class TableStack {
             SymbolTable table = stack.peek();
             table.addEntry(entry);
         }
-
-        builder = new EntryBuilder();
     }
     // remove top symbol table from the stack
-    public SymbolTable removeTable() {
+    public SymbolTable pop() {
         nest--;
         return stack.pop();
     }
 
+    public SymbolTable peek()
+    {
+        return stack.peek();
+    }
+
     // add a row to the symbol table using information retrieved during parse.
-    public void addEntry(EntryBuilder builder) throws ParseException {
+    public boolean addEntry(EntryBuilder builder) throws ParseException {
         // need to fill out logic, catch all errors & ensure program,procedure,function preserve entry for new table creation.
 
         SymbolTable table = stack.peek();
@@ -82,18 +83,17 @@ public class TableStack {
                 //else
                 table.createNewEntry(builder.getLexeme(), builder);
                 // entry reset after new table creation
-                break;
+                return false;
             case PROCEDURE:
                 table.createNewEntry(builder.getLexeme(),builder);
                 // entry reset after new table creation
-                break;
+                return false;
             case PARAMETER:
                 if(builder.getType()==null)
                     throw new ParseException(String.format("Missing type in parameter declaration. Lexeme %s", builder.getLexeme()));
                 table.createNewEntry(builder.getLexeme(),builder);
                 // reset entry
-                builder = new EntryBuilder();
-                break;
+                return true;
             case VARIABLE:
                 if(builder.getType()==null)
                     throw new ParseException(String.format("Missing type in variable declaration. Lexeme %s", builder.getLexeme()));
@@ -103,10 +103,10 @@ public class TableStack {
                     }
                 }
                 // reset entry
-                builder = new EntryBuilder();
-                break;
+                return true;
             case PROGRAM:
                 throw new ParseException("Attempted to enter PROGRAM identifier into table. Program identifiers used in table creation, not entries.");
         }
+        return false;
     }
 }
