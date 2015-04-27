@@ -181,6 +181,17 @@ public class Analyzer {
         putLine("ADD SP #1 SP");
     }
 
+    public void genAssign(TableEntry entry)
+    {
+        String location = getSymbol(entry.lexeme);
+        putLine("POP " + location);
+    }
+
+    public void genNot()
+    {
+        putLine("NOTS");
+    }
+
     private void MULS(Argument leftArg, Argument rightArg) {
     // type checking needed
         // push values on stack if not already in stack
