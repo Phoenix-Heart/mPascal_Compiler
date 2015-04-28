@@ -196,6 +196,51 @@ public class Analyzer {
         writePush(getSymbol(s));
         putLine("ADD SP #1 SP");
     }
+
+    public void genAssign(TableEntry entry)
+    {
+        String location = getSymbol(entry.lexeme);
+        putLine("POP " + location);
+    }
+
+    public void genNot()
+    {
+        putLine("NOTS");
+    }
+
+    private void MULS(Argument leftArg, Argument rightArg) {
+    // type checking needed
+        // push values on stack if not already in stack
+        if(!leftArg.inStack)
+            writePush(leftArg.symbol);
+        if(!rightArg.inStack)
+            writePush(rightArg.symbol);
+        putLine("MULS");
+    }
+
+    public void readParameter(String s){
+        {
+            String toRead = getSymbol(s);
+            putLine("RD" + toRead);
+        }
+    }
+
+    public void writeParameter(SemanticRecord record) throws SemanticException {
+        String toWrite = getRepresentation(record);
+        writePush(toWrite);
+        switch(record.operator)
+        {
+            case MP_WRITE:
+                putLine("WRTS");
+                break;
+            case MP_WRITELN:
+                putLine("WRTLNS");
+                break;
+            default:
+                throw new SemanticException("bad token in Write parameter:" + record.operator);
+        }
+    }
+
     public void optionalSign(Token sign) throws SemanticException
     {
         switch(sign)

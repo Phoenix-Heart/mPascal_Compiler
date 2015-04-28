@@ -22,6 +22,7 @@ public class Parser {
     private int nest;
     private HashMap rules = RuleLookup.getRules();
     private Analyzer analyzer = new Analyzer();
+    private SemanticRecord sr;
 
     public Parser(Dispatcher dispatcher) {
         this.dispatcher = dispatcher;
@@ -575,18 +576,21 @@ public class Parser {
         if(entry.kind == Kind.FUNCTION) {
             parseTree(55);
             FunctionIdentifier();
+            matchLookAhead(Token.MP_ASSIGN);
+            Expression();
 
         }
         else if (entry.kind == Kind.VARIABLE) {
             parseTree(54);
             VariableIdentifier();
+            matchLookAhead(Token.MP_ASSIGN);
+            Expression();
+            analyzer.genAssign(entry);
         }
         else {
-            System.out.println(" (AssignmentStatement) This code should be unreachable.");
+            throw new ParseException(" (AssignmentStatement) This code should be unreachable.");
         }
-        
-        matchLookAhead(Token.MP_ASSIGN);
-        Expression();
+
     }
     private void IfStatement() throws ParseException {
 
@@ -809,6 +813,11 @@ public class Parser {
                 parseTree(84);
                 break;
             case MP_PLUS:
+                parseTree(83);
+                AddingOperator();
+                Term();
+                TermTail();
+                break;
             case MP_MINUS:
                 parseTree(83);
                 AddingOperator();
