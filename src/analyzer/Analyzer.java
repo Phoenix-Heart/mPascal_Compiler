@@ -1,7 +1,9 @@
 package analyzer;
 
+import analyzer.operations.*;
 import core.Token;
 import parser.ParseException;
+import symbolTable.Kind;
 import symbolTable.TableEntry;
 import symbolTable.TableStack;
 import symbolTable.Type;
@@ -15,16 +17,20 @@ import java.util.HashMap;
  */
 public class Analyzer {
     private static TableStack tables = TableStack.getStack();
-    private static HashMap<Token,HashMap<Type,MachineOp>> opTable = new HashMap<>();
-    private String endline = "\n";
+    private static HashMap<Token,Operator> opTable = new HashMap<>();
+    private static String endline = "\n";
     private String writeFile = "generated_code.il";
-    private BufferedWriter writer;
+    private static BufferedWriter writer;
     private int labelCounter = 0;
 
 
     public Analyzer(){
-        addOp(Token.MP_PLUS, Type.INTEGER, MachineOp.Adds);
-        addOp(Token.MP_READ, Type.STRING, MachineOp.Read);
+        // initialize operator lookup table
+        opTable.put(Token.MP_READ, new ReadOp());
+        opTable.put(Token.MP_WRITE, new WriteOp());
+        opTable.put(Token.MP_WRITELN, new WriteLnOp());
+        opTable.put(Token.MP_ASSIGN, new AssignOp());
+
         try {
                 writer = new BufferedWriter(new FileWriter(writeFile));
         } catch (FileNotFoundException e) {
@@ -33,13 +39,7 @@ public class Analyzer {
             e.printStackTrace();
         }
     }
-    private void addOp(Token token, Type type, MachineOp op) {
-        opTable.put(token, new HashMap<Type, MachineOp>(Type.values().length));
-        opTable.get(token).put(type, op);
-
-    }
-
-    public void closeFile()
+    public static void closeFile()
     {
         try {
             writer.close();
@@ -55,7 +55,7 @@ public class Analyzer {
         return currentLabel;
     }
 
-    private void writePush(String s)
+    private static void writePush(String s)
     {
         putLine("PUSH " + s);
     }
@@ -71,7 +71,14 @@ public class Analyzer {
         Type rightType;
         //record.operator;
         if((record.rightOperand.isOperand)&&(record.leftOperand.isOperand)) {
-
+           Operator op = opLookup(record.operator);
+            Argument leftArg = new Argument(getSymbol(record.leftOperand.operand), getType(record.leftOperand.operand),getKind(record.leftOperand.operand));
+            Argument rightArg = new Argument(getSymbol(record.rightOperand.operand), getType(record.rightOperand.operand),getKind(record.rightOperand.operand));
+            try {
+                op.performOp(leftArg,rightArg);
+            } catch (SemanticException e) {
+                e.printStackTrace();
+            }
         }
         else {
             if(!record.rightOperand.isOperand) {
@@ -94,7 +101,7 @@ public class Analyzer {
         }
         return null;
     }
-    private String getSymbol(String operand) {
+    private static String getSymbol(String operand) {
         TableEntry entry;
         try {
             entry = tables.getEntry(operand);
@@ -104,10 +111,19 @@ public class Analyzer {
         }
         return null;
     }
-    private Type getType(String operand) {
+    private static Type getType(String operand) {
         try {
             TableEntry entry  = tables.getEntry(operand);
             return entry.type;
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+    private static  Kind getKind(String operand) {
+        try {
+            TableEntry entry = tables.getEntry(operand);
+            return entry.kind;
         } catch (ParseException e) {
             e.printStackTrace();
         }
@@ -138,19 +154,19 @@ public class Analyzer {
     }
 
     // search the operation table for the correct machine operator for the given type
-    private MachineOp opLookup(Token token, Type type) {
-        if(opTable.containsKey(token) && opTable.get(token).containsKey(type)) {
-            return opTable.get(token).get(type);
+    private Operator opLookup(Token token) {
+        if(opTable.containsKey(token)) {
+            return opTable.get(token);
         }
         else {
             return null;
         }
     }
     // print single line out to a file.
-    private void putLine(String line) {
+    static void putLine(String line) {
         try
         {
-        writer.write(line + endline);
+            writer.write(line + endline);
         }
         catch(IOException e)
         {
@@ -159,7 +175,7 @@ public class Analyzer {
 
     }
     // print input out to file exactly, does not start a new line.
-    private void put(String statement) {
+    static void put(String statement) {
         try{
             writer.write(statement);
         }
@@ -175,45 +191,11 @@ public class Analyzer {
         putLine("MOV SP D0");
     }
 
-    public void varDeclaration(String s)
+    public static void varDeclaration(String s)
     {
         writePush(getSymbol(s));
         putLine("ADD SP #1 SP");
     }
-
-    private void MULS(Argument leftArg, Argument rightArg) {
-    // type checking needed
-        // push values on stack if not already in stack
-        if(!leftArg.inStack)
-            writePush(leftArg.symbol);
-        if(!rightArg.inStack)
-            writePush(rightArg.symbol);
-        putLine("MULS");
-    }
-
-    public void readParameter(String s){
-        {
-            String toRead = getSymbol(s);
-            putLine("RD" + toRead);
-        }
-    }
-
-    public void writeParameter(SemanticRecord record) throws SemanticException {
-        String toWrite = getRepresentation(record);
-        writePush(toWrite);
-        switch(record.operator)
-        {
-            case MP_WRITE:
-                putLine("WRTS");
-                break;
-            case MP_WRITELN:
-                putLine("WRTLNS");
-                break;
-            default:
-                throw new SemanticException("bad token in Write parameter:" + record.operator);
-        }
-    }
-
     public void optionalSign(Token sign) throws SemanticException
     {
         switch(sign)
@@ -231,8 +213,8 @@ public class Analyzer {
     public void compare(SemanticRecord s) throws SemanticException{
         SemanticRecord l = s.leftOperand;
         SemanticRecord r = s.rightOperand;
-        Type lType = l.getType();
-        Type rType = r.getType();
+        Type lType = getType(l.operand);
+        Type rType = getType(r.operand);
         if(l == null || r== null)
             throw new SemanticException("tried to compare without knowing types");
         else if (lType.isFloatish() && !(rType.isFloatish()))
@@ -285,9 +267,33 @@ public class Analyzer {
            throw new SemanticException("attempted to use a non-atomic token in an atomic context");
         }
     }
-
-
-
-
-
+    // compare input types to expected types
+    private Type typeCheck(Type[] input, Type[] expected) {
+        int precedence = expected.length+1;
+        boolean exists = false;
+        for(Type type : input) {
+            exists = false;
+            for(int i=0;i<expected.length;i++) {
+                Type e = expected[i];
+                if(type==e) {
+                    exists = true;
+                    //
+                    if(i<precedence)
+                        precedence = i;
+                }
+                if(!exists) {
+                    try {
+                        throw new SemanticException(String.format("This is not the type you are looking for. Type %s, expected: ", type,expected));
+                    } catch (SemanticException e1) {
+                        e1.printStackTrace();
+                    }
+                }
+            }
+        }
+        if(precedence < expected.length) {
+            return expected[precedence];
+        }
+        else
+            return null;                // this code should be unreachable
+    }
 }

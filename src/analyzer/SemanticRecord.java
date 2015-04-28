@@ -8,11 +8,12 @@ import symbolTable.Type;
  */
 public class SemanticRecord {
     public final Token operator;
-    public Type type;
     public final SemanticRecord leftOperand;
     public final SemanticRecord rightOperand;
-    public final String operand;
-    public final boolean isOperand;
+    public String operand;
+    public Type type;
+    public boolean isOperand;
+    public boolean isEvaluated;
 
     public SemanticRecord(SemanticRecord leftOperand, Token operator, SemanticRecord rightOperand) {
         this.leftOperand = leftOperand;
@@ -20,7 +21,6 @@ public class SemanticRecord {
         this.rightOperand = rightOperand;
         this.isOperand = false;
         operand = null;
-        type = null;
     }
     // operand is a lexeme
     public SemanticRecord(String operand) {
@@ -29,7 +29,13 @@ public class SemanticRecord {
         leftOperand = null;
         rightOperand = null;
         operator = null;
-        type = null;
+    }
+    public SemanticRecord() {
+        isOperand = true;
+        operand = null;
+        leftOperand = null;
+        rightOperand = null;
+        operator = null;
     }
     //use for things that may be literals. in this case operand is the
     //value of the literal if token is a literal, otherwise it is the
@@ -41,19 +47,7 @@ public class SemanticRecord {
         this.rightOperand = null;
         this.operand = operand;
         this.isOperand = false;
-        this.type = null;
     }
-
-    public Type getType()
-    {
-        return this.type;
-    }
-
-    public void setType(Type type)
-    {
-        this.type = type;
-    }
-
     public Boolean isSimple()
     {
         if (this.operator == null)
