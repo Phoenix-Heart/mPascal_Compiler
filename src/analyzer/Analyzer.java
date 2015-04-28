@@ -70,22 +70,22 @@ public class Analyzer {
         Type leftType;
         Type rightType;
         //record.operator;
-        if((record.rightOperand.isOperand)&&(record.leftOperand.isOperand)) {
+        if((record.getRightOperand().isOperand())&&(record.getLeftOperand().isOperand())) {
 
         }
         else {
-            if(!record.rightOperand.isOperand) {
-                rightType = genRecursive(record.rightOperand);
+            if(!record.getRightOperand().isOperand()) {
+                rightType = genRecursive(record.getRightOperand());
             }
             else {
-                rightType = getType(record.rightOperand.operand);
+                rightType = getType(record.getRightOperand().getOperand());
                 // push getSymbol(record.rightOperand.operand) onto stack
             }
-            if(!record.leftOperand.isOperand) {
-                leftType = genRecursive(record.leftOperand);
+            if(!record.getLeftOperand().isOperand()) {
+                leftType = genRecursive(record.getLeftOperand());
             }
             else {
-                leftType = getType(record.leftOperand.operand);
+                leftType = getType(record.getLeftOperand().getOperand());
                 // push getSymbol(record.leftOperand.operand) onto stack
             }
             // continue calculation here
@@ -118,9 +118,9 @@ public class Analyzer {
         if(s.isSimple())
         {
             Type t;
-            if (s.operator.isAtomic())
-                t = s.operator.literalType();
-            else t = getType(s.operand);
+            if (s.getOperator().isAtomic())
+                t = s.getOperator().literalType();
+            else t = getType(s.getOperand());
             return t;
         }
         return null;
@@ -181,9 +181,9 @@ public class Analyzer {
         putLine("ADD SP #1 SP");
     }
 
-    public void genAssign(TableEntry entry)
+    public void genAssign(String lex)
     {
-        String location = getSymbol(entry.lexeme);
+        String location = getSymbol(lex);
         putLine("POP " + location);
     }
 
@@ -212,7 +212,7 @@ public class Analyzer {
     public void writeParameter(SemanticRecord record) throws SemanticException {
         String toWrite = getRepresentation(record);
         writePush(toWrite);
-        switch(record.operator)
+        switch(record.getOperator())
         {
             case MP_WRITE:
                 putLine("WRTS");
@@ -221,7 +221,7 @@ public class Analyzer {
                 putLine("WRTLNS");
                 break;
             default:
-                throw new SemanticException("bad token in Write parameter:" + record.operator);
+                throw new SemanticException("bad token in Write parameter:" + record.getOperator());
         }
     }
 
@@ -240,8 +240,8 @@ public class Analyzer {
     }
 
     public void compare(SemanticRecord s) throws SemanticException{
-        SemanticRecord l = s.leftOperand;
-        SemanticRecord r = s.rightOperand;
+        SemanticRecord l = s.getLeftOperand();
+        SemanticRecord r = s.getRightOperand();
         Type lType = l.getType();
         Type rType = r.getType();
         if(l == null || r== null)
@@ -252,7 +252,7 @@ public class Analyzer {
         }
         else
         {
-            switch(s.operator)
+            switch(s.getOperator())
             {
                 case MP_EQUAL:
                     put("CMPEQS");
@@ -270,7 +270,7 @@ public class Analyzer {
                     put("CMPLTS");
                     break;
                 default:
-                    throw new SemanticException("tried to do a bad compare with token " + s.operator);
+                    throw new SemanticException("tried to do a bad compare with token " + s.getOperator());
             }
             if (lType.isFloatish() || rType.isFloatish())
             {
@@ -285,11 +285,11 @@ public class Analyzer {
     {
         if (s.isSimple())
         {
-            if (s.operator.isLiteral())
+            if (s.getOperator().isLiteral())
             {
-                return("#" + s.operand);
+                return("#" + s.getOperand());
             }
-            else return getSymbol(s.operand);
+            else return getSymbol(s.getOperand());
         }
         else
         {

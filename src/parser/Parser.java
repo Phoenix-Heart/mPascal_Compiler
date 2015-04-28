@@ -22,7 +22,6 @@ public class Parser {
     private int nest;
     private HashMap rules = RuleLookup.getRules();
     private Analyzer analyzer = new Analyzer();
-    private SemanticRecord sr;
 
     public Parser(Dispatcher dispatcher) {
         this.dispatcher = dispatcher;
@@ -585,7 +584,6 @@ public class Parser {
             VariableIdentifier();
             matchLookAhead(Token.MP_ASSIGN);
             Expression();
-            analyzer.genAssign(entry);
         }
         else {
             throw new ParseException(" (AssignmentStatement) This code should be unreachable.");
