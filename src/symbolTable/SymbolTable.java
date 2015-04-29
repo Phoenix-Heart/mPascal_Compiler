@@ -1,5 +1,4 @@
 package symbolTable;
-//import javafx.scene.control.Tab;
 
 import analyzer.Analyzer;
 import parser.EntryBuilder;
@@ -69,5 +68,8 @@ public class SymbolTable {
             Analyzer.varDeclaration(entry.lexeme);
 
         nextoffset++;
+    }
+    public void tempDeclaration() {
+        Analyzer.tempDeclaration(nextoffset+"(D"+nestingLevel+")");
     }
 }

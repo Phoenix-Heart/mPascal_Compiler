@@ -180,6 +180,10 @@ public class Analyzer {
         writePush(getSymbol(s));
         putLine("ADD SP #1 SP");
     }
+    public static void tempDeclaration(String symbol) {
+        writePush(symbol);
+        putLine("ADD SP #1 SP");
+    }
 
     public static void cast(Type from, Type to) throws SemanticException {
         if((to==Type.FLOAT || to==Type.FIXED) && from==Type.INTEGER)

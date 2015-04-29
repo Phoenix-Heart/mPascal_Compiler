@@ -25,6 +25,20 @@ public class SemanticRecord {
         this.label = null;
         setReturnType();
     }
+    public SemanticRecord(Token operator, Argument rightOperand) {
+        this.rightOperand = rightOperand;
+        this.operator = operator;
+        this.label = null;
+        this.leftOperand = null;
+    }
+
+    public SemanticRecord() {
+        operator = null;
+        type = null;
+        leftOperand = null;
+        rightOperand = null;
+        label = null;
+    }
 
     public Type getType()
     {
@@ -54,6 +68,7 @@ public class SemanticRecord {
 
     public void setLeftOperand(Argument leftOperand) {
         this.leftOperand = leftOperand;
+        setReturnType();
     }
 
     public Argument getRightOperand() {
@@ -62,6 +77,17 @@ public class SemanticRecord {
 
     public void setRightOperand(Argument rightOperand) {
         this.rightOperand = rightOperand;
+    }
+
+    public void genCasts() {
+        if(type!=Type.BOOLEAN) {
+            if (rightOperand.getType() != type) {
+                rightOperand.castType(type);
+            }
+            if (leftOperand.getType() != type) {
+                leftOperand.castType(type);
+            }
+        }
     }
 
     private void setReturnType() {
@@ -128,6 +154,7 @@ public class SemanticRecord {
     }
 
     public Argument genExpression() {
+        genCasts();
         Operator op = Analyzer.opLookup(operator);
         op.performOp(leftOperand,rightOperand,label);
         return new Argument(type);

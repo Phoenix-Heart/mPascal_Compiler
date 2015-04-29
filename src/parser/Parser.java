@@ -787,14 +787,15 @@ public class Parser {
         }
     }
     private void SimpleExpression() throws ParseException {
-                parseTree(82);
-                OptionalSign();
-                Term();
-                TermTail();
+        parseTree(82);
+        OptionalSign();
+        SemanticRecord leftRecord = Term();
+        SemanticRecord rightRecord = TermTail();
     }
     private SemanticRecord TermTail() throws ParseException {
         Token op;
-        SemanticRecord record;
+        SemanticRecord leftRecord, rightRecord;
+        Argument leftArg, rightArg;
         switch (lookahead) {
             case MP_COMMA:
             case MP_SCOLON:
@@ -819,8 +820,10 @@ public class Parser {
             case MP_MINUS:
                 parseTree(83);
                 op = AddingOperator();
-                Argument leftArg = Term();
-                record = TermTail();
+                leftRecord = Term();
+                leftArg = leftRecord.genExpression();
+                rightRecord = TermTail();
+                rightArg = rightRecord.genExpression();
                 break;
             default:
                 LL1error();
@@ -874,11 +877,12 @@ public class Parser {
         return null;
     }
 
-    private Argument Term() throws ParseException {
-                parseTree(91);
-                Argument leftArg = Factor();
-                SemanticRecord record = FactorTail();
-        return null;
+    private SemanticRecord Term() throws ParseException {
+        parseTree(91);
+        Argument leftArg = Factor();
+        SemanticRecord record = FactorTail();
+        record.setLeftOperand(leftArg);
+        return record;
     }
     private SemanticRecord FactorTail() throws ParseException
     {
@@ -888,10 +892,12 @@ public class Parser {
             case MP_MOD:
             case MP_AND:
                 parseTree(92);
-                MultiplyingOperator();
-                Factor();
-                FactorTail();
-                break;
+                Token op = MultiplyingOperator();
+                Argument leftArg = Factor();
+                SemanticRecord record = FactorTail();
+                record.setLeftOperand(leftArg);
+                Argument rightArg = record.genExpression();
+                return new SemanticRecord(op, rightArg);
             case MP_DO:
             case MP_DOWNTO:
             case MP_ELSE:
@@ -916,7 +922,7 @@ public class Parser {
             default:
                 LL1error();
         }
-        return null;
+        return new SemanticRecord();
     }
     private Token MultiplyingOperator() throws ParseException
     {
