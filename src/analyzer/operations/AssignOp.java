@@ -1,6 +1,7 @@
 package analyzer.operations;
 
-import analyzer.Argument;
+import analyzer.Analyzer;
+import analyzer.SemRecord;
 import analyzer.SemanticException;
 import symbolTable.Type;
 
@@ -8,18 +9,15 @@ import symbolTable.Type;
  * Created by Christina on 4/26/2015.
  */
 public class AssignOp extends Operator {
+    public AssignOp(Type[] types) {
+        super(types);
+    }
     @Override
-    public Type performOp(Argument leftArg, Argument rightArg) throws SemanticException {
-        if(leftArg.symbol==null || rightArg.symbol==null) {
-            throw new SemanticException("Invalid argument");
-        }
-        if(!rightArg.inStack) {
-            // cast
-            putLine("PUSH "+leftArg.symbol);
-        }
-        else {
-            putLine(String.format("POP %s", leftArg.symbol));
-        }
-        return leftArg.type;
+    protected void Op(SemRecord leftArg, SemRecord rightArg, String label) throws SemanticException {
+        assertValue(leftArg,true);
+        assertValue(rightArg,false);
+        assertValue(label,false);
+
+        Analyzer.putLine(String.format("POP %s", leftArg.getSymbol()));
     }
 }

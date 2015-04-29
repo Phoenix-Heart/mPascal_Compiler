@@ -11,13 +11,6 @@ import java.util.List;
  * Created by Christina on 4/14/2015.
  */
 public class SemanticRecord {
-    public final Token operator;
-    public Type type;
-    public final SemanticRecord leftOperand;
-    public final SemanticRecord rightOperand;
-    public final String operand;
-    public final boolean isOperand;
-
     private Token operator;
     private Type type;
     private SemanticRecord leftOperand;
@@ -34,7 +27,7 @@ public class SemanticRecord {
         type = null;
     }
     // operand is a lexeme
-    public SemanticRecord(String operand) {
+    public SemanticRecord(String operand, Type type) {
         this.operand = operand;
         this.isOperand = true;
         leftOperand = null;
@@ -58,16 +51,6 @@ public class SemanticRecord {
         this.leftOperand = null;
         this.rightOperand = null;
         this.operand = operand;
-        this.isOperand = false;
-        this.type = null;
-    }
-
-    public SemanticRecord()
-    {
-        this.operator = null;
-        this.leftOperand = null;
-        this.rightOperand = null;
-        this.operand = null;
         this.isOperand = false;
         this.type = null;
     }

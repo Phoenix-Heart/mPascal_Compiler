@@ -1,53 +1,40 @@
 package analyzer.operations;
 
-import analyzer.Argument;
-import analyzer.MachineOp;
+import analyzer.SemRecord;
 import analyzer.SemanticException;
 import symbolTable.Type;
 
-import java.io.BufferedWriter;
-import java.io.FileWriter;
-import java.io.IOException;
-
 /**
- * Created by night on 4/26/2015.
+ * Created by Christina on 4/26/2015.
  */
 public abstract class Operator {
-    MachineOp op;
     Type[] types;
-    int numArgs;
-    private String writeFile = "generated_code.out";
-    private BufferedWriter writer;
-    private String endline = "\n";
-
-    Operator() {
+    public Operator(Type[] types) {
+        this.types = types;
+    }
+    public void performOp(SemRecord leftArg, SemRecord rightArg, String label) {
         try {
-            writer = new BufferedWriter(new FileWriter(writeFile));
-        } catch (IOException e) {
+            checkType(leftArg.getType());
+            checkType(rightArg.getType());
+            Op(leftArg, rightArg, label);
+        }
+        catch (SemanticException e) {
             e.printStackTrace();
         }
     }
-
-    public abstract Type performOp(Argument leftArg, Argument rightArg) throws SemanticException;
-
-    // print single line out to a file.
-    void putLine(String line) {
-        try
-        {
-            writer.write(line + endline);
+    protected abstract void Op(SemRecord leftArg, SemRecord rightArg, String label) throws SemanticException;
+    private void checkType(Type type) throws SemanticException {
+        for(Type t : types) {
+            if(t.equals(type)) {
+                return;
+            }
         }
-        catch(IOException e)
-        {
-            e.printStackTrace();
-        }
-
+        throw new SemanticException(String.format("Type mismatch. Type %s is invalid."));
     }
-    public void closeFile()
-    {
-        try {
-            writer.close();
-        } catch (IOException e) {
-            e.printStackTrace();
+    protected void assertValue(Object obj, boolean exists) throws SemanticException {
+        // generate exception when assertion fails. obj is null if and only if exists is false.
+        if((obj==null)==exists) {
+            throw new SemanticException("Invalid argument given for this Operator. "+obj.toString());
         }
     }
 }

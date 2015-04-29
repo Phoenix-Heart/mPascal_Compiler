@@ -1,24 +1,29 @@
 package analyzer.operations;
 
-import analyzer.Argument;
+import analyzer.Analyzer;
+import analyzer.SemRecord;
 import analyzer.SemanticException;
 import symbolTable.Type;
 
 /**
- * Created by night on 4/26/2015.
+ * Created by Christina on 4/26/2015.
  */
 public class WriteOp extends Operator {
+    public WriteOp(Type[] types) {
+        super(types);
+    }
+
     @Override
-    public Type performOp(Argument leftArg, Argument rightArg) throws SemanticException {
-        if(rightArg.symbol!=null) {
-            throw new SemanticException("Invalid number of arguments. Expected 1, Received 2");
-        }
-        if(leftArg.inStack) {
-            putLine("WRTS " + leftArg.symbol);
+    public void Op(SemRecord leftArg, SemRecord rightArg, String label) throws SemanticException {
+        assertValue(leftArg, true);
+        assertValue(rightArg, false);
+        assertValue(label, false);
+
+        if(leftArg.isInStack()) {
+            Analyzer.putLine("WRTS " + leftArg.getSymbol());
         }
         else {
-            putLine("WRT " + leftArg.symbol);
+            Analyzer.putLine("WRT " + leftArg.getSymbol());
         }
-        return leftArg.type;
     }
 }

@@ -25,11 +25,12 @@ public class Analyzer {
 
 
     public Analyzer(){
+        Type[] allTypes = {Type.BOOLEAN,Type.STRING,Type.FLOAT,Type.INTEGER};
         // initialize operator lookup table
-        opTable.put(Token.MP_READ, new ReadOp());
-        opTable.put(Token.MP_WRITE, new WriteOp());
-        opTable.put(Token.MP_WRITELN, new WriteLnOp());
-        opTable.put(Token.MP_ASSIGN, new AssignOp());
+        opTable.put(Token.MP_READ, new ReadOp(new Type[]{Type.INTEGER, Type.FLOAT, Type.STRING}));
+        opTable.put(Token.MP_WRITE, new WriteOp(allTypes));
+        opTable.put(Token.MP_WRITELN, new WriteLnOp(allTypes));
+        opTable.put(Token.MP_ASSIGN, new AssignOp(allTypes));
 
         try {
                 writer = new BufferedWriter(new FileWriter(writeFile));
@@ -50,17 +51,17 @@ public class Analyzer {
 
     private String getLabel()
     {
-        String currentLabel = "l" + Integer.toString(labelCounter);
+        String currentLabel = "L" + Integer.toString(labelCounter);
         labelCounter++;
         return currentLabel;
     }
 
-    private static void writePush(String s)
+    public static void writePush(String s)
     {
         putLine("PUSH " + s);
     }
 
-    // take a record (with at least one valid operation and valid operators). Generate and save the code.
+    /* take a record (with at least one valid operation and valid operators). Generate and save the code.
     public void generate(SemanticRecord record) {
         genRecursive(record);
     }
@@ -71,14 +72,10 @@ public class Analyzer {
         Type rightType;
         //record.operator;
         if((record.getRightOperand().isOperand())&&(record.getLeftOperand().isOperand())) {
-           Operator op = opLookup(record.operator);
-            Argument leftArg = new Argument(getSymbol(record.leftOperand.operand), getType(record.leftOperand.operand),getKind(record.leftOperand.operand));
-            Argument rightArg = new Argument(getSymbol(record.rightOperand.operand), getType(record.rightOperand.operand),getKind(record.rightOperand.operand));
-            try {
-                op.performOp(leftArg,rightArg);
-            } catch (SemanticException e) {
-                e.printStackTrace();
-            }
+            Operator op = opLookup(record.getOperator());
+            SemRecord leftArg = new SemRecord(getSymbol(record.getLeftOperand().getOperand()), getType(record.getLeftOperand().getOperand()));
+            SemRecord rightArg = new SemRecord(getSymbol(record.getRightOperand().getOperand()), getType(record.getRightOperand().getOperand()));
+            op.performOp(leftArg, rightArg, null);
         }
         else {
             if(!record.getRightOperand().isOperand()) {
@@ -101,7 +98,8 @@ public class Analyzer {
         }
         return null;
     }
-    private static String getSymbol(String operand) {
+    */
+    public static String getSymbol(String operand) {
         TableEntry entry;
         try {
             entry = tables.getEntry(operand);
@@ -111,7 +109,7 @@ public class Analyzer {
         }
         return null;
     }
-    private static Type getType(String operand) {
+    public static Type getType(String operand) {
         try {
             TableEntry entry  = tables.getEntry(operand);
             return entry.type;
@@ -120,41 +118,8 @@ public class Analyzer {
         }
         return null;
     }
-    private static  Kind getKind(String operand) {
-        try {
-            TableEntry entry = tables.getEntry(operand);
-            return entry.kind;
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
-    private Type unsafeGetType(SemanticRecord s)
-    {
-        if(s.isSimple())
-        {
-            Type t;
-            if (s.getOperator().isAtomic())
-                t = s.getOperator().literalType();
-            else t = getType(s.getOperand());
-            return t;
-        }
-        return null;
-    }
-
-    private boolean typeCompatible(SemanticRecord s1, SemanticRecord s2)
-    {
-        if (s1.isSimple() && s2.isSimple())
-        {
-            Type t1 = unsafeGetType(s1);
-            Type t2 = unsafeGetType(s2);
-            return t1.equals(t2);
-        }
-        return false;
-    }
-
     // search the operation table for the correct machine operator for the given type
-    private Operator opLookup(Token token) {
+    public Operator opLookup(Token token) {
         if(opTable.containsKey(token)) {
             return opTable.get(token);
         }
@@ -163,7 +128,7 @@ public class Analyzer {
         }
     }
     // print single line out to a file.
-    static void putLine(String line) {
+    public static void putLine(String line) {
         try
         {
             writer.write(line + endline);
@@ -175,7 +140,7 @@ public class Analyzer {
 
     }
     // print input out to file exactly, does not start a new line.
-    static void put(String statement) {
+    public static void put(String statement) {
         try{
             writer.write(statement);
         }
@@ -197,6 +162,9 @@ public class Analyzer {
         putLine("ADD SP #1 SP");
     }
 
+    /*
+    // these methods should be added to operations package
+
     public void genAssign(String lex)
     {
         String location = getSymbol(lex);
@@ -208,7 +176,7 @@ public class Analyzer {
         putLine("NOTS");
     }
 
-    private void MULS(Argument leftArg, Argument rightArg) {
+    private void MULS(SemRecord leftArg, SemRecord rightArg) {
     // type checking needed
         // push values on stack if not already in stack
         if(!leftArg.inStack)
@@ -297,7 +265,7 @@ public class Analyzer {
 
         }
         }
-
+    */
 
     public String getRepresentation(SemanticRecord s) throws SemanticException
     {
@@ -313,34 +281,5 @@ public class Analyzer {
         {
            throw new SemanticException("attempted to use a non-atomic token in an atomic context");
         }
-    }
-    // compare input types to expected types
-    private Type typeCheck(Type[] input, Type[] expected) {
-        int precedence = expected.length+1;
-        boolean exists = false;
-        for(Type type : input) {
-            exists = false;
-            for(int i=0;i<expected.length;i++) {
-                Type e = expected[i];
-                if(type==e) {
-                    exists = true;
-                    //
-                    if(i<precedence)
-                        precedence = i;
-                }
-                if(!exists) {
-                    try {
-                        throw new SemanticException(String.format("This is not the type you are looking for. Type %s, expected: ", type,expected));
-                    } catch (SemanticException e1) {
-                        e1.printStackTrace();
-                    }
-                }
-            }
-        }
-        if(precedence < expected.length) {
-            return expected[precedence];
-        }
-        else
-            return null;                // this code should be unreachable
     }
 }

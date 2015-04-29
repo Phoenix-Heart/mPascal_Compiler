@@ -1,6 +1,7 @@
 package symbolTable;
 //import javafx.scene.control.Tab;
 
+import analyzer.Analyzer;
 import parser.EntryBuilder;
 
 import java.util.*;
@@ -59,6 +60,7 @@ public class SymbolTable {
         tableEntry.setNest(nestingLevel);
         hm.put(lexeme.toUpperCase(), entry);
         nextoffset++;
+        Analyzer.varDeclaration(lexeme);
     }
 
     public void addEntry(TableEntry entry) {

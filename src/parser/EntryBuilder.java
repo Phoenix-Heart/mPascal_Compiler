@@ -78,8 +78,4 @@ public class EntryBuilder {
     public void setNest(int nestingLevel) {
         nest = nestingLevel;
     }
-
-    //   public void setNest(int nestingLevel) {
-     //   this.nest = nest;
-   // }
 }

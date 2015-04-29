@@ -1,25 +1,28 @@
 package analyzer.operations;
 
-import analyzer.Argument;
+import analyzer.Analyzer;
+import analyzer.SemRecord;
 import analyzer.SemanticException;
-import com.sun.org.apache.xpath.internal.Arg;
 import symbolTable.Type;
 
 /**
  * Created by Christina on 4/26/2015.
  */
 public class WriteLnOp extends Operator {
+    public WriteLnOp(Type[] types) {
+        super(types);
+    }
     @Override
-    public Type performOp(Argument leftArg, Argument rightArg) throws SemanticException {
-        if(rightArg.symbol!=null) {
-            throw new SemanticException("Invalid number of arguments. Expected 1, Received 2");
-        }
-        if(leftArg.inStack) {
-            putLine("WRTLNS " + leftArg.symbol);
+    protected void Op(SemRecord leftArg, SemRecord rightArg, String label) throws SemanticException {
+        assertValue(leftArg, true);
+        assertValue(rightArg, false);
+        assertValue(label, false);
+
+        if(leftArg.isInStack()) {
+            Analyzer.putLine("WRTLNS " + leftArg.getSymbol());
         }
         else {
-            putLine("WRTLN " + leftArg.symbol);
+            Analyzer.putLine("WRTLN " + leftArg.getSymbol());
         }
-        return leftArg.type;
     }
 }

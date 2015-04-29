@@ -21,13 +21,14 @@ public class Parser {
     private String parse;
     private int nest;
     private HashMap rules = RuleLookup.getRules();
-    private Analyzer analyzer = new Analyzer();
+    private Analyzer analyzer;
 
     public Parser(Dispatcher dispatcher) {
         this.dispatcher = dispatcher;
         this.parse = "";
         nest = 0;
         tableEntry = new EntryBuilder();
+        analyzer = new Analyzer();
     }
     public void startParse() throws ParseException {
         lookahead = dispatcher.nextToken();
@@ -109,6 +110,8 @@ public class Parser {
         VariableDeclarationPart();
         ProcedureAndFunctionDeclarationPart();
         StatementPart();
+        // unwind the symbol table stack at the end of a program/function/procedure block
+        stack.pop();
     }
 
     private void VariableDeclarationPart() throws ParseException {
@@ -517,7 +520,10 @@ public class Parser {
     private void ReadParameter() throws ParseException {
 
         parseTree(48);
-        VariableIdentifier();
+        String id = VariableIdentifier();
+        // semantic analysis step
+        SemRecord record =  new SemRecord(id);
+        analyzer.opLookup(Token.MP_READ).performOp(record,null,null);
     }
     private void WriteStatement() throws ParseException {
 
@@ -541,7 +547,6 @@ public class Parser {
             default:
                 LL1error();
         }
-
     }
     private void WriteParameterTail() throws ParseException {
         switch (lookahead) {
@@ -1011,26 +1016,33 @@ public class Parser {
         }
         matchLookAhead(Token.MP_IDENTIFIER);
     }
-    private void VariableIdentifier() throws ParseException {
+    private String VariableIdentifier() throws ParseException {
         parseTree(108);
+        String lexeme = dispatcher.getLexeme();
         if(lookahead==Token.MP_IDENTIFIER) {                // the table entry needs to be updated before running our match.
-            tableEntry.setLexeme(dispatcher.getLexeme());
+            tableEntry.setLexeme(lexeme);
         }
         matchLookAhead(Token.MP_IDENTIFIER);
+        return lexeme;
     }
-    private void ProcedureIdentifier() throws ParseException {
+    private String ProcedureIdentifier() throws ParseException {
         parseTree(109);
+        String lexeme = dispatcher.getLexeme();
         if(lookahead==Token.MP_IDENTIFIER) {
-            tableEntry.setLexeme(dispatcher.getLexeme());
+            tableEntry.setLexeme(lexeme);
         }
         matchLookAhead(Token.MP_IDENTIFIER);
+        return lexeme;
     }
-    private void FunctionIdentifier() throws ParseException {
+    private String FunctionIdentifier() throws ParseException {
         parseTree(110);
+        String lexeme = dispatcher.getLexeme();
         if(lookahead==Token.MP_IDENTIFIER) {
-            tableEntry.setLexeme(dispatcher.getLexeme());
+            tableEntry.setLexeme(lexeme);
         }
-        matchLookAhead(Token.MP_IDENTIFIER);}
+        matchLookAhead(Token.MP_IDENTIFIER);
+        return lexeme;
+    }
     private void BooleanExpression() throws ParseException {
                 parseTree(111);
                 Expression();
@@ -1066,5 +1078,4 @@ public class Parser {
                 LL1error();
         }
     }
-
 }
