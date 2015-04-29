@@ -1,7 +1,7 @@
 package analyzer.operations;
 
 import analyzer.Analyzer;
-import analyzer.SemRecord;
+import analyzer.Argument;
 import analyzer.SemanticException;
 import symbolTable.Type;
 
@@ -13,7 +13,7 @@ public class ReadOp extends Operator {
         super(types);
     }
     @Override
-    protected void Op(SemRecord leftArg, SemRecord rightArg, String label) throws SemanticException {
+    protected void Op(Argument leftArg, Argument rightArg, String label) throws SemanticException {
         // assert that only the appropriate parameters are defined. e.g. leftArg is used and the others are null
         assertValue(leftArg, true);
         assertValue(rightArg, false);

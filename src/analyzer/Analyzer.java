@@ -25,12 +25,27 @@ public class Analyzer {
 
 
     public Analyzer(){
-        Type[] allTypes = {Type.BOOLEAN,Type.STRING,Type.FLOAT,Type.INTEGER};
+        Type[] allTypes = {Type.BOOLEAN,Type.STRING,Type.FLOAT,Type.INTEGER, Type.FIXED};
+        Type[] numTypes = {Type.INTEGER,Type.FLOAT,Type.FIXED};
+        Type[] boolType = {Type.BOOLEAN};
+        Type[] floatType = {Type.FLOAT, Type.FIXED};
         // initialize operator lookup table
-        opTable.put(Token.MP_READ, new ReadOp(new Type[]{Type.INTEGER, Type.FLOAT, Type.STRING}));
+        opTable.put(Token.MP_READ, new ReadOp(new Type[]{Type.INTEGER, Type.FLOAT, Type.STRING, Type.FIXED}));
         opTable.put(Token.MP_WRITE, new WriteOp(allTypes));
         opTable.put(Token.MP_WRITELN, new WriteLnOp(allTypes));
         opTable.put(Token.MP_ASSIGN, new AssignOp(allTypes));
+        opTable.put(Token.MP_AND, new AndOp(boolType));
+        opTable.put(Token.MP_OR, new OrOp(boolType));
+        opTable.put(Token.MP_FLOAT_DIVIDE, new DivideOp(floatType));
+        opTable.put(Token.MP_GEQUAL,new GequalOp(numTypes));
+        opTable.put(Token.MP_GTHAN, new GthanOp(numTypes));
+        opTable.put(Token.MP_EQUAL, new EqualOp(allTypes));
+        opTable.put(Token.MP_LEQUAL, new LequalOp(numTypes));
+        opTable.put(Token.MP_LTHAN, new LthanOp(numTypes));
+        opTable.put(Token.MP_MINUS, new MinusOp(numTypes));
+        opTable.put(Token.MP_MOD, new ModOp(numTypes));
+        opTable.put(Token.MP_NEQUAL, new NequalOp(allTypes));
+        opTable.put(Token.MP_PLUS, new PlusOp(numTypes));
 
         try {
                 writer = new BufferedWriter(new FileWriter(writeFile));
@@ -99,6 +114,8 @@ public class Analyzer {
         return null;
     }
     */
+
+    // get identifier symbol from table
     public static String getSymbol(String lexeme) {
         TableEntry entry;
         try {
@@ -121,7 +138,7 @@ public class Analyzer {
         return null;
     }
     // search the operation table for the correct machine operator for the given type
-    public Operator opLookup(Token token) {
+    public static Operator opLookup(Token token) {
         if(opTable.containsKey(token)) {
             return opTable.get(token);
         }
@@ -163,6 +180,16 @@ public class Analyzer {
         writePush(getSymbol(s));
         putLine("ADD SP #1 SP");
     }
+
+    public static void cast(Type from, Type to) throws SemanticException {
+        if((to==Type.FLOAT || to==Type.FIXED) && from==Type.INTEGER)
+        putLine("CASTSF");
+        else if(to==Type.INTEGER && (from==Type.FLOAT || from==Type.FIXED)) {
+            putLine("CASTSI");
+        }
+        else throw new SemanticException(String.format("Error casting, invalid types, from %s, to %s", from, to));
+    }
+
 
     /*
     // these methods should be added to operations package
@@ -267,7 +294,7 @@ public class Analyzer {
 
         }
         }
-    */
+
 
     public String getRepresentation(SemanticRecord s) throws SemanticException
     {
@@ -284,4 +311,5 @@ public class Analyzer {
            throw new SemanticException("attempted to use a non-atomic token in an atomic context");
         }
     }
+    */
 }

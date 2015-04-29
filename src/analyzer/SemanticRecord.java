@@ -1,5 +1,6 @@
 package analyzer;
 
+import analyzer.operations.Operator;
 import core.Token;
 import sun.net.www.content.text.plain;
 import symbolTable.Type;
@@ -13,46 +14,16 @@ import java.util.List;
 public class SemanticRecord {
     private Token operator;
     private Type type;
-    private SemanticRecord leftOperand;
-    private SemanticRecord rightOperand;
-    private String operand;
-    private boolean isOperand;
+    private Argument leftOperand;
+    private Argument rightOperand;
+    private String label;
 
-    public SemanticRecord(SemanticRecord leftOperand, Token operator, SemanticRecord rightOperand) {
+    public SemanticRecord(Argument leftOperand, Token operator, Argument rightOperand) {
         this.leftOperand = leftOperand;
         this.operator = operator;
         this.rightOperand = rightOperand;
-        this.isOperand = false;
-        operand = null;
-        type = null;
-    }
-    // operand is a lexeme
-    public SemanticRecord(String operand, Type type) {
-        this.operand = operand;
-        this.isOperand = true;
-        leftOperand = null;
-        rightOperand = null;
-        operator = null;
-        type = null;
-    }
-    public SemanticRecord() {
-        isOperand = true;
-        operand = null;
-        leftOperand = null;
-        rightOperand = null;
-        operator = null;
-    }
-    //use for things that may be literals. in this case operand is the
-    //value of the literal if token is a literal, otherwise it is the
-    //token's lexeme
-    public SemanticRecord(String operand, Token token)
-    {
-        this.operator = token;
-        this.leftOperand = null;
-        this.rightOperand = null;
-        this.operand = operand;
-        this.isOperand = false;
-        this.type = null;
+        this.label = null;
+        setReturnType();
     }
 
     public Type getType()
@@ -73,37 +44,63 @@ public class SemanticRecord {
         this.operator = operator;
     }
 
-    public SemanticRecord getLeftOperand() {
+    public void setLabel(String label) { this.label = label;}
+
+    public String getLabel() { return label;}
+
+    public Argument getLeftOperand() {
         return leftOperand;
     }
 
-    public void setLeftOperand(SemanticRecord leftOperand) {
+    public void setLeftOperand(Argument leftOperand) {
         this.leftOperand = leftOperand;
     }
 
-    public SemanticRecord getRightOperand() {
+    public Argument getRightOperand() {
         return rightOperand;
     }
 
-    public void setRightOperand(SemanticRecord rightOperand) {
+    public void setRightOperand(Argument rightOperand) {
         this.rightOperand = rightOperand;
     }
 
-    public String getOperand() {
-        return operand;
+    private void setReturnType() {
+        switch (operator) {
+            case MP_MINUS:
+            case MP_PLUS:
+            case MP_TIMES:
+                if(leftOperand.getType()==Type.FLOAT || rightOperand.getType()==Type.FLOAT
+                        || leftOperand.getType()==Type.FIXED || rightOperand.getType()==Type.FIXED) {
+                    type = Type.FLOAT;
+                }
+                else {
+                    type = Type.INTEGER;
+                }
+                break;
+            case MP_FLOAT_DIVIDE:
+                type = Type.FLOAT;
+                break;
+            case MP_AND:
+            case MP_OR:
+            case MP_GTHAN:
+            case MP_GEQUAL:
+            case MP_EQUAL:
+            case MP_NEQUAL:
+            case MP_NOT:
+            case MP_LTHAN:
+            case MP_LEQUAL:
+                type = Type.BOOLEAN;
+                break;
+            // not an expression, does not evaluate to a type
+            case MP_ASSIGN:
+            case MP_READ:
+            case MP_WRITE:
+            case MP_WRITELN:
+                type = null;
+                break;
+        }
     }
 
-    public void setOperand(String operand) {
-        this.operand = operand;
-    }
-
-    public boolean isOperand() {
-        return isOperand;
-    }
-
-    public void setOperand(boolean isOperand) {
-        this.isOperand = isOperand;
-    }
 
     public Boolean isSimple()
     {
@@ -123,11 +120,17 @@ public class SemanticRecord {
         while(op.operator != null)
         {
             System.out.println(op.operator);
-            System.out.println(op.operand);
             System.out.println("leftSide");
-            printRecordHelper(op.getLeftOperand());
-            printRecordHelper(op.getRightOperand());
-
+            System.out.println(leftOperand);
+            System.out.println("rightSide");
+            System.out.println(rightOperand);
         }
     }
+
+    public Argument genExpression() {
+        Operator op = Analyzer.opLookup(operator);
+        op.performOp(leftOperand,rightOperand,label);
+        return new Argument(type);
+    }
+
 }

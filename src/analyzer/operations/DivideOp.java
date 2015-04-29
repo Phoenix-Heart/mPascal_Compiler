@@ -4,9 +4,9 @@ import analyzer.Argument;
 import analyzer.SemanticException;
 import symbolTable.Type;
 
-public class EqualOp extends Operator {
-    public EqualOp(Type[] types) {
-        super(types);
+public class DivideOp extends Operator {
+    public DivideOp(Type[] numTypes) {
+        super(numTypes);
     }
 
     @Override

@@ -7,7 +7,6 @@ import analyzer.*;
 
 import java.io.*;
 import java.util.HashMap;
-import java.util.List;
 
 /**
  * Created by Christina on 3/6/2015.
@@ -521,7 +520,7 @@ public class Parser {
         parseTree(48);
         String id = VariableIdentifier();
         // semantic analysis step
-        SemRecord record =  new SemRecord(id);
+        Argument record =  new Argument(id);
         analyzer.opLookup(Token.MP_READ).performOp(record,null,null);
     }
     private void WriteStatement() throws ParseException {
@@ -793,7 +792,9 @@ public class Parser {
                 Term();
                 TermTail();
     }
-    private void TermTail() throws ParseException {
+    private SemanticRecord TermTail() throws ParseException {
+        Token op;
+        SemanticRecord record;
         switch (lookahead) {
             case MP_COMMA:
             case MP_SCOLON:
@@ -815,25 +816,21 @@ public class Parser {
                 parseTree(84);
                 break;
             case MP_PLUS:
-                parseTree(83);
-                AddingOperator();
-                Term();
-                TermTail();
-                break;
             case MP_MINUS:
                 parseTree(83);
-                AddingOperator();
-                Term();
-                TermTail();
+                op = AddingOperator();
+                Argument leftArg = Term();
+                record = TermTail();
                 break;
             default:
                 LL1error();
         }
+        return null;
     }
 
     // section written by Hunter
 
-    private void OptionalSign() throws ParseException {
+    private Token OptionalSign() throws ParseException {
         switch(lookahead){
             case MP_FALSE:
             case MP_NOT:
@@ -844,44 +841,46 @@ public class Parser {
             case MP_STRING_LIT:
             case MP_LPAREN:
                 parseTree(87);
-                break;
             case MP_PLUS:
                 parseTree(85);
                 matchLookAhead(Token.MP_PLUS);
-                break;
+                return Token.MP_PLUS;
             case MP_MINUS:
                 parseTree(86);
                 matchLookAhead(Token.MP_MINUS);
-                break;
+                return Token.MP_MINUS;
             default:
                 LL1error();
         }
-        
+        return null;
     }
-    private void AddingOperator() throws ParseException{
+    private Token AddingOperator() throws ParseException{
         switch(lookahead){
             case MP_PLUS:
                 parseTree(88);
                 matchLookAhead(Token.MP_PLUS);
-                break;
+                return Token.MP_PLUS;
             case MP_MINUS:
                 parseTree(89);
                 matchLookAhead(Token.MP_MINUS);
-                break;
+                return Token.MP_MINUS;
             case MP_OR:
                 parseTree(90);
                 matchLookAhead(Token.MP_OR);
+                return Token.MP_OR;
             default:
                 LL1error();
         }
+        return null;
     }
 
-    private void Term() throws ParseException {
+    private Argument Term() throws ParseException {
                 parseTree(91);
-                Factor();
-                FactorTail();
+                Argument leftArg = Factor();
+                SemanticRecord record = FactorTail();
+        return null;
     }
-    private void FactorTail() throws ParseException
+    private SemanticRecord FactorTail() throws ParseException
     {
         switch(lookahead){
             case MP_FLOAT_DIVIDE:
@@ -917,9 +916,11 @@ public class Parser {
             default:
                 LL1error();
         }
+        return null;
     }
-    private void MultiplyingOperator() throws ParseException
+    private Token MultiplyingOperator() throws ParseException
     {
+        Token temp = lookahead;
         switch(lookahead){
             case MP_TIMES:
                 parseTree(94);
@@ -945,15 +946,29 @@ public class Parser {
             default:
                 LL1error();
         }
+        return temp;
     }
 
-    private void Factor() throws ParseException
+    private Argument Factor() throws ParseException
     {
+        Token temp = lookahead;
+        String id = null;
+        String lit = dispatcher.getLexeme();
+
         switch(lookahead){
             case MP_NOT:
                 parseTree(104);
                 matchLookAhead(Token.MP_NOT);
-                Factor();
+                Argument arg = Factor();
+                if(!arg.isInStack()) {
+                    try {
+                        arg.genPush();
+                    } catch (SemanticException e) {
+                        e.printStackTrace();
+                    }
+                }
+                SemanticRecord record = new SemanticRecord(arg,Token.MP_NOT,null);
+                record.genExpression();
                 break;
             case MP_LPAREN:
                 parseTree(105);
@@ -964,27 +979,27 @@ public class Parser {
             case MP_INTEGER_LIT:
                 parseTree(99);
                 matchLookAhead(Token.MP_INTEGER_LIT);
-                break;
+                return new Argument(lit,Type.INTEGER);
             case MP_FIXED_LIT:
                 //parseTree(0);
                 matchLookAhead(Token.MP_FIXED_LIT);
-                break;
+                return new Argument(lit,Type.FIXED);
             case MP_FLOAT_LIT:
                 parseTree(100);
                 matchLookAhead(Token.MP_FLOAT_LIT);
-                break;
+                return new Argument(lit,Type.FLOAT);
             case MP_STRING_LIT:
                 parseTree(101);
                 matchLookAhead(Token.MP_STRING_LIT);
-                break;
+                return new Argument(lit,Type.STRING);
             case MP_TRUE:
                 parseTree(102);
                 matchLookAhead(Token.MP_TRUE);
-                break;
+                return new Argument(lit,Type.BOOLEAN);
             case MP_FALSE:
                 parseTree(103);
                 matchLookAhead(Token.MP_FALSE);
-                break;
+                return new Argument(lit,Type.BOOLEAN);
             case MP_IDENTIFIER:
                 TableEntry entry;
                 try
@@ -996,16 +1011,22 @@ public class Parser {
                 }
                 if(entry.kind == Kind.VARIABLE) {
                     parseTree(116);
-                    VariableIdentifier();
+                    id = VariableIdentifier();
                 }
                 else if (entry.kind == Kind.FUNCTION) {
                     parseTree(106);
-                    FunctionIdentifier();
+                    id = FunctionIdentifier();
                     OptionalActualParameterList();
                 }
                 break;
             default:
                 LL1error();
+        }
+        if(id!=null) {
+            return new Argument(id);
+        }
+        else {
+            return null;
         }
     }
     private void ProgramIdentifier() throws ParseException {

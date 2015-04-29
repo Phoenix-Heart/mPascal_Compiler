@@ -1,6 +1,6 @@
 package analyzer.operations;
 
-import analyzer.SemRecord;
+import analyzer.Argument;
 import analyzer.SemanticException;
 import symbolTable.Type;
 
@@ -12,20 +12,23 @@ public abstract class Operator {
     public Operator(Type[] types) {
         this.types = types;
     }
-    public void performOp(SemRecord leftArg, SemRecord rightArg, String label) {
+    public void performOp(Argument leftArg, Argument rightArg, String label) {
         try {
             if(leftArg!=null)
             checkType(leftArg.getType());
             if(rightArg!=null)
             checkType(rightArg.getType());
-
+            if(leftArg!=null && rightArg != null) {
+                if (!leftArg.typeEquals(rightArg))
+                    throw new SemanticException(String.format("Incompatible types passed, %s and %s.",leftArg.getType(),rightArg.getType()));
+            }
             Op(leftArg, rightArg, label);
         }
         catch (SemanticException e) {
             e.printStackTrace();
         }
     }
-    protected abstract void Op(SemRecord leftArg, SemRecord rightArg, String label) throws SemanticException;
+    protected abstract void Op(Argument leftArg, Argument rightArg, String label) throws SemanticException;
     private void checkType(Type type) throws SemanticException {
         for(Type t : types) {
             if(t.equals(type)) {

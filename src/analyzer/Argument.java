@@ -1,23 +1,29 @@
 package analyzer;
 
-import symbolTable.Kind;
 import symbolTable.Type;
 
 /**
  * Created by Christina on 4/24/2015.
  */
-public class SemRecord {
+public class Argument {
     private Type type;
     private String symbol;
     private boolean inStack;
-        // add intermediate value with just a type signature
-        public SemRecord(Type type) {
-            inStack = true;
-            this.symbol = null;
-            this.type = type;
-        }
 
-    public SemRecord(String id) {
+    // add literal argument
+    public Argument(String lit, Type type) {
+        inStack = true;
+        this.symbol = "#"+lit;
+        this.type = type;
+    }
+    // add intermediate value with just a type signature
+    public Argument(Type type) {
+        inStack = true;
+        this.type = type;
+        symbol = null;
+    }
+    // add identifier argument
+    public Argument(String id) {
         inStack = false;
         this.symbol = Analyzer.getSymbol(id);
         this.type = Analyzer.getType(id);
@@ -37,7 +43,14 @@ public class SemRecord {
             }
             Analyzer.putLine("PUSH "+symbol);
         }
-
+    public void castType(Type type) {
+        try {
+            Analyzer.cast(this.type, type);
+        } catch (SemanticException e) {
+            e.printStackTrace();
+        }
+        this.type = type;
+    }
         // getters
         public Type getType() {
             return type;
@@ -49,7 +62,7 @@ public class SemRecord {
             return inStack;
         }
         // return true if types are the same, return false otherwise.
-        public boolean typeEquals(SemRecord record) {
+        public boolean typeEquals(Argument record) {
             return type==record.getType();
         }
         public String toString() {

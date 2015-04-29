@@ -1,7 +1,7 @@
 package analyzer.operations;
 
 import analyzer.Analyzer;
-import analyzer.SemRecord;
+import analyzer.Argument;
 import analyzer.SemanticException;
 import symbolTable.Type;
 
@@ -14,7 +14,7 @@ public class WriteOp extends Operator {
     }
 
     @Override
-    public void Op(SemRecord leftArg, SemRecord rightArg, String label) throws SemanticException {
+    public void Op(Argument leftArg, Argument rightArg, String label) throws SemanticException {
         assertValue(leftArg, true);
         assertValue(rightArg, false);
         assertValue(label, false);

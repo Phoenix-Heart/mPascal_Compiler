@@ -1,6 +1,6 @@
 package analyzer.operations;
 
-import analyzer.SemRecord;
+import analyzer.Argument;
 import analyzer.SemanticException;
 import symbolTable.Type;
 
@@ -10,7 +10,7 @@ public class NotOp extends Operator {
     }
 
     @Override
-    protected void Op(SemRecord leftArg, SemRecord rightArg, String label) throws SemanticException {
+    protected void Op(Argument leftArg, Argument rightArg, String label) throws SemanticException {
 
     }
 }
