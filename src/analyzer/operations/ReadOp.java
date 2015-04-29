@@ -6,7 +6,7 @@ import analyzer.SemanticException;
 import symbolTable.Type;
 
 /**
- * Created by night on 4/26/2015.
+ * Created by Christina on 4/26/2015.
  */
 public class ReadOp extends Operator {
     public ReadOp(Type[] types) {
