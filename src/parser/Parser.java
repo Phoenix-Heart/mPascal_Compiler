@@ -16,7 +16,7 @@ public class Parser {
 
     private Dispatcher dispatcher;
     private Token lookahead;
-    private static TableStack stack = TableStack.getStack();
+    private TableStack stack = TableStack.getStack();
     private EntryBuilder tableEntry;
     private String parse;
     private int nest;
@@ -160,18 +160,17 @@ public class Parser {
         IdentifierList();
         matchLookAhead(Token.MP_COLON);
         Type();
-        List<String> varsToDeclare = tableEntry.getLexemes();
-        boolean flag = stack.addEntry(tableEntry);
-        if(flag)
-        {
-            tableEntry = new EntryBuilder();
-        }
+        //List<String> varsToDeclare = tableEntry.getLexemes();
+        stack.addEntry(tableEntry);
+        //if(flag)
+        //{
+        tableEntry = new EntryBuilder();
+        //}
         tableEntry.setKind(Kind.VARIABLE);
-        for(String elem: varsToDeclare)
-        {
-            analyzer.varDeclaration(elem);
-        }
-
+        //for(String elem: varsToDeclare)
+        //{
+        ///    analyzer.varDeclaration(elem);
+        //}
     }
 
     private void Type() throws ParseException {
@@ -183,7 +182,7 @@ public class Parser {
                 break;
             case MP_FLOAT:
                 parseTree(11);
-                tableEntry.setType(Type.INTEGER);
+                tableEntry.setType(Type.FLOAT);
                 matchLookAhead(Token.MP_FLOAT);
                 break;
             case MP_STRING:

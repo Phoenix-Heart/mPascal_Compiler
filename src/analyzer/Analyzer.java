@@ -99,16 +99,18 @@ public class Analyzer {
         return null;
     }
     */
-    public static String getSymbol(String operand) {
+    public static String getSymbol(String lexeme) {
         TableEntry entry;
         try {
-            entry = tables.getEntry(operand);
-            return entry.offset+"(D"+entry.nest+")";
+            entry = tables.getEntry(lexeme);
+            int nest = tables.getNest(lexeme);
+            return entry.offset+"(D"+nest+")";
         } catch (ParseException e) {
             e.printStackTrace();
         }
         return null;
     }
+
     public static Type getType(String operand) {
         try {
             TableEntry entry  = tables.getEntry(operand);

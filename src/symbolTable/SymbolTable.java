@@ -56,14 +56,18 @@ public class SymbolTable {
     }
 
     public void createNewEntry(String lexeme, EntryBuilder tableEntry) {
-        TableEntry entry = new TableEntry(lexeme.toUpperCase(), nextoffset, tableEntry);
         tableEntry.setNest(nestingLevel);
-        hm.put(lexeme.toUpperCase(), entry);
-        nextoffset++;
-        Analyzer.varDeclaration(lexeme);
+        TableEntry entry = new TableEntry(lexeme.toUpperCase(), nextoffset, tableEntry);
+        addEntry(entry);
     }
 
     public void addEntry(TableEntry entry) {
         hm.put(entry.lexeme.toUpperCase(),entry);
+
+        // procedures and programs do not store values.
+        if(entry.kind!=Kind.PROCEDURE && entry.kind!=Kind.PROGRAM)
+            Analyzer.varDeclaration(entry.lexeme);
+
+        nextoffset++;
     }
 }

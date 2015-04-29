@@ -14,8 +14,11 @@ public abstract class Operator {
     }
     public void performOp(SemRecord leftArg, SemRecord rightArg, String label) {
         try {
+            if(leftArg!=null)
             checkType(leftArg.getType());
+            if(rightArg!=null)
             checkType(rightArg.getType());
+
             Op(leftArg, rightArg, label);
         }
         catch (SemanticException e) {

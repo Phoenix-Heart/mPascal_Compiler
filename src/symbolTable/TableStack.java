@@ -12,7 +12,7 @@ import java.util.LinkedList;
  * Created by Christina on 4/21/2015.
  */
 public class TableStack {
-    private static LinkedList<SymbolTable> stack;
+    private LinkedList<SymbolTable> stack;
     private int nest;
     private static TableStack singleton;
 
@@ -67,7 +67,7 @@ public class TableStack {
     // add a row to the symbol table using information retrieved during parse.
     public boolean addEntry(EntryBuilder builder) throws ParseException {
         // need to fill out logic, catch all errors & ensure program,procedure,function preserve entry for new table creation.
-
+        builder.setNest(nest);
         SymbolTable table = stack.peek();
         if(builder.getLexeme()==null) {
             throw new ParseException(String.format("Missing lexeme in %s declaration.", builder.getKind()));
@@ -108,5 +108,14 @@ public class TableStack {
                 throw new ParseException("Attempted to enter PROGRAM identifier into table. Program identifiers used in table creation, not entries.");
         }
         return false;
+    }
+
+    public int getNest(String lexeme) {
+        for(SymbolTable table : stack) {
+            if(table.hasEntry(lexeme)) {
+                return table.getNestingLevel();
+            }
+        }
+        return -1;  // lexeme is not in the symbol tables
     }
 }

@@ -13,7 +13,7 @@ program Program4;
         end ;
   begin
 
-     Read(N);
+     Read(N, t);
      Write(f1(I,N,'hello'));
      I   := 0;
      Sum := 0;

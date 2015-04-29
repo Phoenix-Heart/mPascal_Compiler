@@ -16,17 +16,8 @@ public class TableEntry {
     public final int nest;
     List<TableEntry> parameters;
 
-    /*public TableEntry(String lex, Type t, Kind k, Mode mode, int offset, List<TableEntry> params) {
-        this.lexeme = lex.toLowerCase();
-        this.type = t;
-        this.kind = k;
-        this.mode = mode;
-        this.offset = offset;
-        this.nest = nest;
-        this.parameters = params;
-    }*/
-    public TableEntry(String name, int offset, EntryBuilder entry) {
-        this.lexeme = entry.getLexeme().toLowerCase();
+    public TableEntry(String lexeme, int offset, EntryBuilder entry) {
+        this.lexeme = lexeme;
         this.type = entry.getType();
         this.kind = entry.getKind();
         this.mode = entry.getMode();
