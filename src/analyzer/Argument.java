@@ -9,6 +9,8 @@ public class Argument {
     private Type type;
     private String symbol;
     private boolean inStack;
+    private int stacklevel;
+    protected static int stackpointer = 0;
 
     // add literal argument
     public Argument(String lit, Type type) {
@@ -42,8 +44,22 @@ public class Argument {
                 throw new SemanticException(String.format("Symbol %s already on the stack.", symbol));
             }
             Analyzer.putLine("PUSH "+symbol);
+            stacklevel = stackpointer;
+            stackpointer++;
         }
+    public int getStackDepth() {
+        return stacklevel - stackpointer;
+    }
     public void castType(Type type) {
+        int depth = getStackDepth();
+        if(depth!=-1) {
+            Analyzer.writePush(depth+"(SP)");
+            castOnStack(type);
+        }
+        depth--;
+        Analyzer.writePop(depth+"(SP)");
+    }
+    private void castOnStack(Type type) {
         try {
             Analyzer.cast(this.type, type);
         } catch (SemanticException e) {
@@ -51,6 +67,13 @@ public class Argument {
         }
         this.type = type;
     }
+    public static void increaseSP() {
+        stackpointer++;
+    }
+    public static void decreaseSP() {
+        stackpointer--;
+    }
+
         // getters
         public Type getType() {
             return type;
@@ -66,6 +89,6 @@ public class Argument {
             return type==record.getType();
         }
         public String toString() {
-            return symbol+" : "+type.name();
+            return symbol;
         }
 }

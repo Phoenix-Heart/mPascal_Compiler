@@ -4,19 +4,14 @@ import analyzer.Argument;
 import analyzer.SemanticException;
 import symbolTable.Type;
 
-public class EqualOp extends Operator {
-    public EqualOp(Type[] types) {
-        super(types);
+public class FloatDivOp extends Operator {
+    public FloatDivOp(Type[] numTypes) {
+        super(numTypes);
     }
 
     @Override
     protected String Op(Argument leftArg, Argument rightArg, String label) throws SemanticException {
         Argument.decreaseSP();
-        if(leftArg.getType()==Type.FIXED || leftArg.getType()==Type.FLOAT) {
-            return "CMPEQSF";
-        }
-        else {
-            return "CMPEQS";
-        }
+        return "DIVSF";
     }
 }

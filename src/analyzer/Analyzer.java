@@ -3,7 +3,6 @@ package analyzer;
 import analyzer.operations.*;
 import core.Token;
 import parser.ParseException;
-import symbolTable.Kind;
 import symbolTable.TableEntry;
 import symbolTable.TableStack;
 import symbolTable.Type;
@@ -36,7 +35,7 @@ public class Analyzer {
         opTable.put(Token.MP_ASSIGN, new AssignOp(allTypes));
         opTable.put(Token.MP_AND, new AndOp(boolType));
         opTable.put(Token.MP_OR, new OrOp(boolType));
-        opTable.put(Token.MP_FLOAT_DIVIDE, new DivideOp(floatType));
+        opTable.put(Token.MP_FLOAT_DIVIDE, new FloatDivOp(floatType));
         opTable.put(Token.MP_GEQUAL,new GequalOp(numTypes));
         opTable.put(Token.MP_GTHAN, new GthanOp(numTypes));
         opTable.put(Token.MP_EQUAL, new EqualOp(allTypes));
@@ -192,6 +191,10 @@ public class Analyzer {
             putLine("CASTSI");
         }
         else throw new SemanticException(String.format("Error casting, invalid types, from %s, to %s", from, to));
+    }
+
+    public static void writePop(String s) {
+        putLine("POP "+s);
     }
 
 

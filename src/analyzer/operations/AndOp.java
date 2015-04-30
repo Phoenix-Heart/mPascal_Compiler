@@ -10,7 +10,12 @@ public class AndOp extends Operator {
     }
 
     @Override
-    protected void Op(Argument leftArg, Argument rightArg, String label) throws SemanticException {
+    protected String Op(Argument leftArg, Argument rightArg, String label) throws SemanticException {
+        assertValue(leftArg, true);
+        assertValue(rightArg, true);
+        assertValue(label, false);
 
+        Argument.decreaseSP();      // do this for any stack operations that pop off exactly 1 more argument than is added on.
+        return "ANDS";
     }
 }

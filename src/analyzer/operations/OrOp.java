@@ -10,7 +10,8 @@ public class OrOp extends Operator {
     }
 
     @Override
-    protected void Op(Argument leftArg, Argument rightArg, String label) throws SemanticException {
-
+    protected String Op(Argument leftArg, Argument rightArg, String label) throws SemanticException {
+        Argument.decreaseSP();
+        return "ORS";
     }
 }
