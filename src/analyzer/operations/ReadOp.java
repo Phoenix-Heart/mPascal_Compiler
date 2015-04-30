@@ -13,7 +13,7 @@ public class ReadOp extends Operator {
         super(types);
     }
     @Override
-    protected void Op(Argument leftArg, Argument rightArg, String label) throws SemanticException {
+    protected String Op(Argument leftArg, Argument rightArg, String label) throws SemanticException {
         // assert that only the appropriate parameters are defined. e.g. leftArg is used and the others are null
         assertValue(leftArg, true);
         assertValue(rightArg, false);
@@ -21,14 +21,11 @@ public class ReadOp extends Operator {
 
         switch (leftArg.getType()) {
             case INTEGER:
-                Analyzer.putLine("RD " + leftArg.getSymbol());
-                break;
+                return String.format("RD %s", leftArg);
             case FLOAT:
-                Analyzer.putLine("RDF " + leftArg.getSymbol());
-                break;
+                return String.format("RDF %s",leftArg);
             case STRING:
-                Analyzer.putLine("RDS " + leftArg.getSymbol());
-                break;
+                return String.format("RDF %s",leftArg);
             default:
                 throw new SemanticException("Unrecognized type: "+leftArg.getType());
         }

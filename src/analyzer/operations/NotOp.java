@@ -4,13 +4,13 @@ import analyzer.Argument;
 import analyzer.SemanticException;
 import symbolTable.Type;
 
-public class NotOp extends Operator {
+public class NotOp extends StackOperator {
     public NotOp(Type[] types) {
         super(types);
     }
 
     @Override
-    protected String Op(Argument leftArg, Argument rightArg, String label) throws SemanticException {
+    protected String safeOp(Argument leftArg, Argument rightArg, String label) throws SemanticException {
         Argument.decreaseSP();
         return "NOTS";
     }

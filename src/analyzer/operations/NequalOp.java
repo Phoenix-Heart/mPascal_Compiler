@@ -4,13 +4,13 @@ import analyzer.Argument;
 import analyzer.SemanticException;
 import symbolTable.Type;
 
-public class NequalOp extends Operator {
+public class NequalOp extends StackOperator {
     public NequalOp(Type[] types) {
         super(types);
     }
 
     @Override
-    protected void Op(Argument leftArg, Argument rightArg, String label) throws SemanticException {
-
+    protected String safeOp(Argument leftArg, Argument rightArg, String label) throws SemanticException {
+        return null;
     }
 }

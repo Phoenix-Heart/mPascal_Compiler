@@ -4,13 +4,13 @@ import analyzer.Argument;
 import analyzer.SemanticException;
 import symbolTable.Type;
 
-public class AndOp extends Operator {
+public class AndOp extends StackOperator {
     public AndOp(Type[] types) {
         super(types);
     }
 
     @Override
-    protected String Op(Argument leftArg, Argument rightArg, String label) throws SemanticException {
+    protected String safeOp(Argument leftArg, Argument rightArg, String label) throws SemanticException {
         assertValue(leftArg, true);
         assertValue(rightArg, true);
         assertValue(label, false);
