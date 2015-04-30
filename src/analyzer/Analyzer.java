@@ -24,10 +24,13 @@ public class Analyzer {
 
 
     public Analyzer(){
+        // helper lists
         Type[] allTypes = {Type.BOOLEAN,Type.STRING,Type.FLOAT,Type.INTEGER, Type.FIXED};
         Type[] numTypes = {Type.INTEGER,Type.FLOAT,Type.FIXED};
         Type[] boolType = {Type.BOOLEAN};
         Type[] floatType = {Type.FLOAT, Type.FIXED};
+        Type[] intType = {Type.INTEGER};
+
         // initialize operator lookup table
         opTable.put(Token.MP_READ, new ReadOp(new Type[]{Type.INTEGER, Type.FLOAT, Type.STRING, Type.FIXED}));
         opTable.put(Token.MP_WRITE, new WriteOp(allTypes));
@@ -38,13 +41,16 @@ public class Analyzer {
         opTable.put(Token.MP_FLOAT_DIVIDE, new FloatDivOp(floatType));
         opTable.put(Token.MP_GEQUAL,new GequalOp(numTypes));
         opTable.put(Token.MP_GTHAN, new GthanOp(numTypes));
-        opTable.put(Token.MP_EQUAL, new EqualOp(allTypes));
+        opTable.put(Token.MP_EQUAL, new EqualOp(numTypes));
         opTable.put(Token.MP_LEQUAL, new LequalOp(numTypes));
         opTable.put(Token.MP_LTHAN, new LthanOp(numTypes));
         opTable.put(Token.MP_MINUS, new MinusOp(numTypes));
         opTable.put(Token.MP_MOD, new ModOp(numTypes));
-        opTable.put(Token.MP_NEQUAL, new NequalOp(allTypes));
+        opTable.put(Token.MP_NEQUAL, new NequalOp(numTypes));
         opTable.put(Token.MP_PLUS, new PlusOp(numTypes));
+        opTable.put(Token.MP_DIV, new DivOp(intType));
+        opTable.put(Token.MP_NOT, new NotOp(boolType));
+        opTable.put(Token.MP_TIMES, new TimesOp(numTypes));
 
         try {
                 writer = new BufferedWriter(new FileWriter(writeFile));

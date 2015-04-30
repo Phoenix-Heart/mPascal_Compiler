@@ -20,7 +20,6 @@ public abstract class StackOperator extends Operator {
                 leftArg.genPush();
 
         }
-        
         if(rightArg!=null) {
             if (!rightArg.isInStack())
                 rightArg.genPush();
