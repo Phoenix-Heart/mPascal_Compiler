@@ -37,7 +37,7 @@ public abstract class Operator {
     protected void assertValue(Object obj, boolean exists) throws SemanticException {
         // generate exception when assertion fails. obj is null if and only if exists is false.
         if((obj==null)==exists) {
-            throw new SemanticException("Invalid argument given for this Operator. "+obj.toString());
+            throw new SemanticException("Invalid argument given.");
         }
     }
 }

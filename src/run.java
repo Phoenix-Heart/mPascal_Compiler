@@ -11,7 +11,7 @@ public class run {
             String filename = args[0];
             Dispatcher dispatcher = new Dispatcher(filename);
 
-            Parser parser = new Parser(dispatcher);
+            Parser parser = new Parser(dispatcher, filename);
             try {
                 parser.startParse();
             } catch (ParseException e) {

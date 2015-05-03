@@ -23,13 +23,15 @@ public class Parser {
     private int nest;
     private HashMap rules = RuleLookup.getRules();
     private Analyzer analyzer;
+    private String filename;
 
-    public Parser(Dispatcher dispatcher) {
+    public Parser(Dispatcher dispatcher, String filename) {
         this.dispatcher = dispatcher;
         this.parse = "";
         nest = 0;
         tableEntry = new EntryBuilder();
-        analyzer = new Analyzer();
+        analyzer = new Analyzer(filename);
+        this.filename = filename + ".parse";
     }
     public void startParse() throws ParseException {
         lookahead = dispatcher.nextToken();
@@ -40,7 +42,7 @@ public class Parser {
     // copy trace to file
     public void saveParse() {
         try {
-            BufferedWriter writer = new BufferedWriter(new FileWriter("parsefile.txt"));
+            BufferedWriter writer = new BufferedWriter(new FileWriter(filename));
             writer.write("## Trace File ##\n");
             writer.write(parse);
             writer.close();

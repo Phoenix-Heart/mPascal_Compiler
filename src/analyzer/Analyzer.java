@@ -21,12 +21,13 @@ public class Analyzer {
     private static HashMap<Token,Operator> opTable = new HashMap<>();
     private static negSign negsign;
     private static String endline = "\n";
-    private String writeFile = "generated_code.il";
+    private String writeFile;
     private static BufferedWriter writer;
     private int labelCounter = 0;
 
+    public Analyzer(String filename){
+        writeFile = filename + ".psc";
 
-    public Analyzer(){
         // helper lists
         Type[] allTypes = {Type.BOOLEAN,Type.STRING,Type.FLOAT,Type.INTEGER, Type.FIXED};
         Type[] numTypes = {Type.INTEGER,Type.FLOAT,Type.FIXED};
