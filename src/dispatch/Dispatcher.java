@@ -1,4 +1,4 @@
-package scanner;
+package dispatch;
 
 import core.Selector;
 import core.Token;
@@ -109,7 +109,10 @@ public class Dispatcher {
                 ch = read();
                 return nextToken();
             }
-
+            // reached end of file after whitespace?
+            if(ch==-1) {
+                return Token.MP_EOF;
+            }
             // prepare to scan for a token. Scan first character and choose appropriate selector.
                 boolean valid = true;
                 if(isAlpha(ch)) {
@@ -117,6 +120,10 @@ public class Dispatcher {
                 }
                 else if (isSpecial(ch)||isDigit(ch)) {
                     select = new specialSelector();
+                }
+                else if (isEOL(ch)) {
+                    ch = read();
+                    return nextToken();
                 }
                 else {
                     updateLexeme(ch);

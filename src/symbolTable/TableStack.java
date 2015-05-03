@@ -1,9 +1,7 @@
 package symbolTable;
 
-import core.Token;
 import parser.EntryBuilder;
 import parser.ParseException;
-import scanner.Dispatcher;
 
 import java.util.Iterator;
 import java.util.LinkedList;

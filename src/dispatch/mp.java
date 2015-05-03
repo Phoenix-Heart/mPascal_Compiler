@@ -1,4 +1,4 @@
-package scanner;
+package dispatch;
 
 import core.Token;
 
@@ -28,7 +28,7 @@ public class mp {
 
                 if(token==Token.MP_RUN_COMMENT || token==Token.MP_ERROR || token==Token.MP_RUN_STRING) {
                     System.out.println();
-                    System.out.print("Error found, exiting scanner.");
+                    System.out.print("Error found, exiting dispatch.");
                 }
             }
         }

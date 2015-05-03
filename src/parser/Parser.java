@@ -1,8 +1,7 @@
 package parser;
 
-import analyzer.operations.negSign;
 import core.Token;
-import scanner.Dispatcher;
+import dispatch.Dispatcher;
 import symbolTable.*;
 import analyzer.*;
 
@@ -443,6 +442,7 @@ public class Parser {
                 ReadStatement();
                 break;
             case MP_WRITE:
+            case MP_WRITELN:
                 parseTree(37);
                 WriteStatement();
                 break;
@@ -931,6 +931,7 @@ public class Parser {
     {
         switch(lookahead){
             case MP_FLOAT_DIVIDE:
+            case MP_DIV:
             case MP_TIMES:
             case MP_MOD:
             case MP_AND:

@@ -1,6 +1,6 @@
 import parser.ParseException;
 import parser.Parser;
-import scanner.Dispatcher;
+import dispatch.Dispatcher;
 
 /**
  * Created by Christina on 4/13/2015.
