@@ -3,6 +3,7 @@ package analyzer;
 import analyzer.operations.*;
 import core.Token;
 import parser.ParseException;
+import parser.Parser;
 import symbolTable.TableEntry;
 import symbolTable.TableStack;
 import symbolTable.Type;
@@ -13,10 +14,12 @@ import java.util.HashMap;
 
 /**
  * Created by Christina on 4/8/2015.
+ * Modified by Hunter
  */
 public class Analyzer {
     private static TableStack tables = TableStack.getStack();
     private static HashMap<Token,Operator> opTable = new HashMap<>();
+    private static negSign negsign;
     private static String endline = "\n";
     private String writeFile = "generated_code.il";
     private static BufferedWriter writer;
@@ -30,6 +33,8 @@ public class Analyzer {
         Type[] boolType = {Type.BOOLEAN};
         Type[] floatType = {Type.FLOAT, Type.FIXED};
         Type[] intType = {Type.INTEGER};
+
+        negsign = new negSign(numTypes);
 
         // initialize operator lookup table
         opTable.put(Token.MP_READ, new ReadOp(new Type[]{Type.INTEGER, Type.FLOAT, Type.STRING, Type.FIXED}));
@@ -67,6 +72,9 @@ public class Analyzer {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+    public Operator getNeg() {
+        return negsign;
     }
 
     private String getLabel()
@@ -250,7 +258,6 @@ public class Analyzer {
                 throw new SemanticException("bad token in Write parameter:" + record.getOperator());
         }
     }
-
     public void optionalSign(Token sign) throws SemanticException
     {
         switch(sign)

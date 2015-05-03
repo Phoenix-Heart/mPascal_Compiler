@@ -14,16 +14,16 @@ public class WriteOp extends Operator {
     }
 
     @Override
-    public void Op(Argument leftArg, Argument rightArg, String label) throws SemanticException {
+    public String Op(Argument leftArg, Argument rightArg, String label) throws SemanticException {
         assertValue(leftArg, true);
         assertValue(rightArg, false);
         assertValue(label, false);
 
         if(leftArg.isInStack()) {
-            Analyzer.putLine("WRTS " + leftArg.getSymbol());
+            return "WRTS ";
         }
         else {
-            Analyzer.putLine("WRT " + leftArg.getSymbol());
+            return "WRT " + leftArg.getSymbol();
         }
     }
 }

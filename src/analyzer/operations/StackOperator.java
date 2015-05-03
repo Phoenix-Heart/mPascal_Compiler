@@ -26,7 +26,7 @@ public abstract class StackOperator extends Operator {
         }
 
 
-        return Op(leftArg, rightArg,label);
+        return safeOp(leftArg, rightArg,label);
     }
     protected abstract String safeOp(Argument leftArg, Argument rightArg, String label) throws SemanticException;
 }

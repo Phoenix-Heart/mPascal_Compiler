@@ -1,6 +1,9 @@
 program Program4;
   var Sum : Integer;
+  str : String;
   begin
      Sum := 0;
      Write(Sum);
+     Read(Sum);
+     Write(str, Sum+5);
   end.

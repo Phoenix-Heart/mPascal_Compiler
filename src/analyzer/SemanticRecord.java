@@ -1,6 +1,7 @@
 package analyzer;
 
 import analyzer.operations.Operator;
+import com.sun.org.apache.xpath.internal.Arg;
 import core.Token;
 import sun.net.www.content.text.plain;
 import symbolTable.Type;
@@ -12,32 +13,45 @@ import java.util.List;
  * Created by Christina on 4/14/2015.
  */
 public class SemanticRecord {
-    private Token operator;
+    private Operator operator;
     private Type type;
     private Argument leftOperand;
     private Argument rightOperand;
     private String label;
+    private Token token;
 
     public SemanticRecord(Argument leftOperand, Token operator, Argument rightOperand) {
+        token = operator;
         this.leftOperand = leftOperand;
-        this.operator = operator;
         this.rightOperand = rightOperand;
         this.label = null;
-        setReturnType();
+        this.operator = Analyzer.opLookup(operator);
+        setReturnType(operator);
     }
     public SemanticRecord(Token operator, Argument rightOperand) {
+        token = operator;
         this.rightOperand = rightOperand;
-        this.operator = operator;
+        this.operator = Analyzer.opLookup(operator);
         this.label = null;
         this.leftOperand = null;
     }
-
+    // set the operator directly
+    public SemanticRecord(Argument leftOperand, Operator operator, Argument rightOperand, Type type) {
+        this.rightOperand = rightOperand;
+        this.leftOperand = leftOperand;
+        this.operator = operator;
+        this.type = type;
+    }
     public SemanticRecord() {
         operator = null;
         type = null;
         leftOperand = null;
         rightOperand = null;
         label = null;
+    }
+
+    public void setOperator(Operator operator) {
+        this.operator = operator;
     }
 
     public Type getType()
@@ -50,14 +64,6 @@ public class SemanticRecord {
         this.type = type;
     }
 
-    public Token getOperator() {
-        return operator;
-    }
-
-    public void setOperator(Token operator) {
-        this.operator = operator;
-    }
-
     public void setLabel(String label) { this.label = label;}
 
     public String getLabel() { return label;}
@@ -68,7 +74,7 @@ public class SemanticRecord {
 
     public void setLeftOperand(Argument leftOperand) {
         this.leftOperand = leftOperand;
-        setReturnType();
+        setReturnType(token);
     }
 
     public Argument getRightOperand() {
@@ -80,7 +86,7 @@ public class SemanticRecord {
     }
 
     public void genCasts() {
-        if(type!=Type.BOOLEAN) {
+        if(type!=Type.BOOLEAN && type!=null) {
             if (rightOperand.getType() != type) {
                 rightOperand.castType(type);
             }
@@ -90,7 +96,9 @@ public class SemanticRecord {
         }
     }
 
-    private void setReturnType() {
+    private void setReturnType(Token operator) {
+        if(operator==null)
+            return;
         switch (operator) {
             case MP_MINUS:
             case MP_PLUS:
@@ -130,9 +138,9 @@ public class SemanticRecord {
 
     public Boolean isSimple()
     {
-        if (this.operator == null)
+        if (this.token == null)
             return false;
-        else return this.operator.isAtomic();
+        else return this.token.isAtomic();
     }
 
     public void printRecord()
@@ -153,11 +161,17 @@ public class SemanticRecord {
         }
     }
 
-    public Argument genExpression() {
+    public Argument genExpression() throws SemanticException {
         genCasts();
-        Operator op = Analyzer.opLookup(operator);
-        op.performOp(leftOperand,rightOperand,label);
+        operator.performOp(leftOperand,rightOperand,label);
         return new Argument(type);
     }
 
+    public void setToken(Token token) {
+        this.token = token;
+    }
+
+    public Token getToken() {
+        return token;
+    }
 }

@@ -44,6 +44,7 @@ public class Argument {
                 throw new SemanticException(String.format("Symbol %s already on the stack.", symbol));
             }
             Analyzer.putLine("PUSH "+symbol);
+            confirmStackPush();
             stacklevel = stackpointer;
             stackpointer++;
         }

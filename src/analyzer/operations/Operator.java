@@ -13,9 +13,7 @@ public abstract class Operator {
     public Operator(Type[] types) {
         this.types = types;
     }
-    public void performOp(Argument leftArg, Argument rightArg, String label) {
-
-        try {
+    public void performOp(Argument leftArg, Argument rightArg, String label) throws SemanticException {
             if(leftArg!=null)
             checkType(leftArg.getType());
             if(rightArg!=null)
@@ -25,10 +23,7 @@ public abstract class Operator {
                     throw new SemanticException(String.format("Incompatible types passed, %s and %s.",leftArg.getType(),rightArg.getType()));
             }
             Analyzer.putLine(Op(leftArg, rightArg, label));
-        }
-        catch (SemanticException e) {
-            e.printStackTrace();
-        }
+
     }
     protected abstract String Op(Argument leftArg, Argument rightArg, String label) throws SemanticException;
     private void checkType(Type type) throws SemanticException {
@@ -37,7 +32,7 @@ public abstract class Operator {
                 return;
             }
         }
-        throw new SemanticException(String.format("Type mismatch. Type %s is invalid."));
+        throw new SemanticException(String.format("Type mismatch. Type %s is invalid.", type));
     }
     protected void assertValue(Object obj, boolean exists) throws SemanticException {
         // generate exception when assertion fails. obj is null if and only if exists is false.

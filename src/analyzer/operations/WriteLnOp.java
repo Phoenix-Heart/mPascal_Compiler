@@ -13,16 +13,16 @@ public class WriteLnOp extends Operator {
         super(types);
     }
     @Override
-    protected void Op(Argument leftArg, Argument rightArg, String label) throws SemanticException {
+    protected String Op(Argument leftArg, Argument rightArg, String label) throws SemanticException {
         assertValue(leftArg, true);
         assertValue(rightArg, false);
         assertValue(label, false);
 
         if(leftArg.isInStack()) {
-            Analyzer.putLine("WRTLNS " + leftArg.getSymbol());
+            return "WRTLNS " + leftArg.getSymbol();
         }
         else {
-            Analyzer.putLine("WRTLN " + leftArg.getSymbol());
+            return "WRTLN " + leftArg.getSymbol();
         }
     }
 }

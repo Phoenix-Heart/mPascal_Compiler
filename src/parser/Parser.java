@@ -1,12 +1,15 @@
 package parser;
 
+import analyzer.operations.negSign;
 import core.Token;
 import scanner.Dispatcher;
 import symbolTable.*;
 import analyzer.*;
 
 import java.io.*;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 /**
  * Created by Christina on 3/6/2015.
@@ -60,8 +63,29 @@ public class Parser {
     private void LL1error() throws ParseException {
         throw new ParseException(String.format("Parse error on line %s, col %s. Unexpected token %s, lexeme %s", dispatcher.getLine(), dispatcher.getColumn(), dispatcher.getToken(), dispatcher.getLexeme()));
     }
-
-
+    // handles null records in an Expression leaf node
+    private Argument getNextArg(Argument nextArg, SemanticRecord record) {
+        if(record==null) {
+            return nextArg;
+        }
+        else if(nextArg!=null) {
+            record.setLeftOperand(nextArg);
+            return genExpression(record);
+        }
+        else {
+            return null;
+        }
+    }
+    private Argument genExpression(SemanticRecord record) {
+        try {
+            return record.genExpression();
+        } catch (SemanticException e) {
+            System.err.println(String.format("Error on line %s, col %s, Token %s, lexeme %s",
+                    dispatcher.getLine(),dispatcher.getColumn(), dispatcher.getToken(), dispatcher.getLexeme()));
+            e.printStackTrace();
+        }
+        return null;
+    }
 
     // save parse tree rules to file
     private void parseTree(int rule) {
@@ -90,18 +114,19 @@ public class Parser {
     }
     private void Program() throws ParseException {
         parseTree(2);
-        ProgramHeading();
+        String label = ProgramHeading();
         matchLookAhead(Token.MP_SCOLON);
         Block();
         matchLookAhead(Token.MP_PERIOD);
     }
-    private void ProgramHeading() throws ParseException {
+    private String ProgramHeading() throws ParseException {
         parseTree(3);
         tableEntry.setKind(Kind.PROGRAM);
         matchLookAhead(Token.MP_PROGRAM);
-        ProgramIdentifier();
+        String id = ProgramIdentifier();
         stack.createTable(tableEntry);
         tableEntry = new EntryBuilder();
+        return id;
     }
     private void Block() throws ParseException
     {
@@ -159,17 +184,9 @@ public class Parser {
         IdentifierList();
         matchLookAhead(Token.MP_COLON);
         Type();
-        //List<String> varsToDeclare = tableEntry.getLexemes();
         stack.addEntry(tableEntry);
-        //if(flag)
-        //{
         tableEntry = new EntryBuilder();
-        //}
         tableEntry.setKind(Kind.VARIABLE);
-        //for(String elem: varsToDeclare)
-        //{
-        ///    analyzer.varDeclaration(elem);
-        //}
     }
 
     private void Type() throws ParseException {
@@ -242,7 +259,7 @@ public class Parser {
         parseTree(19);
         tableEntry.setKind(Kind.PROCEDURE);
         matchLookAhead(Token.MP_PROCEDURE);
-        ProcedureIdentifier();
+        String id = ProcedureIdentifier();
         OptionalFormalParameterList();
         boolean flag = stack.addEntry(tableEntry);
         if(flag)
@@ -258,7 +275,7 @@ public class Parser {
         parseTree(20);
         tableEntry.setKind(Kind.FUNCTION);
         matchLookAhead(Token.MP_FUNCTION);
-        FunctionIdentifier();
+        String id =  FunctionIdentifier();
         OptionalFormalParameterList();
         matchLookAhead(Token.MP_COLON);
         Type();
@@ -516,54 +533,66 @@ public class Parser {
         }
     }
     private void ReadParameter() throws ParseException {
-
         parseTree(48);
         String id = VariableIdentifier();
         // semantic analysis step
         Argument record =  new Argument(id);
-        analyzer.opLookup(Token.MP_READ).performOp(record,null,null);
+        try {
+            analyzer.opLookup(Token.MP_READ).performOp(record,null,null);
+        } catch (SemanticException e) {
+            e.printStackTrace();
+        }
     }
     private void WriteStatement() throws ParseException {
-
+        SemanticRecord record = new SemanticRecord();
+        Argument arg;
+        record.setOperator(Analyzer.opLookup(Token.MP_WRITE));
+        record.setToken(lookahead);
         switch (lookahead) {
             case MP_WRITE:
                 parseTree(49);
                 matchLookAhead(Token.MP_WRITE);
                 matchLookAhead(Token.MP_LPAREN);
-                WriteParameter();
-                WriteParameterTail();
+                arg = WriteParameter();
+                record.setLeftOperand(arg);
+                WriteParameterTail(record);
                 matchLookAhead(Token.MP_RPAREN);
                 break;
             case MP_WRITELN:
                 parseTree(50);
                 matchLookAhead(Token.MP_WRITELN);
                 matchLookAhead(Token.MP_LPAREN);
-                WriteParameter();
-                WriteParameterTail();
+                arg = WriteParameter();
+                record.setLeftOperand(arg);
+                WriteParameterTail(record);
                 matchLookAhead(Token.MP_RPAREN);
                 break;
             default:
                 LL1error();
         }
     }
-    private void WriteParameterTail() throws ParseException {
+    private void WriteParameterTail(SemanticRecord record) throws ParseException {
         switch (lookahead) {
             case MP_COMMA:
                 parseTree(51);
                 matchLookAhead(Token.MP_COMMA);
-                WriteParameter();
-                WriteParameterTail();
+                genExpression(record);
+                Argument currentArg = WriteParameter();
+                record.setLeftOperand(currentArg);
+                WriteParameterTail(record);
                 break;
             case MP_RPAREN:
+                record.setOperator(Analyzer.opLookup(record.getToken()));
+                genExpression(record);
                 parseTree(52);
                 break;
         default:
             LL1error();
         }
     }
-    private void WriteParameter() throws ParseException {
+    private Argument WriteParameter() throws ParseException {
         parseTree(53);
-        OrdinalExpression();
+        return OrdinalExpression();
     }
     private void AssignmentStatement() throws ParseException {
 
@@ -584,7 +613,7 @@ public class Parser {
         }
         else if (entry.kind == Kind.VARIABLE) {
             parseTree(54);
-            VariableIdentifier();
+            String id = VariableIdentifier();
             matchLookAhead(Token.MP_ASSIGN);
             Expression();
         }
@@ -597,7 +626,7 @@ public class Parser {
 
         parseTree(56);
         matchLookAhead(Token.MP_IF);
-        BooleanExpression();
+        Argument arg = BooleanExpression();
         matchLookAhead(Token.MP_THEN);
         Statement();
         OptionalElsePart();
@@ -626,13 +655,13 @@ public class Parser {
         matchLookAhead(Token.MP_REPEAT);
         StatementSequence();
         matchLookAhead(Token.MP_UNTIL);
-        BooleanExpression();
+        Argument arg = BooleanExpression();
     }
     private void WhileStatement() throws ParseException {
 
         parseTree(60);
         matchLookAhead(Token.MP_WHILE);
-        BooleanExpression();
+        Argument arg = BooleanExpression();
         matchLookAhead(Token.MP_DO);
         Statement();
     }
@@ -640,26 +669,26 @@ public class Parser {
 
         parseTree(61);
         matchLookAhead(Token.MP_FOR);
-        ControlVariable();
+        String Cvar = ControlVariable();
         matchLookAhead(Token.MP_ASSIGN);
-        InitialValue();
-        StepValue();
-        FinalValue();
+        Argument arg = InitialValue();
+        Token op = StepValue();
+        Argument endArg = FinalValue();
         matchLookAhead(Token.MP_DO);
         Statement();
     }
-    private void ControlVariable() throws ParseException {
+    private String ControlVariable() throws ParseException {
 
         parseTree(62);
-        VariableIdentifier();
+        return VariableIdentifier();
     }
-    private void InitialValue() throws ParseException {
+    private Argument InitialValue() throws ParseException {
 
         parseTree(63);
-        OrdinalExpression();
+        return OrdinalExpression();
     }
-    private void StepValue() throws ParseException {
-
+    private Token StepValue() throws ParseException {
+        Token token = lookahead;
         switch (lookahead) {
             case MP_TO:
                 parseTree(64);
@@ -672,23 +701,25 @@ public class Parser {
             default:
                 LL1error();
         }
+        return token;
     }
-    private void FinalValue() throws ParseException {
+    private Argument FinalValue() throws ParseException {
         parseTree(66);
-        OrdinalExpression();
+        return OrdinalExpression();
     }
     private void ProcedureStatement() throws ParseException {
         parseTree(67);
-        ProcedureIdentifier();
-        OptionalActualParameterList();
+        String label = ProcedureIdentifier();
+        List<Argument> params = OptionalActualParameterList();
     }
-    private void OptionalActualParameterList() throws ParseException {
+    private List<Argument> OptionalActualParameterList() throws ParseException {
+        List<Argument> argList = new ArrayList<Argument>();
         switch (lookahead) {
             case MP_LPAREN:
                 parseTree(68);
                 matchLookAhead(Token.MP_LPAREN);
-                ActualParameter();
-                ActualParameterTail();
+                ActualParameter(argList);
+                ActualParameterTail(argList);
                 matchLookAhead(Token.MP_RPAREN);
                 break;
             case MP_SCOLON:
@@ -700,15 +731,16 @@ public class Parser {
             default:
                 LL1error();
         }
+        return argList;
     }
-    private void ActualParameterTail() throws ParseException {
+    private void ActualParameterTail(List<Argument> argList) throws ParseException {
 
         switch (lookahead) {
             case MP_COMMA:
                 parseTree(70);
                 matchLookAhead(Token.MP_COMMA);
-                ActualParameter();
-                ActualParameterTail();
+                ActualParameter(argList);
+                ActualParameterTail(argList);
                 break;
             case MP_RPAREN:
                 parseTree(71);
@@ -717,16 +749,19 @@ public class Parser {
                 LL1error();
         }
     }
-    private void ActualParameter() throws ParseException {
+    // appends arguments to list
+    private void ActualParameter(List<Argument> argList) throws ParseException {
         parseTree(72);
-        OrdinalExpression();
+        Argument newArg = OrdinalExpression();
+        argList.add(newArg);
     }
-    private void Expression() throws ParseException {
-                parseTree(73);
-                SimpleExpression();
-                OptionalRelationalPart();
-}
-    private void OptionalRelationalPart() throws ParseException {
+    private Argument Expression() throws ParseException {
+        parseTree(73);
+        Argument arg = SimpleExpression();
+        SemanticRecord record = OptionalRelationalPart();
+        return getNextArg(arg,record);
+    }
+    private SemanticRecord OptionalRelationalPart() throws ParseException {
         switch (lookahead) {
             case MP_COMMA:
             case MP_SCOLON:
@@ -748,15 +783,16 @@ public class Parser {
             case MP_GEQUAL:
             case MP_NEQUAL:
                 parseTree(74);
-                RelationalOperator();
-                SimpleExpression();
-                break;
+                Token op = RelationalOperator();
+                Argument arg = SimpleExpression();
+                return new SemanticRecord(op,arg);
             default:
                 LL1error();
         }
+        return null;
     }
-    private void RelationalOperator() throws ParseException {
-
+    private Token RelationalOperator() throws ParseException {
+        Token token = lookahead;
         switch (lookahead) {
             case MP_EQUAL:
                 parseTree(76);
@@ -785,16 +821,23 @@ public class Parser {
             default:
                 LL1error();
         }
+        return token;
     }
-    private void SimpleExpression() throws ParseException {
+    private Argument SimpleExpression() throws ParseException {
         parseTree(82);
-        OptionalSign();
-        SemanticRecord leftRecord = Term();
-        SemanticRecord rightRecord = TermTail();
+        Token token = OptionalSign();
+        Argument newArg = Term();
+        if(token==Token.MP_MINUS) {   // generate negation
+            SemanticRecord signRecord = new SemanticRecord(newArg, token, null);
+            signRecord.setOperator(analyzer.getNeg());  // manually operator to negate
+            newArg = genExpression(signRecord);        // reassign argument
+        }
+        SemanticRecord record = TermTail();
+        return getNextArg(newArg, record);
     }
     private SemanticRecord TermTail() throws ParseException {
         Token op;
-        SemanticRecord leftRecord, rightRecord;
+        SemanticRecord record;
         Argument leftArg, rightArg;
         switch (lookahead) {
             case MP_COMMA:
@@ -820,11 +863,10 @@ public class Parser {
             case MP_MINUS:
                 parseTree(83);
                 op = AddingOperator();
-                leftRecord = Term();
-                leftArg = leftRecord.genExpression();
-                rightRecord = TermTail();
-                rightArg = rightRecord.genExpression();
-                break;
+                leftArg= Term();
+                record = TermTail();
+                rightArg = getNextArg(leftArg,record);   // generates expression if applicable and gets the next rightArg
+                return new SemanticRecord(op,rightArg);
             default:
                 LL1error();
         }
@@ -844,6 +886,7 @@ public class Parser {
             case MP_STRING_LIT:
             case MP_LPAREN:
                 parseTree(87);
+                break;
             case MP_PLUS:
                 parseTree(85);
                 matchLookAhead(Token.MP_PLUS);
@@ -858,7 +901,7 @@ public class Parser {
         return null;
     }
     private Token AddingOperator() throws ParseException{
-        switch(lookahead){
+        switch(lookahead) {
             case MP_PLUS:
                 parseTree(88);
                 matchLookAhead(Token.MP_PLUS);
@@ -873,16 +916,15 @@ public class Parser {
                 return Token.MP_OR;
             default:
                 LL1error();
+                return null;
         }
-        return null;
     }
 
-    private SemanticRecord Term() throws ParseException {
+    private Argument Term() throws ParseException {
         parseTree(91);
         Argument leftArg = Factor();
         SemanticRecord record = FactorTail();
-        record.setLeftOperand(leftArg);
-        return record;
+        return getNextArg(leftArg,record);   // generates expression if applicable and gets the next rightArg
     }
     private SemanticRecord FactorTail() throws ParseException
     {
@@ -893,11 +935,10 @@ public class Parser {
             case MP_AND:
                 parseTree(92);
                 Token op = MultiplyingOperator();
-                Argument leftArg = Factor();
+                Argument newArg = Factor();
                 SemanticRecord record = FactorTail();
-                record.setLeftOperand(leftArg);
-                Argument rightArg = record.genExpression();
-                return new SemanticRecord(op, rightArg);
+                Argument nextArg = getNextArg(newArg, record);   // generates expression if applicable and gets the next rightArg
+                return new SemanticRecord(op, nextArg);         // returns a record with missing leftArg
             case MP_DO:
             case MP_DOWNTO:
             case MP_ELSE:
@@ -922,7 +963,7 @@ public class Parser {
             default:
                 LL1error();
         }
-        return new SemanticRecord();
+        return null;
     }
     private Token MultiplyingOperator() throws ParseException
     {
@@ -957,7 +998,6 @@ public class Parser {
 
     private Argument Factor() throws ParseException
     {
-        Token temp = lookahead;
         String id = null;
         String lit = dispatcher.getLexeme();
 
@@ -974,8 +1014,7 @@ public class Parser {
                     }
                 }
                 SemanticRecord record = new SemanticRecord(arg,Token.MP_NOT,null);
-                record.genExpression();
-                break;
+                return genExpression(record);
             case MP_LPAREN:
                 parseTree(105);
                 matchLookAhead(Token.MP_LPAREN);
@@ -1035,12 +1074,14 @@ public class Parser {
             return null;
         }
     }
-    private void ProgramIdentifier() throws ParseException {
+    private String ProgramIdentifier() throws ParseException {
         parseTree(107);
+        String lexeme = dispatcher.getLexeme();
         if(lookahead==Token.MP_IDENTIFIER) {                // the table entry needs to be updated before running our match.
-            tableEntry.setLexeme(dispatcher.getLexeme());
+            tableEntry.setLexeme(lexeme);
         }
         matchLookAhead(Token.MP_IDENTIFIER);
+        return lexeme;
     }
     private String VariableIdentifier() throws ParseException {
         parseTree(108);
@@ -1051,6 +1092,7 @@ public class Parser {
         matchLookAhead(Token.MP_IDENTIFIER);
         return lexeme;
     }
+    // use return value for label production
     private String ProcedureIdentifier() throws ParseException {
         parseTree(109);
         String lexeme = dispatcher.getLexeme();
@@ -1060,6 +1102,7 @@ public class Parser {
         matchLookAhead(Token.MP_IDENTIFIER);
         return lexeme;
     }
+    // use return value for label production and function return value/identifier
     private String FunctionIdentifier() throws ParseException {
         parseTree(110);
         String lexeme = dispatcher.getLexeme();
@@ -1069,13 +1112,15 @@ public class Parser {
         matchLookAhead(Token.MP_IDENTIFIER);
         return lexeme;
     }
-    private void BooleanExpression() throws ParseException {
+    private Argument BooleanExpression() throws ParseException {
                 parseTree(111);
-                Expression();
+                // add type checking
+                return Expression();
     }
-    private void OrdinalExpression() throws ParseException {
+    private Argument OrdinalExpression() throws ParseException {
                 parseTree(112);
-                Expression();
+                // add type checking
+                return Expression();
     }
     private void IdentifierList() throws ParseException {
                 parseTree(113);
