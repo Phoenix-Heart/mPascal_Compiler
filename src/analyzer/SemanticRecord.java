@@ -114,6 +114,9 @@ public class SemanticRecord {
             case MP_FLOAT_DIVIDE:
                 type = Type.FLOAT;
                 break;
+            case MP_DIV:
+                type = Type.INTEGER;
+                break;
             case MP_AND:
             case MP_OR:
             case MP_GTHAN:
@@ -142,23 +145,11 @@ public class SemanticRecord {
             return false;
         else return this.token.isAtomic();
     }
-
-    public void printRecord()
-    {
-        printRecordHelper(this);
+    public String toString() {
+        return String.format("Operator %s from Token %s, Type %s. Left arg %s, Right Arg %s ", operator, token, type, leftOperand, rightOperand);
     }
-
-    public void printRecordHelper(SemanticRecord op)
-    {
-        System.out.println("RECORD");
-        while(op.operator != null)
-        {
-            System.out.println(op.operator);
-            System.out.println("leftSide");
-            System.out.println(leftOperand);
-            System.out.println("rightSide");
-            System.out.println(rightOperand);
-        }
+    public void printRecord() {
+        System.out.println(this);
     }
 
     public Argument genExpression() throws SemanticException {

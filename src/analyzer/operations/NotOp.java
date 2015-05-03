@@ -11,6 +11,9 @@ public class NotOp extends StackOperator {
 
     @Override
     protected String safeOp(Argument leftArg, Argument rightArg, String label) throws SemanticException {
+        assertValue(leftArg, true);
+        assertValue(rightArg, false);
+        assertValue(label, false);
         Argument.decreaseSP();
         return "NOTS";
     }

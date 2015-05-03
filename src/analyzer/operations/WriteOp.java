@@ -20,6 +20,7 @@ public class WriteOp extends Operator {
         assertValue(label, false);
 
         if(leftArg.isInStack()) {
+            Argument.decreaseSP();
             return "WRTS ";
         }
         else {

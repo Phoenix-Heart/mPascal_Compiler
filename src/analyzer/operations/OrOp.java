@@ -11,6 +11,9 @@ public class OrOp extends StackOperator {
 
     @Override
     protected String safeOp(Argument leftArg, Argument rightArg, String label) throws SemanticException {
+        assertValue(leftArg, true);
+        assertValue(rightArg, true);
+        assertValue(label, false);
         Argument.decreaseSP();
         return "ORS";
     }

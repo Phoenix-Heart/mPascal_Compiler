@@ -82,6 +82,7 @@ public class Parser {
         } catch (SemanticException e) {
             System.err.println(String.format("Error on line %s, col %s, Token %s, lexeme %s",
                     dispatcher.getLine(),dispatcher.getColumn(), dispatcher.getToken(), dispatcher.getLexeme()));
+            System.err.println(record);
             e.printStackTrace();
         }
         return null;

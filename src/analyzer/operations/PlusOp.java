@@ -11,6 +11,15 @@ public class PlusOp extends StackOperator {
 
     @Override
     protected String safeOp(Argument leftArg, Argument rightArg, String label) throws SemanticException {
-        return null;
+        assertValue(leftArg, true);
+        assertValue(rightArg, true);
+        assertValue(label, false);
+        Argument.decreaseSP();
+        if(leftArg.getType()==Type.INTEGER) {
+            return "ADDS";
+        }
+        else {
+            return "ADDSF";
+        }
     }
 }

@@ -14,9 +14,14 @@ public class Argument {
 
     // add literal argument
     public Argument(String lit, Type type) {
-        inStack = true;
+        inStack = false;
         this.symbol = "#"+lit;
         this.type = type;
+        try {
+            genPush();
+        } catch (SemanticException e) {
+            e.printStackTrace();
+        }
     }
     // add intermediate value with just a type signature
     public Argument(Type type) {
@@ -29,6 +34,11 @@ public class Argument {
         inStack = false;
         this.symbol = Analyzer.getSymbol(id);
         this.type = Analyzer.getType(id);
+        try {
+            genPush();
+        } catch (SemanticException e) {
+            e.printStackTrace();
+        }
     }
 
     // use after performing appropriate call to push value onto stack.
@@ -52,13 +62,20 @@ public class Argument {
         return stacklevel - stackpointer;
     }
     public void castType(Type type) {
+        if((this.type==Type.FIXED || this.type==Type.FLOAT) && (type==Type.FIXED || type == Type.FLOAT)) {
+            return;
+        }
         int depth = getStackDepth();
         if(depth!=-1) {
             Analyzer.writePush(depth+"(SP)");
             castOnStack(type);
+            depth--;
+            Analyzer.writePop(depth+"(SP)");
         }
-        depth--;
-        Analyzer.writePop(depth+"(SP)");
+        else {
+            castOnStack(type);
+        }
+        this.type = type;
     }
     private void castOnStack(Type type) {
         try {
@@ -87,7 +104,14 @@ public class Argument {
         }
         // return true if types are the same, return false otherwise.
         public boolean typeEquals(Argument record) {
-            return type==record.getType();
+            if( type==record.getType()) {
+                return true;
+            }
+            else if ((type==Type.FIXED || type == Type.FLOAT) && (record.type == Type.FIXED || record.type == Type.FLOAT)) {
+                return true;
+            }
+            else
+                return false;
         }
         public String toString() {
             return symbol;
