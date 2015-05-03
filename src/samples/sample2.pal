@@ -1,8 +1,15 @@
 program Program4;
   var Sum : Integer;
+  x : Float;
   str : String;
+  bool : Boolean;
   begin
      Sum := 0;
-    Read(str);
+     Read(str);
      Write(str, Sum+5, Sum / 2 + 4 * 4.7);
+     Sum := Sum + 4;
+     x := Sum mod 2;
+     bool := False;
+     bool := Sum=7 OR not Sum > 20;
+     bool := x < 51 AND Sum <= 50 AND x >= 5;
   end.
