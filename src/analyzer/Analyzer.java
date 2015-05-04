@@ -68,6 +68,7 @@ public class Analyzer {
     }
     public static void closeFile()
     {
+        putLine("HLT");
         try {
             writer.close();
         } catch (IOException e) {

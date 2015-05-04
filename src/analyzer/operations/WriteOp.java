@@ -21,7 +21,7 @@ public class WriteOp extends Operator {
 
         if(leftArg.isInStack()) {
             Argument.decreaseSP();
-            return "WRTS ";
+            return "WRTS";
         }
         else {
             return "WRT " + leftArg.getSymbol();

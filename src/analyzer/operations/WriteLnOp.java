@@ -20,7 +20,7 @@ public class WriteLnOp extends Operator {
 
         if(leftArg.isInStack()) {
             Argument.decreaseSP();
-            return "WRTLNS " + leftArg.getSymbol();
+            return "WRTLNS ";
         }
         else {
             return "WRTLN " + leftArg.getSymbol();
