@@ -103,7 +103,7 @@ public class Dispatcher {
                     ch = read();
                     if(isEOL(ch)) {
                         ch = read();
-                        System.out.println("Run on Comment found");
+                        //System.out.println("Run on Comment found");
                         //return Token.MP_RUN_COMMENT;
                     }
                 }
