@@ -9,7 +9,10 @@ import symbolTable.TableStack;
 import symbolTable.Type;
 
 import java.io.*;
+import java.lang.reflect.Array;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 
 /**
@@ -95,6 +98,7 @@ public class Analyzer {
     {
         String l1 = getLabel();
         putLine("BRFS " + l1);
+        Argument.decreaseSP();
         return l1;
     }
 
@@ -102,6 +106,40 @@ public class Analyzer {
     {
         putLine(l1 + ":");
     }
+
+    public static String genRepeatUntilStart()
+    {
+        String l1 = getLabel();
+        putLine(l1 + ":");
+        return l1;
+    }
+
+    public static void genRepeatUntilEnd(String l1)
+    {
+        putLine("BRTS " + l1);
+    }
+
+    public static ArrayList<String> genWhileStart()
+    {
+        ArrayList<String> labelList = new ArrayList<String>();
+        labelList.add(getLabel());
+        labelList.add(getLabel());
+        putLine(labelList.get(0) + ":");
+        return labelList;
+    }
+
+    public static void genWhileMiddle(ArrayList<String> labels)
+    {
+        putLine("BRFS " + labels.get(1));
+    }
+
+    public static void genWhileEnd(ArrayList<String> labels)
+    {
+        putLine("BR " + labels.get(0));
+        putLine(labels.get(1) + ": ");
+    }
+
+
 
     /* take a record (with at least one valid operation and valid operators). Generate and save the code.
     public void generate(SemanticRecord record) {

@@ -658,17 +658,22 @@ public class Parser {
 
         parseTree(59);
         matchLookAhead(Token.MP_REPEAT);
+        String l1 = analyzer.genRepeatUntilStart();
         StatementSequence();
         matchLookAhead(Token.MP_UNTIL);
         Argument arg = BooleanExpression();
+        analyzer.genRepeatUntilEnd(l1);
     }
     private void WhileStatement() throws ParseException {
 
         parseTree(60);
         matchLookAhead(Token.MP_WHILE);
+        ArrayList<String> labels = analyzer.genWhileStart();
         Argument arg = BooleanExpression();
+        analyzer.genWhileMiddle(labels);
         matchLookAhead(Token.MP_DO);
         Statement();
+        analyzer.genWhileEnd(labels);
     }
     private void ForStatement() throws ParseException {
 
