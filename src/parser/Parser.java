@@ -682,10 +682,13 @@ public class Parser {
         String Cvar = ControlVariable();
         matchLookAhead(Token.MP_ASSIGN);
         Argument arg = InitialValue();
+        String l1 = analyzer.genForStart(Cvar, arg);
         Token op = StepValue();
         Argument endArg = FinalValue();
+        String l2 = analyzer.genForMiddle(Cvar, op, endArg, l1);
         matchLookAhead(Token.MP_DO);
         Statement();
+        analyzer.genForEnd(Cvar, op, l1, l2);
     }
     private String ControlVariable() throws ParseException {
 

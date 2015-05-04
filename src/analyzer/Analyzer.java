@@ -139,6 +139,54 @@ public class Analyzer {
         putLine(labels.get(1) + ": ");
     }
 
+    public static String genForStart(String cVar, Argument init)
+    {
+        String symbol = getSymbol(cVar);
+        putLine("POP " + symbol);
+        String l1 = getLabel();
+        putLine(l1 + ": ");
+        putLine("PUSH " + symbol);
+        return l1;
+    }
+
+    public static String genForMiddle(String cVar, Token step, Argument end, String l1)
+    {
+        //end val should be on stack already
+        if(step == Token.MP_DOWNTO)
+        {
+            putLine("CMPLES");
+            Argument.decreaseSP();
+        }
+        else if (step == Token.MP_TO)
+        {
+            putLine("CMPGES");
+            Argument.decreaseSP();
+        }
+        else
+        {
+            System.out.println("Token " + step.toString() + "encountered. Expected TO or DOWNTO");
+        }
+        String l2 = getLabel();
+        putLine("BRTS " + l2);
+        return l2;
+    }
+
+    public static void genForEnd(String cVar, Token step, String l1, String l2)
+    {
+        String symbol = getSymbol(cVar);
+        switch(step)
+        {
+            case MP_DOWNTO:
+                putLine("SUB " + symbol + " #1 " + symbol);
+                break;
+            case MP_TO:
+                putLine("ADD " + symbol + " #1 " + symbol);
+                break;
+        }
+        putLine("BR " + l1);
+        putLine(l2 + ": ");
+    }
+
 
 
     /* take a record (with at least one valid operation and valid operators). Generate and save the code.
