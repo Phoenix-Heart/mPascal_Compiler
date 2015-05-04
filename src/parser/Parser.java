@@ -1051,7 +1051,7 @@ public class Parser {
             case MP_STRING_LIT:
                 parseTree(101);
                 matchLookAhead(Token.MP_STRING_LIT);
-                return new Argument(lit,Type.STRING);
+                return new Argument(lit.replace("\'", "\""),Type.STRING);
             case MP_TRUE:
                 parseTree(102);
                 matchLookAhead(Token.MP_TRUE);
