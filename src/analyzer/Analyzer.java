@@ -187,6 +187,11 @@ public class Analyzer {
         putLine(l2 + ": ");
     }
 
+    public static void genAssign(String id)
+    {
+        putLine("POP " + getSymbol(id));
+    }
+
 
 
     /* take a record (with at least one valid operation and valid operators). Generate and save the code.

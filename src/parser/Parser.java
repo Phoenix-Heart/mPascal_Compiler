@@ -619,6 +619,7 @@ public class Parser {
             String id = VariableIdentifier();
             matchLookAhead(Token.MP_ASSIGN);
             Expression();
+            analyzer.genAssign(id);
         }
         else {
             throw new ParseException(" (AssignmentStatement) This code should be unreachable.");
