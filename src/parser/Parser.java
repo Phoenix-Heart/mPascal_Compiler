@@ -630,8 +630,10 @@ public class Parser {
         parseTree(56);
         matchLookAhead(Token.MP_IF);
         Argument arg = BooleanExpression();
+        String label = analyzer.genIfStart();
         matchLookAhead(Token.MP_THEN);
         Statement();
+        analyzer.genIfEnd(label);
         OptionalElsePart();
     }
     private void OptionalElsePart() throws ParseException {

@@ -15,6 +15,6 @@ public class LequalOp extends StackOperator {
         assertValue(rightArg, true);
         assertValue(label, false);
         Argument.decreaseSP();
-        return null;
+        return "CMPLES";
     }
 }

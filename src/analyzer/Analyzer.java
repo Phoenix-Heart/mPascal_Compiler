@@ -91,6 +91,18 @@ public class Analyzer {
         putLine("PUSH " + s);
     }
 
+    public static String genIfStart()
+    {
+        String l1 = getLabel();
+        putLine("BRFS " + l1);
+        return l1;
+    }
+
+    public static void genIfEnd(String l1)
+    {
+        putLine(l1 + ":");
+    }
+
     /* take a record (with at least one valid operation and valid operators). Generate and save the code.
     public void generate(SemanticRecord record) {
         genRecursive(record);

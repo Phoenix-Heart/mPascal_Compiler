@@ -15,6 +15,6 @@ public class LthanOp extends StackOperator {
         assertValue(rightArg, true);
         assertValue(label, false);
         Argument.decreaseSP();
-        return null;
+        return "CMPLTS";
     }
 }

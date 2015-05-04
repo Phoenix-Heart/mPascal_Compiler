@@ -15,6 +15,6 @@ public class GthanOp extends StackOperator {
         assertValue(rightArg, true);
         assertValue(label, false);
         Argument.decreaseSP();
-        return null;
+        return "CMPGTS";
     }
 }
