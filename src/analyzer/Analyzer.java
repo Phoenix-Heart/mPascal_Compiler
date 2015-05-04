@@ -23,7 +23,7 @@ public class Analyzer {
     private static String endline = "\n";
     private String writeFile;
     private static BufferedWriter writer;
-    private int labelCounter = 0;
+    private static int labelCounter = 0;
 
     public Analyzer(String filename){
         writeFile = filename + ".psc";
@@ -79,7 +79,7 @@ public class Analyzer {
         return negsign;
     }
 
-    private String getLabel()
+    private static String getLabel()
     {
         String currentLabel = "L" + Integer.toString(labelCounter);
         labelCounter++;
