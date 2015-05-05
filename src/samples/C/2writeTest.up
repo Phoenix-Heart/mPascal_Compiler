@@ -31,7 +31,7 @@ begin
 
         {multi read}
         writeln('input 10, 20, 4, and 100 (without the commas)');
-        read(b,c,d,e); 
+        read(b,c,d,e);
 {END READ STATEMENT}
 
 

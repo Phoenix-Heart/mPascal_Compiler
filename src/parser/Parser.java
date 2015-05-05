@@ -74,6 +74,11 @@ public class Parser {
             return genExpression(record);
         }
         else {
+            try {
+                throw new SemanticException("No record or argument found.");
+            } catch (SemanticException e) {
+                e.printStackTrace();
+            }
             return null;
         }
     }
@@ -575,6 +580,7 @@ public class Parser {
         }
     }
     private void WriteParameterTail(SemanticRecord record) throws ParseException {
+        Argument arg;
         switch (lookahead) {
             case MP_COMMA:
                 parseTree(51);
@@ -1033,9 +1039,9 @@ public class Parser {
             case MP_LPAREN:
                 parseTree(105);
                 matchLookAhead(Token.MP_LPAREN);
-                Expression();
+                arg = Expression();
                 matchLookAhead(Token.MP_RPAREN);
-                break;
+                return arg;
             case MP_INTEGER_LIT:
                 parseTree(99);
                 matchLookAhead(Token.MP_INTEGER_LIT);

@@ -103,6 +103,7 @@ public class SemanticRecord {
             case MP_MINUS:
             case MP_PLUS:
             case MP_TIMES:
+            case MP_MOD:
                 if(leftOperand.getType()==Type.FLOAT || rightOperand.getType()==Type.FLOAT
                         || leftOperand.getType()==Type.FIXED || rightOperand.getType()==Type.FIXED) {
                     type = Type.FLOAT;
