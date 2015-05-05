@@ -623,9 +623,11 @@ public class Parser {
         else if (entry.kind == Kind.VARIABLE) {
             parseTree(54);
             String id = VariableIdentifier();
+            Argument idArg = new Argument(id);
             matchLookAhead(Token.MP_ASSIGN);
-            Expression();
-            analyzer.genAssign(id);
+            Argument ex = Expression();
+            SemanticRecord sr = new SemanticRecord(idArg, Token.MP_ASSIGN, ex );
+            genExpression(sr);
         }
         else {
             throw new ParseException(" (AssignmentStatement) This code should be unreachable.");

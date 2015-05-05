@@ -25,7 +25,7 @@ public class ReadOp extends Operator {
             case FLOAT:
                 return String.format("RDF %s",leftArg);
             case STRING:
-                return String.format("RDF %s",leftArg);
+                return String.format("RDS %s",leftArg);
             default:
                 throw new SemanticException("Unrecognized type: "+leftArg.getType());
         }
