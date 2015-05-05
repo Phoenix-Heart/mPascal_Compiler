@@ -609,10 +609,14 @@ public class Parser {
         try
         {
             entry = stack.getEntry(dispatcher.getLexeme());
+            if(entry.invariant) {
+                throw new ParseException("Attempted to assign a control variable ");
+            }
         } catch (ParseException p)
         {
             throw new ParseException(p.getMessage() + String.format("Line %s, Col %s, Token %s", dispatcher.getLine(), dispatcher.getColumn(), dispatcher.getToken().toString()));
         }
+
         if(entry.kind == Kind.FUNCTION) {
             parseTree(55);
             String id = FunctionIdentifier();
@@ -713,12 +717,14 @@ public class Parser {
         Token op = StepValue();
         Argument endArg = FinalValue();
         String l2 = analyzer.genForMiddle(Cvar, op, endArg, l1);
+        stack.getEntry(Cvar).invariant=true;    // temporarily set variable as invariant
         matchLookAhead(Token.MP_DO);
         Statement();
         analyzer.genForEnd(Cvar, op, l1, l2);
+        stack.getEntry(Cvar).invariant=false;
     }
     private String ControlVariable() throws ParseException {
-
+        // do not allow this value to be changed
         parseTree(62);
         return VariableIdentifier();
     }

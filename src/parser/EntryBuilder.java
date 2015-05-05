@@ -17,6 +17,7 @@ public class EntryBuilder {
     private Mode mode;
     private LinkedList<TableEntry> params;
     public int nest;
+    private boolean invariant;
 
     public EntryBuilder() {
         lexemes = new LinkedList();

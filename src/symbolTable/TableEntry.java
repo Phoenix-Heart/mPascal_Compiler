@@ -15,8 +15,10 @@ public class TableEntry {
     public final int offset;
     public final int nest;
     List<TableEntry> parameters;
+    public boolean invariant;
 
     public TableEntry(String lexeme, int offset, EntryBuilder entry) {
+        invariant = false;
         this.lexeme = lexeme;
         this.type = entry.getType();
         this.kind = entry.getKind();
