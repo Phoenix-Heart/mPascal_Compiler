@@ -1,7 +1,5 @@
 package symbolTable;
 
-import parser.EntryBuilder;
-
 import java.util.List;
 
 /**

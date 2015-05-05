@@ -1,5 +1,6 @@
-package parser;
+package symbolTable;
 
+import parser.ParseException;
 import symbolTable.Kind;
 import symbolTable.Mode;
 import symbolTable.TableEntry;

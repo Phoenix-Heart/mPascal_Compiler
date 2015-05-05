@@ -1,6 +1,5 @@
 package symbolTable;
 
-import parser.EntryBuilder;
 import parser.ParseException;
 
 import java.util.Iterator;
