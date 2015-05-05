@@ -640,8 +640,10 @@ public class Parser {
         String label = analyzer.genIfStart();
         matchLookAhead(Token.MP_THEN);
         Statement();
-        analyzer.genIfEnd(label);
+        String l2 = analyzer.genIfMiddle();
+        analyzer.genIfMiddle2(label);
         OptionalElsePart();
+        analyzer.genIfEnd(l2);
     }
     private void OptionalElsePart() throws ParseException {
 

@@ -102,9 +102,21 @@ public class Analyzer {
         return l1;
     }
 
-    public static void genIfEnd(String l1)
+    public static String genIfMiddle()
+    {
+        String l2 = getLabel();
+        putLine("BR " + l2);
+        return l2;
+    }
+
+    public static void genIfMiddle2(String l1)
     {
         putLine(l1 + ":");
+    }
+
+    public static void genIfEnd(String l2)
+    {
+        putLine(l2 + ":");
     }
 
     public static String genRepeatUntilStart()
@@ -154,12 +166,12 @@ public class Analyzer {
         //end val should be on stack already
         if(step == Token.MP_DOWNTO)
         {
-            putLine("CMPLES");
+            putLine("CMPLTS");
             Argument.decreaseSP();
         }
         else if (step == Token.MP_TO)
         {
-            putLine("CMPGES");
+            putLine("CMPGTS");
             Argument.decreaseSP();
         }
         else
