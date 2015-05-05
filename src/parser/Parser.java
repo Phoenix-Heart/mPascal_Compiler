@@ -874,12 +874,12 @@ public class Parser {
             case MP_DOWNTO:
             case MP_ELSE:
             case MP_END:
-            case MP_OR:
             case MP_THEN:
             case MP_TO:
             case MP_UNTIL:
                 parseTree(84);
                 break;
+            case MP_OR:
             case MP_PLUS:
             case MP_MINUS:
                 parseTree(83);
