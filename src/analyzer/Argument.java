@@ -15,7 +15,17 @@ public class Argument {
     // add literal argument
     public Argument(String lit, Type type) {
         inStack = false;
-        this.symbol = "#"+lit;
+        if(type==Type.BOOLEAN) {
+            if(lit.equalsIgnoreCase("true")) {
+                this.symbol = "#1";
+            }
+            else {
+                this.symbol = "#0";
+            }
+        }
+        else {
+            this.symbol = "#" + lit;
+        }
         this.type = type;
         try {
             genPush();
