@@ -99,7 +99,7 @@ public class SemanticRecord {
     }
 
     private void setReturnType(Token operator) {
-        if(operator==null || leftOperand == null || rightOperand == null)
+        if(operator==null || leftOperand == null)
             return;
         switch (operator) {
             case MP_MINUS:

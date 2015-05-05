@@ -1,0 +1,93 @@
+PUSH D0
+MOV SP D0
+PUSH 0(D0)
+ADD SP #1 SP
+PUSH 1(D0)
+ADD SP #1 SP
+PUSH 2(D0)
+ADD SP #1 SP
+PUSH 3(D0)
+ADD SP #1 SP
+PUSH 4(D0)
+ADD SP #1 SP
+PUSH #"input 5"
+WRTLNS 
+PUSH 4(D0)
+RD 4(D0)
+PUSH #"input 10, 20, 4, and 100 (without the commas)"
+WRTLNS 
+PUSH 3(D0)
+RD 3(D0)
+PUSH 2(D0)
+RD 2(D0)
+PUSH 1(D0)
+RD 1(D0)
+PUSH 0(D0)
+RD 0(D0)
+PUSH #100
+WRTS
+PUSH #": should be 100"
+WRTLNS 
+PUSH #"a = "
+WRTS
+PUSH 4(D0)
+WRTS
+PUSH #": should be 5"
+WRTLNS 
+PUSH #100
+WRTS
+PUSH #": should be 100"
+WRTLNS 
+PUSH 4(D0)
+PUSH 3(D0)
+MULS
+WRTS
+PUSH #": should be 50"
+WRTLNS 
+PUSH 2(D0)
+PUSH 1(D0)
+DIVS
+WRTS
+PUSH #": should be 5"
+WRTLNS 
+PUSH 4(D0)
+PUSH 0(D0)
+MODS
+WRTS
+PUSH #": should be 5"
+WRTLNS 
+PUSH 4(D0)
+PUSH 3(D0)
+ADDS
+WRTS
+PUSH #": should be 15"
+WRTLNS 
+PUSH 2(D0)
+PUSH 3(D0)
+SUBS
+WRTS
+PUSH #": should be 10"
+WRTLNS 
+PUSH #88
+WRTS
+PUSH #": should be 88"
+WRTLNS 
+PUSH #66
+NEGS
+WRTS
+PUSH #": should be -66"
+WRTLNS 
+PUSH 4(D0)
+PUSH 3(D0)
+ADDS
+WRTS
+PUSH #": should be 15"
+WRTLNS 
+PUSH 4(D0)
+PUSH 3(D0)
+ADDS
+NEGS
+WRTS
+PUSH #": should be -15"
+WRTLNS 
+HLT

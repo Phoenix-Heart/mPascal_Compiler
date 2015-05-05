@@ -848,9 +848,11 @@ public class Parser {
         Token token = OptionalSign();
         Argument newArg = Term();
         if(token==Token.MP_MINUS) {   // generate negation
-            SemanticRecord signRecord = new SemanticRecord(newArg, token, null);
+            SemanticRecord signRecord = new SemanticRecord();   // manually define this record
+            signRecord.setLeftOperand(newArg);          // this needs to be done first
             signRecord.setOperator(analyzer.getNeg());  // manually operator to negate
             signRecord.setType(newArg.getType());
+            signRecord.setToken(Token.MP_MINUS);
             newArg = genExpression(signRecord);        // reassign argument
         }
         SemanticRecord record = TermTail();
