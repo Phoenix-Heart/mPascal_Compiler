@@ -72,6 +72,7 @@ public class Argument {
         return stacklevel - stackpointer;
     }
     public void castType(Type type) {
+        // does not cast if both types are fixed and float types.
         if((this.type==Type.FIXED || this.type==Type.FLOAT) && (type==Type.FIXED || type == Type.FLOAT)) {
             return;
         }

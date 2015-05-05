@@ -54,7 +54,7 @@ public class Analyzer {
         opTable.put(Token.MP_LEQUAL, new LequalOp(numTypes));
         opTable.put(Token.MP_LTHAN, new LthanOp(numTypes));
         opTable.put(Token.MP_MINUS, new MinusOp(numTypes));
-        opTable.put(Token.MP_MOD, new ModOp(numTypes));
+        opTable.put(Token.MP_MOD, new ModOp(intType));
         opTable.put(Token.MP_NEQUAL, new NequalOp(numTypes));
         opTable.put(Token.MP_PLUS, new PlusOp(numTypes));
         opTable.put(Token.MP_DIV, new DivOp(intType));
@@ -197,11 +197,6 @@ public class Analyzer {
         }
         putLine("BR " + l1);
         putLine(l2 + ": ");
-    }
-
-    public static void genAssign(String id)
-    {
-        putLine("POP " + getSymbol(id));
     }
 
 

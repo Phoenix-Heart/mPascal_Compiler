@@ -615,22 +615,40 @@ public class Parser {
         }
         if(entry.kind == Kind.FUNCTION) {
             parseTree(55);
-            FunctionIdentifier();
+            String id = FunctionIdentifier();
+            Argument leftArg = new Argument(id);
             matchLookAhead(Token.MP_ASSIGN);
-            Expression();
+            Argument rightArg = Expression();
+            if(rightArg.getType()!=leftArg.getType()) {
+                leftArg.castType(rightArg.getType());
+            }
+            SemanticRecord r = new SemanticRecord(leftArg,Token.MP_ASSIGN, rightArg);
+            try {
+                r.genExpression();
+            } catch (SemanticException e) {
+                e.printStackTrace();
+            }
 
         }
         else if (entry.kind == Kind.VARIABLE) {
             parseTree(54);
             String id = VariableIdentifier();
+            Argument leftArg = new Argument(id);
             matchLookAhead(Token.MP_ASSIGN);
-            Expression();
-            analyzer.genAssign(id);
+            Argument rightArg = Expression();
+            if(rightArg.getType()!=leftArg.getType()) {
+                leftArg.castType(rightArg.getType());
+            }
+            SemanticRecord r = new SemanticRecord(leftArg,Token.MP_ASSIGN, rightArg);
+            try {
+                r.genExpression();
+            } catch (SemanticException e) {
+                e.printStackTrace();
+            }
         }
         else {
             throw new ParseException(" (AssignmentStatement) This code should be unreachable.");
         }
-
     }
     private void IfStatement() throws ParseException {
 
@@ -913,6 +931,7 @@ public class Parser {
             case MP_IDENTIFIER:
             case MP_INTEGER_LIT:
             case MP_FLOAT_LIT:
+            case MP_FIXED_LIT:
             case MP_STRING_LIT:
             case MP_LPAREN:
                 parseTree(87);

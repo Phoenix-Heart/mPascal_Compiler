@@ -1,0 +1,13 @@
+program Tester;
+       var a,b,c,d,e : Float;
+        begin {tester}
+          a:= 5.5;
+          b:= 2;
+          e:= 20;
+          c:= 3e+5;
+          d:= 15.0e-10;
+          writeln( (-d-b) / a * c);
+          writeln(d - a);
+          writeln(a * b * c);
+          writeln(a + b + c + d + e);
+        end. {tester}

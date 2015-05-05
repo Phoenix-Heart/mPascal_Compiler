@@ -15,8 +15,12 @@ public class AssignOp extends Operator {
     @Override
     protected String Op(Argument leftArg, Argument rightArg, String label) throws SemanticException {
         assertValue(leftArg,true);
-        assertValue(rightArg,false);
+        assertValue(rightArg,true);
         assertValue(label,false);
+        if(leftArg.getType()!=rightArg.getType()) {
+
+        }
+
 
         Argument.decreaseSP();
         return String.format("POP %s", leftArg);

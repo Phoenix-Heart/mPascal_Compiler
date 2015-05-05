@@ -1,6 +1,6 @@
 ## Trace File ##
-1 <SystemGoal> ⟶ <Progrm> EOF
-2 <Progrm> ⟶ <ProgramHeading> ; <Block> .
+1 <SystemGoal> ⟶ <Program> EOF
+2 <Program> ⟶ <ProgramHeading> ; <Block> .
 3 <ProgramHeading> ⟶ program <ProgramIdentifier>
 107 <ProgramIdentifier> ⟶ identifier
 4 <Block> ⟶ <VariableDeclarationPart> <ProcedureAndFunctionDeclarationPart> <StatementPart>
