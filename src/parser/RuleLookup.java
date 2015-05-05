@@ -5,8 +5,8 @@ import java.util.Map;
 public class RuleLookup {
     private static final HashMap<Integer, String> rules = new HashMap<Integer, String>();
     static {
-        rules.put(1, "<SystemGoal> ⟶ <Progrm> EOF");
-        rules.put(2, "<Progrm> ⟶ <ProgramHeading> ; <Block> .");
+        rules.put(1, "<SystemGoal> ⟶ <Program> EOF");
+        rules.put(2, "<Program> ⟶ <ProgramHeading> ; <Block> .");
         rules.put(3, "<ProgramHeading> ⟶ program <ProgramIdentifier>");
         rules.put(4, "<Block> ⟶ <VariableDeclarationPart> <ProcedureAndFunctionDeclarationPart> <StatementPart>");
         rules.put(5, "<VariableDeclarationPart> ⟶ var <VariableDeclaration> ; <VariableDeclarationTail>");
