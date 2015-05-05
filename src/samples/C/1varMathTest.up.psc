@@ -13,75 +13,85 @@ ADD SP #1 SP
 PUSH 5(D0)
 ADD SP #1 SP
 PUSH #2
+POP 4(D0)
 PUSH #5
+POP 3(D0)
 PUSH 4(D0)
 PUSH 3(D0)
 ADDS
+POP 5(D0)
 PUSH 3(D0)
 PUSH 4(D0)
 SUBS
+POP 2(D0)
 PUSH 4(D0)
 PUSH 5(D0)
 MULS
+POP 1(D0)
 PUSH 3(D0)
 PUSH 2(D0)
 MULS
-PUSH #'e = '
-WRTS 
+POP 0(D0)
+PUSH #"e = "
+WRTS
 PUSH 1(D0)
-WRTS 
-PUSH #': should be 14'
-WRTLNS #': should be 14'
-PUSH #'f = '
-WRTS 
+WRTS
+PUSH #": should be 14"
+WRTLNS 
+PUSH #"f = "
+WRTS
 PUSH 0(D0)
-WRTS 
-PUSH #': should be 15'
-WRTLNS #': should be 15'
-PUSH #'a = '
-WRTS 
+WRTS
+PUSH #": should be 15"
+WRTLNS 
+PUSH #"a = "
+WRTS
 PUSH 5(D0)
-WRTS 
-PUSH #': should be 7'
-WRTLNS #': should be 7'
+WRTS
+PUSH #": should be 7"
+WRTLNS 
 PUSH 1(D0)
 PUSH 0(D0)
 MODS
-PUSH #'a = '
-WRTS 
+POP 5(D0)
+PUSH #"a = "
+WRTS
 PUSH 5(D0)
-WRTS 
-PUSH #': should be 14'
-WRTLNS #': should be 14'
-PUSH #'b = '
-WRTS 
+WRTS
+PUSH #": should be 14"
+WRTLNS 
+PUSH #"b = "
+WRTS
 PUSH 4(D0)
-WRTS 
-PUSH #': should be 2'
-WRTLNS #': should be 2'
+WRTS
+PUSH #": should be 2"
+WRTLNS 
 PUSH 5(D0)
 PUSH 4(D0)
 DIVS
-PUSH #'b = '
-WRTS 
+POP 4(D0)
+PUSH #"b = "
+WRTS
 PUSH 4(D0)
-WRTS 
-PUSH #': should be 7'
-WRTLNS #': should be 7'
-PUSH #'c = '
-WRTS 
+WRTS
+PUSH #": should be 7"
+WRTLNS 
+PUSH #"c = "
+WRTS
 PUSH 3(D0)
-WRTS 
-PUSH #': should be 5'
-WRTLNS #': should be 5'
+WRTS
+PUSH #": should be 5"
+WRTLNS 
 PUSH 0(D0)
 PUSH 3(D0)
+DIVS
 PUSH 4(D0)
 MULS
-DIVS
-PUSH #'c = '
-WRTS 
+POP 3(D0)
+PUSH #"c = "
+WRTS
 PUSH 3(D0)
-WRTS 
-PUSH #': should be 21'
-WRTLNS #': should be 21'
+WRTS
+PUSH #": should be 21"
+WRTLNS 
+HLT

@@ -1,0 +1,112 @@
+## Trace File ##
+1 <SystemGoal> ⟶ <Progrm> EOF
+2 <Progrm> ⟶ <ProgramHeading> ; <Block> .
+3 <ProgramHeading> ⟶ program <ProgramIdentifier>
+107 <ProgramIdentifier> ⟶ identifier
+4 <Block> ⟶ <VariableDeclarationPart> <ProcedureAndFunctionDeclarationPart> <StatementPart>
+5 <VariableDeclarationPart> ⟶ var <VariableDeclaration> ; <VariableDeclarationTail>
+9 <VariableDeclaration> ⟶ <IdentifierList> : <Type>
+113 <IdentifierList> ⟶ identifier <IdentifierTail>
+115 <IdentifierTail> ⟶ lambda
+10 <Type> ⟶ Integer
+7 <VariableDeclarationTail> ⟶ <VariableDeclaration> ; <VariableDeclarationTail>
+9 <VariableDeclaration> ⟶ <IdentifierList> : <Type>
+113 <IdentifierList> ⟶ identifier <IdentifierTail>
+115 <IdentifierTail> ⟶ lambda
+10 <Type> ⟶ Integer
+8 <VariableDeclarationTail> ⟶ lambda
+16 <ProcedureAndFunctionDeclarationPart> ⟶ lambda
+29 <StatementPart> ⟶ <CompoundStatement>
+30 <CompoundStatement> ⟶ begin <StatementSequence> end
+31 <StatementSequence> ⟶ <Statement> <StatementTail>
+36 <Statement> ⟶ <ReadStatement>
+45 <ReadStatement> ⟶ read ( <ReadParameter> <ReadParameterTail> )
+48 <ReadParameter> ⟶ <VariableIdentifier>
+108 <VariableIdentifier> ⟶ identifier
+47 <ReadParameterTail> ⟶ lambda
+32 <StatementTail> ⟶ ; <Statement> <StatementTail>
+42 <Statement> ⟶ <ForStatement>
+61 <ForStatement> ⟶ for <ControlVariable> := <InitialValue> <StepValue> <FinalValue> do <Statement>
+62 <ControlVariable> ⟶ <VariableIdentifier>
+108 <VariableIdentifier> ⟶ identifier
+63 <InitialValue> ⟶ <OrdinalExpression>
+112 <OrdinalExpression> ⟶ <Expression>
+73 <Expression> ⟶ <SimpleExpression> <OptionalRelationalPart>
+82 <SimpleExpression> ⟶ <OptionalSign> <Term> <TermTail>
+87 <OptionalSign> ⟶ lambda
+91 <Term> ⟶ <Factor> <FactorTail>
+99 <Factor> ⟶ unsignedInteger
+93 <FactorTail> ⟶ lambda
+84 <TermTail> ⟶ lambda
+75 <OptionalRelationalPart> ⟶ lambda
+64 <StepValue> ⟶ to
+66 <FinalValue> ⟶ <OrdinalExpression>
+112 <OrdinalExpression> ⟶ <Expression>
+73 <Expression> ⟶ <SimpleExpression> <OptionalRelationalPart>
+82 <SimpleExpression> ⟶ <OptionalSign> <Term> <TermTail>
+87 <OptionalSign> ⟶ lambda
+91 <Term> ⟶ <Factor> <FactorTail>
+116 <Factor> ⟶ <VariableIdentifier>
+108 <VariableIdentifier> ⟶ identifier
+93 <FactorTail> ⟶ lambda
+84 <TermTail> ⟶ lambda
+75 <OptionalRelationalPart> ⟶ lambda
+37 <Statement> ⟶ <WriteStatement>
+49 <WriteStatement> ⟶ write ( <WriteParameter> <WriteParameterTail> )
+53 <WriteParameter> ⟶ <OrdinalExpression>
+112 <OrdinalExpression> ⟶ <Expression>
+73 <Expression> ⟶ <SimpleExpression> <OptionalRelationalPart>
+82 <SimpleExpression> ⟶ <OptionalSign> <Term> <TermTail>
+87 <OptionalSign> ⟶ lambda
+91 <Term> ⟶ <Factor> <FactorTail>
+116 <Factor> ⟶ <VariableIdentifier>
+108 <VariableIdentifier> ⟶ identifier
+93 <FactorTail> ⟶ lambda
+84 <TermTail> ⟶ lambda
+75 <OptionalRelationalPart> ⟶ lambda
+52 <WriteParameterTail> ⟶ lambda
+32 <StatementTail> ⟶ ; <Statement> <StatementTail>
+42 <Statement> ⟶ <ForStatement>
+61 <ForStatement> ⟶ for <ControlVariable> := <InitialValue> <StepValue> <FinalValue> do <Statement>
+62 <ControlVariable> ⟶ <VariableIdentifier>
+108 <VariableIdentifier> ⟶ identifier
+63 <InitialValue> ⟶ <OrdinalExpression>
+112 <OrdinalExpression> ⟶ <Expression>
+73 <Expression> ⟶ <SimpleExpression> <OptionalRelationalPart>
+82 <SimpleExpression> ⟶ <OptionalSign> <Term> <TermTail>
+87 <OptionalSign> ⟶ lambda
+91 <Term> ⟶ <Factor> <FactorTail>
+99 <Factor> ⟶ unsignedInteger
+93 <FactorTail> ⟶ lambda
+84 <TermTail> ⟶ lambda
+75 <OptionalRelationalPart> ⟶ lambda
+65 <StepValue> ⟶ downto
+66 <FinalValue> ⟶ <OrdinalExpression>
+112 <OrdinalExpression> ⟶ <Expression>
+73 <Expression> ⟶ <SimpleExpression> <OptionalRelationalPart>
+82 <SimpleExpression> ⟶ <OptionalSign> <Term> <TermTail>
+87 <OptionalSign> ⟶ lambda
+91 <Term> ⟶ <Factor> <FactorTail>
+116 <Factor> ⟶ <VariableIdentifier>
+108 <VariableIdentifier> ⟶ identifier
+93 <FactorTail> ⟶ lambda
+84 <TermTail> ⟶ lambda
+75 <OptionalRelationalPart> ⟶ lambda
+37 <Statement> ⟶ <WriteStatement>
+49 <WriteStatement> ⟶ write ( <WriteParameter> <WriteParameterTail> )
+53 <WriteParameter> ⟶ <OrdinalExpression>
+112 <OrdinalExpression> ⟶ <Expression>
+73 <Expression> ⟶ <SimpleExpression> <OptionalRelationalPart>
+82 <SimpleExpression> ⟶ <OptionalSign> <Term> <TermTail>
+87 <OptionalSign> ⟶ lambda
+91 <Term> ⟶ <Factor> <FactorTail>
+116 <Factor> ⟶ <VariableIdentifier>
+108 <VariableIdentifier> ⟶ identifier
+93 <FactorTail> ⟶ lambda
+84 <TermTail> ⟶ lambda
+75 <OptionalRelationalPart> ⟶ lambda
+52 <WriteParameterTail> ⟶ lambda
+32 <StatementTail> ⟶ ; <Statement> <StatementTail>
+34 <Statement> ⟶ <EmptyStatement>
+44 <EmptyStatement> ⟶ lambda
+33 <StatementTail> ⟶ lambda

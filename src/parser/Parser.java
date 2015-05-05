@@ -855,13 +855,12 @@ public class Parser {
             signRecord.setToken(Token.MP_MINUS);
             newArg = genExpression(signRecord);        // reassign argument
         }
-        SemanticRecord record = TermTail();
-        return getNextArg(newArg, record);
+        return TermTail(newArg);
     }
-    private SemanticRecord TermTail() throws ParseException {
+    private Argument TermTail(Argument leftArg) throws ParseException {
         Token op;
         SemanticRecord record;
-        Argument leftArg, rightArg;
+        Argument rightArg;
         switch (lookahead) {
             case MP_COMMA:
             case MP_SCOLON:
@@ -886,14 +885,20 @@ public class Parser {
             case MP_MINUS:
                 parseTree(83);
                 op = AddingOperator();
-                leftArg= Term();
-                record = TermTail();
-                rightArg = getNextArg(leftArg,record);   // generates expression if applicable and gets the next rightArg
-                return new SemanticRecord(op,rightArg);
+                rightArg= Term();
+                record = new SemanticRecord(leftArg,op,rightArg);
+                try {
+                    leftArg = record.genExpression();
+                } catch (SemanticException e) {
+                    e.printStackTrace();
+                }
+                return TermTail(leftArg);
+                //rightArg = getNextArg(leftArg,record);   // generates expression if applicable and gets the next rightArg
+                //return new SemanticRecord(op,rightArg);
             default:
                 LL1error();
         }
-        return null;
+        return leftArg;
     }
 
     // section written by Hunter
@@ -946,10 +951,9 @@ public class Parser {
     private Argument Term() throws ParseException {
         parseTree(91);
         Argument leftArg = Factor();
-        SemanticRecord record = FactorTail();
-        return getNextArg(leftArg,record);   // generates expression if applicable and gets the next rightArg
+        return FactorTail(leftArg);
     }
-    private SemanticRecord FactorTail() throws ParseException
+    private Argument FactorTail(Argument leftArg) throws ParseException
     {
         switch(lookahead){
             case MP_FLOAT_DIVIDE:
@@ -959,10 +963,14 @@ public class Parser {
             case MP_AND:
                 parseTree(92);
                 Token op = MultiplyingOperator();
-                Argument newArg = Factor();
-                SemanticRecord record = FactorTail();
-                Argument nextArg = getNextArg(newArg, record);   // generates expression if applicable and gets the next rightArg
-                return new SemanticRecord(op, nextArg);         // returns a record with missing leftArg
+                Argument rightArg = Factor();
+                SemanticRecord r = new SemanticRecord(leftArg, op, rightArg);
+                try {
+                    leftArg = r.genExpression();
+                } catch (SemanticException e) {
+                    e.printStackTrace();
+                }
+                return FactorTail(leftArg);
             case MP_DO:
             case MP_DOWNTO:
             case MP_ELSE:
@@ -987,7 +995,7 @@ public class Parser {
             default:
                 LL1error();
         }
-        return null;
+        return leftArg;
     }
     private Token MultiplyingOperator() throws ParseException
     {

@@ -1,19 +1,11 @@
 program Tester;
-       var I: Integer;
+       var a,b,c,d : Integer;
         begin {tester}
-          Writeln; Writeln;
-          Write('Please enter an integer value for I: ');
-          Read(I);
-          I := I + 1;      {int lit test}
-          m := m + 1.25;   {fixed lit test}
-          m := m + 1.5e+2; {float lit test}
-          {test keywords}
-          and beGin Boolean div do downto else end FALSE fixed Float for function
-          if integer mod not or procedure program read repeat string then true to
-          type until var while write writeln
-          {test operators}
-          := : , = / >= > <= ( < - <> . + ) ; *
-          Writeln('The current value of I is, I:0); {run string test}
-          Writeln; Writeln;
-
+          a:= 5;
+          b:= 2;
+          c:= 3;
+          d:= 150;
+          writeln( d div a div c); {5}
+          writeln(d mod a); {0}
+          writeln(a mod b mod c); {1}
         end. {tester}
