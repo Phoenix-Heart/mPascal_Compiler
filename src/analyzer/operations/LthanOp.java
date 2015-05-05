@@ -15,6 +15,11 @@ public class LthanOp extends StackOperator {
         assertValue(rightArg, true);
         assertValue(label, false);
         Argument.decreaseSP();
-        return "CMPLTS";
+        if(leftArg.getType()==Type.FIXED || leftArg.getType()==Type.FLOAT) {
+            return "CMPLTSF";
+        }
+        else {
+            return "CMPLTS";
+        }
     }
 }

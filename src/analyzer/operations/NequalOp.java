@@ -15,6 +15,11 @@ public class NequalOp extends StackOperator {
         assertValue(rightArg, true);
         assertValue(label, false);
         Argument.decreaseSP();
-        return null;
+        if(leftArg.getType()==Type.FIXED || leftArg.getType()==Type.FLOAT) {
+            return "CMPNESF";
+        }
+        else {
+            return "CMPNES";
+        }
     }
 }

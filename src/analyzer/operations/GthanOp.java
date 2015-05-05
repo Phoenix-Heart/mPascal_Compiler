@@ -15,6 +15,11 @@ public class GthanOp extends StackOperator {
         assertValue(rightArg, true);
         assertValue(label, false);
         Argument.decreaseSP();
-        return "CMPGTS";
+        if(leftArg.getType()==Type.FIXED || leftArg.getType()==Type.FLOAT) {
+            return "CMPGTSF";
+        }
+        else {
+            return "CMPGTS";
+        }
     }
 }

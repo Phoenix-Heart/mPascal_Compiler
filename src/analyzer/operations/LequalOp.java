@@ -15,6 +15,11 @@ public class LequalOp extends StackOperator {
         assertValue(rightArg, true);
         assertValue(label, false);
         Argument.decreaseSP();
-        return "CMPLES";
+        if(leftArg.getType()==Type.FIXED || leftArg.getType()==Type.FLOAT) {
+            return "CMPLESF";
+        }
+        else {
+            return "CMPLES";
+        }
     }
 }

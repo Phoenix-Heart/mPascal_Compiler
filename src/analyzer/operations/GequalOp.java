@@ -15,6 +15,11 @@ public class GequalOp extends StackOperator {
         assertValue(rightArg, true);
         assertValue(label, false);
         Argument.decreaseSP();
-        return "CMPGES";
+        if(leftArg.getType()==Type.FIXED || leftArg.getType()==Type.FLOAT) {
+            return "CMPGESF";
+        }
+        else {
+            return "CMPGES";
+        }
     }
 }
