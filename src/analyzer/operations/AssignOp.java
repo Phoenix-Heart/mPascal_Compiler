@@ -14,6 +14,7 @@ public class AssignOp extends Operator {
     }
     @Override
     protected String Op(Argument leftArg, Argument rightArg, String label) throws SemanticException {
+
         assertValue(leftArg,true);
         assertValue(rightArg,true);
         assertValue(label,false);
