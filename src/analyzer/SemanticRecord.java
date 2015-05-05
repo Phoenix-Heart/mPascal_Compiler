@@ -87,9 +87,11 @@ public class SemanticRecord {
 
     public void genCasts() {
         if(type!=Type.BOOLEAN && type!=null) {
+            if(rightOperand!=null)
             if (rightOperand.getType() != type) {
                 rightOperand.castType(type);
             }
+            if(leftOperand!=null)
             if (leftOperand.getType() != type) {
                 leftOperand.castType(type);
             }
@@ -97,7 +99,7 @@ public class SemanticRecord {
     }
 
     private void setReturnType(Token operator) {
-        if(operator==null)
+        if(operator==null || leftOperand == null || rightOperand == null)
             return;
         switch (operator) {
             case MP_MINUS:
