@@ -128,7 +128,7 @@ public class Analyzer {
 
     public static void genRepeatUntilEnd(String l1)
     {
-        putLine("BRTS " + l1);
+        putLine("BRFS " + l1);
     }
 
     public static ArrayList<String> genWhileStart()
